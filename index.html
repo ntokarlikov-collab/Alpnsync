@@ -13,9 +13,8 @@
         .progress-glow { animation: progress-glow 1.5s ease-in-out infinite; }
     </style>
 </head>
-<body class="bg-[#05070c] text-slate-100 font-sans antialiased">
+<body class="bg-[#05070c] text-slate-100 font-sans antialiased bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#05070c] to-[#010204]">
 
-    <!-- NAV -->
     <nav class="border-b border-slate-800/80 bg-[#05070b]/80 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 group cursor-pointer">
@@ -37,7 +36,6 @@
         </div>
     </nav>
 
-    <!-- API PANEL -->
     <div id="devPanel" class="hidden bg-[#05070b] border-b border-amber-500/20 p-6 font-mono text-xs">
         <div class="max-w-3xl mx-auto">
             <div class="flex justify-between items-center mb-3">
@@ -53,7 +51,6 @@
         </div>
     </div>
 
-    <!-- HERO -->
     <header class="relative overflow-hidden py-32 bg-[url('https://images.unsplash.com/photo-1549441617-64906f343a4a?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center border-b border-slate-900">
         <div class="absolute inset-0 bg-gradient-to-b from-[#05070c]/60 via-[#05070c]/80 to-[#05070c]"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
@@ -65,7 +62,6 @@
         </div>
     </header>
 
-    <!-- THE PROBLEM -->
     <section id="problem" class="py-20 bg-[#05070b] border-b border-slate-800/50">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-10">
@@ -92,7 +88,6 @@
         </div>
     </section>
 
-    <!-- DASHBOARD -->
     <section id="dashboard" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div class="text-center max-w-3xl mx-auto mb-10">
             <h2 class="text-3xl font-black text-white tracking-tight uppercase">The Multi-Modal Control Center</h2>
@@ -116,7 +111,6 @@
 
             <div class="p-6 grid lg:grid-cols-3 gap-6">
 
-                <!-- LEFT: Parameters -->
                 <div class="space-y-6">
                     <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner">
                         <h4 class="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-4 flex items-center justify-between">
@@ -163,11 +157,10 @@
                                     <option value="Glacier Mountaineering">High Glacial Traverse</option>
                                 </select>
                             </div>
-                            <!-- NEW: Budget + Group Size -->
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1.5">Budget / Person (EUR)</label>
-                                    <input type="number" id="paramBudget" placeholder="e.g. 120" min="20" class="w-full bg-[#05070b] border border-slate-800 rounded-lg p-2.5 text-white font-medium focus:outline-none focus:border-sky-500 transition-colors">
+                                    <input type="number" id="paramBudget" value="150" min="20" class="w-full bg-[#05070b] border border-slate-800 rounded-lg p-2.5 text-white font-medium focus:outline-none focus:border-sky-500 transition-colors">
                                 </div>
                                 <div>
                                     <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1.5">Group Size</label>
@@ -177,4 +170,174 @@
                             <div>
                                 <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1.5">Group Skill Level</label>
                                 <select id="paramSkill" class="w-full bg-[#05070b] border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-sky-500 transition-colors">
-                                    <option value="Mixed">Mixed — includes beginners</option
+                                    <option value="Mixed">Mixed — includes beginners</option>
+                                    <option value="Intermediate">Intermediate — solid proficiency</option>
+                                    <option value="Expert">Expert — high technical mastery</option>
+                                </select>
+                            </div>
+                            <button onclick="runEngine()" id="engineBtn" class="w-full mt-2 bg-gradient-to-r from-sky-500 to-blue-500 text-slate-950 font-black py-3 rounded-lg text-xs uppercase tracking-widest transition shadow-lg shadow-sky-500/10 hover:shadow-sky-500/20 active:scale-[0.99] flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-circle-nodes"></i> Compute Expedition Route
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner">
+                        <h4 class="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-3 flex items-center justify-between">
+                            <span><i class="fa-solid fa-satellite-dish text-amber-400 mr-1.5"></i> Telemetry Matrix</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                        </h4>
+                        <div class="space-y-2.5 font-mono text-xs">
+                            <div class="flex justify-between p-2.5 bg-[#05070b] rounded-lg border border-slate-800">
+                                <span class="text-slate-500">EAWS Avalanche Index:</span>
+                                <span id="hudEaws" class="text-emerald-400 font-bold">Level 1 (Low)</span>
+                            </div>
+                            <div class="flex justify-between p-2.5 bg-[#05070b] rounded-lg border border-slate-800">
+                                <span class="text-slate-500">Mean Basin Snow Depth:</span>
+                                <span id="hudSnow" class="text-white">180 cm</span>
+                            </div>
+                            <div class="flex justify-between p-2.5 bg-[#05070b] rounded-lg border border-slate-800">
+                                <span class="text-slate-500">Isothermal Limit:</span>
+                                <span id="hudFreeze" class="text-white">1,950 m</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner font-mono text-xs">
+                        <h4 class="text-[11px] font-sans font-black tracking-widest text-slate-400 uppercase mb-2.5 flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-emerald-400"></i> Background System Pipeline Execution
+                        </h4>
+                        <div id="logConsole" class="bg-[#05070b] p-3 rounded-lg border border-slate-800 h-28 overflow-y-auto space-y-1.5 text-slate-400 scrollbar-thin">
+                            <div class="text-slate-600">> Core matrix operating nominal. Awaiting cluster initialization parameters...</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-[11px] font-black tracking-widest text-slate-400 uppercase"><i class="fa-solid fa-map-location-dot text-sky-400 mr-1.5"></i> Dynamic Path & Route Itinerary Matrix</h4>
+                            <span id="matchRate" class="text-[10px] bg-slate-950 text-slate-500 px-2.5 py-0.5 rounded-md font-mono border border-slate-800">0% Calibration</span>
+                        </div>
+                        <div id="itineraryContainer" class="space-y-4 min-h-[140px] flex flex-col justify-center text-center p-6 bg-[#05070b]/30 rounded-xl border border-dashed border-slate-800/80 transition-all duration-300">
+                            <p class="text-slate-500 text-xs font-medium">Configure metrics and select an objective to generate full multi-modal travel maps with verified transfers.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner">
+                        <h4 class="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-3"><i class="fa-solid fa-boxes-packing text-indigo-400 mr-1.5"></i> Automated Gear Contingency Registry</h4>
+                        <div id="gearGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-slate-400">
+                            <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Avalanche Beacon</div>
+                            <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Shovel & Probe</div>
+                            <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> First Aid Kit</div>
+                            <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Thermal Bivy</div>
+                        </div>
+                    </div>
+
+                    <div id="hitlContainer" class="hidden bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/20 p-5 rounded-xl transition-all duration-300">
+                        <div class="flex gap-4 items-start">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-base shadow"><i class="fa-solid fa-user-shield"></i></div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-black text-white uppercase tracking-wider">Required Human Operator Validation Gate</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">The AI-native layer has matched connections and safety indexes. Before booking access, the **Student Trip Leader** must manually certify that all participating club members possess validated alpine competency signatures.</p>
+                                <div class="mt-4 flex items-center justify-between gap-4 flex-wrap pt-3 border-t border-slate-800/40">
+                                    <label class="inline-flex items-center gap-2.5 text-xs text-slate-300 font-mono cursor-pointer select-none">
+                                        <input type="checkbox" id="hitlCheck" onchange="toggleBookingBtn()" class="rounded bg-slate-950 border-slate-800 text-sky-500 focus:ring-0 focus:ring-offset-0 w-4 h-4">
+                                        I certify team technical proficiency & safety checklists.
+                                    </label>
+                                    <button id="bookBtn" disabled onclick="triggerSuccess()" class="bg-slate-900 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all duration-200">Execute Consolidated Ledger Bookings</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-slate-900 bg-[#05070b] py-10 text-center text-[11px] font-mono text-slate-500 tracking-wider uppercase">
+        <p>© 2026 AlpenSync Automated Platforms. Optimized for Academic Evaluation Pipelines.</p>
+        <p class="mt-2 text-slate-600 tracking-normal normal-case">All metrics follow European avalanche bulletins (EAWS) and standardized metric spatial systems.</p>
+    </footer>
+
+    <script>
+        function toggleDevPanel() {
+            document.getElementById('devPanel').classList.toggle('hidden');
+        }
+
+        function saveApiKey() {
+            const val = document.getElementById('apiKeyInput').value.trim();
+            if(val) {
+                sessionStorage.setItem('anthropic_key', val);
+                document.getElementById('apiStatus').innerHTML = "Runtime Mode: <span class='text-emerald-400 font-bold'>Live Claude 3.5 Network Engine Active</span>";
+                alert("Neural pipeline linked securely. Live generation sequence unlocked.");
+                toggleDevPanel();
+            } else {
+                sessionStorage.removeItem('anthropic_key');
+                document.getElementById('apiStatus').innerText = "Runtime Mode: Local Static Workflow Simulation";
+            }
+        }
+
+        function toggleBookingBtn() {
+            const chk = document.getElementById('hitlCheck');
+            const btn = document.getElementById('bookBtn');
+            if(chk.checked) {
+                btn.removeAttribute('disabled');
+                btn.className = "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all duration-200 shadow-lg shadow-emerald-500/10 cursor-pointer";
+            } else {
+                btn.setAttribute('disabled', 'true');
+                btn.className = "bg-slate-900 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all duration-200";
+            }
+        }
+
+        function adjustGearMatrix() {
+            const obj = document.getElementById('paramObjective').value;
+            const grid = document.getElementById('gearGrid');
+            let baseItems = `
+                <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> First Aid Kit</div>
+                <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Thermal Bivy</div>`;
+            
+            if (obj === "Ski Touring") {
+                grid.innerHTML = baseItems + `
+                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Avalanche Beacon</div>
+                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Shovel & Probe</div>`;
+            } else if (obj === "Alpinism") {
+                grid.innerHTML = baseItems + `
+                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Dynamic Rope 50m</div>
+                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Steel Crampons</div>`;
+            } else if (obj === "Ice Climbing") {
+                grid.innerHTML = baseItems + `
+                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Technical Ice Tools</div>
+                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Ice Screw Set</div>`;
+            } else {
+                grid.innerHTML = baseItems + `
+                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Crevasse Haul Kit</div>
+                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Harness & Carabiners</div>`;
+            }
+        }
+
+        // Global Static Simulation Engine Database
+        const routeData = {
+            "Zermatt": { name: "Zermatt (Matterhorn Axis)", eaws: "Level 1 (Low Danger)", snow: "195 cm", freeze: "2,100 m" },
+            "Chamonix": { name: "Chamonix-Mont-Blanc Valley", eaws: "Level 2 (Moderate)", snow: "240 cm", freeze: "1,750 m" },
+            "Verbier": { name: "Verbier (4 Vallées Sector)", eaws: "Level 2 (Moderate)", snow: "185 cm", freeze: "1,900 m" },
+            "StAnton": { name: "St. Anton am Arlberg Hub", eaws: "Level 3 (Considerable)", snow: "265 cm", freeze: "1,450 m" },
+            "Grindelwald": { name: "Grindelwald (Eiger Cluster)", eaws: "Level 1 (Low Danger)", snow: "160 cm", freeze: "2,250 m" },
+            "Cortina": { name: "Cortina d'Ampezzo (Dolomites)", eaws: "Level 2 (Moderate)", snow: "140 cm", freeze: "2,300 m" }
+        };
+
+        async function runEngine() {
+            const origin = document.getElementById('paramOrigin').value;
+            const dest = document.getElementById('paramDestination').value;
+            const mode = document.getElementById('paramTravelMode').value;
+            const objective = document.getElementById('paramObjective').value;
+            const budget = document.getElementById('paramBudget').value || 150;
+            const groupSize = document.getElementById('paramGroupSize').value || 6;
+            const skill = document.getElementById('paramSkill').value;
+            
+            const consoleBox = document.getElementById('logConsole');
+            const btn = document.getElementById('engineBtn');
+            
+            btn.setAttribute('disabled', 'true');
+            btn.innerHTML = "<i class='fa-solid fa-rotate animate-spin'></i> Running Neural Mapping Vectors...";
+            consoleBox.innerHTML = `<div class="text-sky-400">> Initiating routing
