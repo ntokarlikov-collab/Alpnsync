@@ -9,17 +9,20 @@
     <style>
         @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .animate-pulse-slow { animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes progress-glow { 0%, 100% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.4); } 50% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.9); } }
+        .progress-glow { animation: progress-glow 1.5s ease-in-out infinite; }
     </style>
 </head>
 <body class="bg-[#05070c] text-slate-100 font-sans antialiased">
 
+    <!-- NAV -->
     <nav class="border-b border-slate-800/80 bg-[#05070b]/80 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 group cursor-pointer">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20 group-hover:rotate-12 transition-transform duration-300">
                     <i class="fa-solid fa-mountain-snow text-slate-950 text-lg"></i>
                 </div>
-                <span class="font-black text-xl tracking-wider text-white">ALPEN<span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-400">SYNC</span><span class="text-[9px] font-mono tracking-normal text-sky-500 bg-sky-500/10 border border-sky-500/20 px-1.5 py-0.5 rounded-md ml-2 align-middle">OS 2.5</span></span>
+                <span class="font-black text-xl tracking-wider text-white">ALPEN<span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-400">SYNC</span><span class="text-[9px] font-mono tracking-normal text-sky-500 bg-sky-500/10 border border-sky-500/20 px-1.5 py-0.5 rounded-md ml-2 align-middle">OS 2.6</span></span>
             </div>
             <div class="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-widest text-slate-400">
                 <a href="#problem" class="hover:text-sky-400 transition-colors">The Problem</a>
@@ -34,17 +37,14 @@
         </div>
     </nav>
 
+    <!-- API PANEL -->
     <div id="devPanel" class="hidden bg-[#05070b] border-b border-amber-500/20 p-6 font-mono text-xs">
         <div class="max-w-3xl mx-auto">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-amber-400 font-bold flex items-center gap-2 tracking-wider uppercase">
-                    <i class="fa-solid fa-shield-halved"></i> Cloud Secure API Linkage
-                </h3>
+                <h3 class="text-amber-400 font-bold flex items-center gap-2 tracking-wider uppercase"><i class="fa-solid fa-shield-halved"></i> Cloud Secure API Linkage</h3>
                 <button onclick="toggleDevPanel()" class="text-slate-500 hover:text-slate-300 text-sm">✕</button>
             </div>
-            <p class="text-slate-400 mb-4 leading-relaxed">
-                Paste your Anthropic API token directly to local runtime cache for live Claude generations. Credentials never persist on GitHub instances.
-            </p>
+            <p class="text-slate-400 mb-4 leading-relaxed">Paste your Anthropic API token directly to local runtime cache for live Claude generations. Credentials never persist on GitHub instances.</p>
             <div class="flex flex-col sm:flex-row gap-3">
                 <input type="password" id="apiKeyInput" placeholder="Enter Claude Auth Token (sk-ant-...)" class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 flex-1 focus:outline-none focus:border-sky-500 font-mono text-xs shadow-inner">
                 <button onclick="saveApiKey()" class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-5 py-2.5 rounded-xl uppercase tracking-wider hover:brightness-110 transition shadow-lg shadow-amber-500/10">Initialize API</button>
@@ -53,21 +53,46 @@
         </div>
     </div>
 
+    <!-- HERO -->
     <header class="relative overflow-hidden py-32 bg-[url('https://images.unsplash.com/photo-1549441617-64906f343a4a?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center border-b border-slate-900">
         <div class="absolute inset-0 bg-gradient-to-b from-[#05070c]/60 via-[#05070c]/80 to-[#05070c]"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
             <span class="inline-flex items-center gap-2 py-1 px-3.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-sky-400/10 text-sky-400 border border-sky-400/20 mb-8 animate-pulse-slow backdrop-blur-md">
                 <span class="w-1.5 h-1.5 rounded-full bg-sky-400 inline-block"></span> Switzerland Expedition Hub Configured
             </span>
-            <h1 class="text-4xl sm:text-7xl font-black text-white tracking-tight max-w-5xl mx-auto leading-[1.1] mb-6 drop-shadow-md">
-                Swiss Alpine Engine for Student Expeditions
-            </h1>
-            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed drop-shadow">
-                Real-time transit vectorization, micro-climate evaluations, and safety calculations engineered for the spirit of European alpinism and backcountry touring.
-            </p>
+            <h1 class="text-4xl sm:text-7xl font-black text-white tracking-tight max-w-5xl mx-auto leading-[1.1] mb-6 drop-shadow-md">Swiss Alpine Engine for Student Expeditions</h1>
+            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed drop-shadow">Real-time transit vectorization, micro-climate evaluations, and safety calculations engineered for the spirit of European alpinism and backcountry touring.</p>
         </div>
     </header>
 
+    <!-- THE PROBLEM -->
+    <section id="problem" class="py-20 bg-[#05070b] border-b border-slate-800/50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl font-black text-white uppercase tracking-tight">Why This Exists</h2>
+                <p class="mt-2 text-slate-400 text-sm">The three problems every university alpine club faces and nobody solves.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="p-6 bg-slate-900/50 rounded-2xl border border-slate-800/60">
+                    <div class="text-3xl mb-3">💸</div>
+                    <h3 class="text-sm font-black text-white uppercase tracking-wider mb-2">Budget Fragmentation</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Students cross-reference 6–10 booking platforms manually. Train prices change hourly. One missed connection collapses the entire plan — with no warning.</p>
+                </div>
+                <div class="p-6 bg-slate-900/50 rounded-2xl border border-slate-800/60">
+                    <div class="text-3xl mb-3">⚠️</div>
+                    <h3 class="text-sm font-black text-white uppercase tracking-wider mb-2">Avalanche Data Overload</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">EAWS bulletins, ZAMG models, and regional reports all use different formats. Students with no meteorological training must make safety calls with no structured support.</p>
+                </div>
+                <div class="p-6 bg-slate-900/50 rounded-2xl border border-slate-800/60">
+                    <div class="text-3xl mb-3">📋</div>
+                    <h3 class="text-sm font-black text-white uppercase tracking-wider mb-2">No Accountability Trail</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">University sports officers require documented risk assessments for insurance. No tool produces a signed, auditable safety artifact that a Trip Leader can actually defend.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DASHBOARD -->
     <section id="dashboard" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div class="text-center max-w-3xl mx-auto mb-10">
             <h2 class="text-3xl font-black text-white tracking-tight uppercase">The Multi-Modal Control Center</h2>
@@ -76,8 +101,8 @@
 
         <div class="bg-slate-950/70 backdrop-blur-xl rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl relative">
             <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky-500/20 to-transparent"></div>
-            
-            <div class="bg-[#05070b]/90 px-5 py-4 border-b border-slate-800/80 flex items-center justify-between">
+
+            <div class="bg-[#05070b]/90 px-5 py-4 border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block"></span>
                     <span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block"></span>
@@ -90,12 +115,13 @@
             </div>
 
             <div class="p-6 grid lg:grid-cols-3 gap-6">
-                
+
+                <!-- LEFT: Parameters -->
                 <div class="space-y-6">
                     <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner">
                         <h4 class="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-4 flex items-center justify-between">
                             <span><i class="fa-solid fa-sliders text-sky-400 mr-1.5"></i> Parameters</span>
-                            <span class="text-[9px] font-mono text-slate-500 lowercase">v2.5</span>
+                            <span class="text-[9px] font-mono text-slate-500 lowercase">v2.6</span>
                         </h4>
                         <div class="space-y-4 text-xs">
                             <div>
@@ -124,8 +150,8 @@
                             <div>
                                 <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1.5">Routing Optimization Priority</label>
                                 <select id="paramTravelMode" class="w-full bg-[#05070b] border border-slate-800 rounded-lg p-2.5 text-sky-400 font-bold focus:outline-none focus:border-sky-500 transition-colors">
-                                    <option value="Preferred">Preferred (High-Speed EuroCity / TGV + Express Links)</option>
-                                    <option value="Affordable">Most Affordable (FlixBus Matrix + Regional Rail Loops)</option>
+                                    <option value="Preferred">Preferred (High-Speed EuroCity / TGV + Express)</option>
+                                    <option value="Affordable">Most Affordable (FlixBus + Regional Rail Loops)</option>
                                 </select>
                             </div>
                             <div>
@@ -137,303 +163,18 @@
                                     <option value="Glacier Mountaineering">High Glacial Traverse</option>
                                 </select>
                             </div>
-                            <button onclick="runEngine()" id="engineBtn" class="w-full mt-2 bg-gradient-to-r from-sky-500 to-blue-500 text-slate-950 font-black py-3 rounded-lg text-xs uppercase tracking-widest transition shadow-lg shadow-sky-500/10 hover:shadow-sky-500/20 active:scale-[0.99] flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-circle-nodes"></i> Compute Expedition Route
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner">
-                        <h4 class="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-3 flex items-center justify-between">
-                            <span><i class="fa-solid fa-satellite-dish text-amber-400 mr-1.5"></i> Telemetry Matrix</span>
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block shadow-sm shadow-emerald-500/50"></span>
-                        </h4>
-                        <div class="space-y-2.5 font-mono text-xs">
-                            <div class="flex justify-between p-2.5 bg-[#05070b] rounded-lg border border-slate-800">
-                                <span class="text-slate-500">EAWS Avalanche Index:</span>
-                                <span id="hudEaws" class="text-emerald-400 font-bold">Level 1 (Low)</span>
-                            </div>
-                            <div class="flex justify-between p-2.5 bg-[#05070b] rounded-lg border border-slate-800">
-                                <span class="text-slate-500">Mean Basin Snow Depth:</span>
-                                <span id="hudSnow" class="text-white">180 cm</span>
-                            </div>
-                            <div class="flex justify-between p-2.5 bg-[#05070b] rounded-lg border border-slate-800">
-                                <span class="text-slate-500">Isothermal Limit:</span>
-                                <span id="hudFreeze" class="text-white">1,950 m</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-2 space-y-6">
-                    
-                    <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner font-mono text-xs">
-                        <h4 class="text-[11px] font-sans font-black tracking-widest text-slate-400 uppercase mb-2.5 flex items-center gap-2">
-                            <i class="fa-solid fa-terminal text-emerald-400"></i> Background System Pipeline Execution
-                        </h4>
-                        <div id="logConsole" class="bg-[#05070b] p-3 rounded-lg border border-slate-800 h-28 overflow-y-auto space-y-1.5 text-slate-400 scrollbar-thin">
-                            <div class="text-slate-600">> Core matrix operating nominal. Awaiting cluster initialization parameters...</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner">
-                        <div class="flex justify-between items-center mb-4">
-                            <h4 class="text-[11px] font-black tracking-widest text-slate-400 uppercase"><i class="fa-solid fa-map-location-dot text-sky-400 mr-1.5"></i> Dynamic Path & Route Itinerary Matrix</h4>
-                            <span id="matchRate" class="text-[10px] bg-slate-950 text-slate-500 px-2.5 py-0.5 rounded-md font-mono border border-slate-800">0% Calibration</span>
-                        </div>
-                        
-                        <div id="itineraryContainer" class="space-y-4 min-h-[140px] flex flex-col justify-center text-center p-6 bg-[#05070b]/30 rounded-xl border border-dashed border-slate-800/80 transition-all duration-300">
-                            <p class="text-slate-500 text-xs font-medium">Configure metrics and select an objective to generate full multi-modal travel maps with verified transfers.</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800/60 shadow-inner">
-                        <h4 class="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-3"><i class="fa-solid fa-boxes-packing text-indigo-400 mr-1.5"></i> Automated Gear Contingency Registry</h4>
-                        <div id="gearGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-slate-400">
-                            <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Avalanche Beacon</div>
-                            <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Shovel & Probe</div>
-                            <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> First Aid Kit</div>
-                            <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Thermal Bivy</div>
-                        </div>
-                    </div>
-
-                    <div id="hitlContainer" class="hidden bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/20 p-5 rounded-xl transition-all duration-300">
-                        <div class="flex gap-4 items-start">
-                            <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-base shadow"><i class="fa-solid fa-user-shield"></i></div>
-                            <div class="flex-1">
-                                <h4 class="text-xs font-black text-white uppercase tracking-wider">Required Human Operator Validation Gate</h4>
-                                <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                                    The AI-native layer has matched connections and safety indexes. Before booking access, the **Student Trip Leader** must manually certify that all participating club members possess validated alpine competency signatures.
-                                </p>
-                                <div class="mt-4 flex items-center justify-between gap-4 flex-wrap pt-3 border-t border-slate-800/40">
-                                    <label class="inline-flex items-center gap-2.5 text-xs text-slate-300 font-mono cursor-pointer select-none">
-                                        <input type="checkbox" id="hitlCheck" onchange="toggleBookingBtn()" class="rounded bg-slate-950 border-slate-800 text-sky-500 focus:ring-0 focus:ring-offset-0 w-4 h-4">
-                                        I certify team technical proficiency & safety checklists.
-                                    </label>
-                                    <button id="bookBtn" disabled onclick="triggerSuccess()" class="bg-slate-900 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all duration-200">
-                                        Execute Consolidated Ledger Bookings
-                                    </button>
+                            <!-- NEW: Budget + Group Size -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1.5">Budget / Person (EUR)</label>
+                                    <input type="number" id="paramBudget" placeholder="e.g. 120" min="20" class="w-full bg-[#05070b] border border-slate-800 rounded-lg p-2.5 text-white font-medium focus:outline-none focus:border-sky-500 transition-colors">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1.5">Group Size</label>
+                                    <input type="number" id="paramGroupSize" value="6" min="2" max="20" class="w-full bg-[#05070b] border border-slate-800 rounded-lg p-2.5 text-white font-medium focus:outline-none focus:border-sky-500 transition-colors">
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="border-t border-slate-900 bg-[#05070b] py-10 text-center text-[11px] font-mono text-slate-500 tracking-wider uppercase">
-        <p>© 2026 AlpenSync Automated Platforms. Optimized for Academic Evaluation Pipelines.</p>
-        <p class="mt-2 text-slate-600 tracking-normal normal-case">All metrics follow European avalanche bulletins (EAWS) and standardized metric spatial systems.</p>
-    </footer>
-
-    <script>
-        function toggleDevPanel() {
-            document.getElementById('devPanel').classList.toggle('hidden');
-        }
-
-        function saveApiKey() {
-            const val = document.getElementById('apiKeyInput').value.trim();
-            if(val) {
-                sessionStorage.setItem('anthropic_key', val);
-                document.getElementById('apiStatus').innerHTML = "Runtime Mode: <span class='text-emerald-400 font-bold'>Live Claude 3.5 Network Engine Active</span>";
-                alert("Neural pipeline linked securely. Live generation sequence unlocked.");
-                toggleDevPanel();
-            } else {
-                sessionStorage.removeItem('anthropic_key');
-                document.getElementById('apiStatus').innerText = "Runtime Mode: Local Static Workflow Simulation";
-            }
-        }
-
-        function toggleBookingBtn() {
-            const chk = document.getElementById('hitlCheck');
-            const btn = document.getElementById('bookBtn');
-            if(chk.checked) {
-                btn.removeAttribute('disabled');
-                btn.className = "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all duration-200 shadow-lg shadow-emerald-500/10 cursor-pointer";
-            } else {
-                btn.setAttribute('disabled', 'true');
-                btn.className = "bg-slate-900 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all duration-200";
-            }
-        }
-
-        function adjustGearMatrix() {
-            const obj = document.getElementById('paramObjective').value;
-            const grid = document.getElementById('gearGrid');
-            let baseItems = `
-                <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> First Aid Kit</div>
-                <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Thermal Bivy</div>`;
-            
-            if (obj === "Ski Touring") {
-                grid.innerHTML = baseItems + `
-                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Avalanche Beacon</div>
-                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Shovel & Probe</div>`;
-            } else if (obj === "Alpinism") {
-                grid.innerHTML = baseItems + `
-                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Dynamic Rope 50m</div>
-                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Steel Crampons</div>`;
-            } else if (obj === "Ice Climbing") {
-                grid.innerHTML = baseItems + `
-                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Technical Ice Tools</div>
-                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Ice Screw Set</div>`;
-            } else {
-                grid.innerHTML = baseItems + `
-                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Crevasse Haul Kit</div>
-                    <div class="p-2 bg-[#05070b] rounded border border-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-check text-sky-400"></i> Harness & Carabiners</div>`;
-            }
-        }
-
-        // Dedicated Real-World Route Architecture Database (Preferred vs Affordable breakdowns)
-        const alpineRoutes = {
-            "Zermatt": {
-                eaws: "Level 1 (Low)", snow: "210 cm", freeze: "2,150 m",
-                Preferred: {
-                    cost: "€64.00", transit: "SBB InterCity 8 + Matterhorn Gotthard Bahn",
-                    html: `
-                        <div class="space-y-4 text-left font-sans text-xs">
-                            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 uppercase tracking-wider">Leg 1: SBB Express Track</span>
-                                <div class="mt-2 text-white font-bold">Fast InterCity 8 Connection</div>
-                                <p class="text-slate-400 mt-1">Direct high-speed link to Visp Terminal. Group equipment storage pods allocated seamlessly. Spatial distance: 162 km.</p>
-                            </div>
-                            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">Leg 2: Mountain Rack Railway</span>
-                                <div class="mt-2 text-white font-bold">Matterhorn Gotthard Bahn Ascender</div>
-                                <p class="text-slate-400 mt-1">Ascend from Visp directly into car-free Zermatt Center (Elevation: 1,620 m). Total multi-modal travel timeline: 3 hours 12 mins.</p>
-                            </div>
-                        </div>`
-                },
-                Affordable: {
-                    cost: "€28.00", transit: "FlixBus 410 + Regional Bus Line Combo",
-                    html: `
-                        <div class="space-y-4 text-left font-sans text-xs">
-                            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">Leg 1: Cross-Border Coach Matrix</span>
-                                <div class="mt-2 text-white font-bold">FlixBus Route 410 Array</div>
-                                <p class="text-slate-400 mt-1">Budget long-distance transport to central Sion or Visp peripheral drop-point. Slower track window but saves over 50% capital pool parameters.</p>
-                            </div>
-                            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider">Leg 2: Alpine PostBus Link</span>
-                                <div class="mt-2 text-white font-bold">Regional Multi-Stop Shuttle</div>
-                                <p class="text-slate-400 mt-1">Final stage regional high-altitude connection up the Vispa valley. Total multi-modal travel timeline: 5 hours 45 mins.</p>
-                            </div>
-                        </div>`
-                }
-            },
-            "Chamonix": {
-                eaws: "Level 2 (Moderate)", snow: "245 cm", freeze: "1,800 m",
-                Preferred: {
-                    cost: "€72.00", transit: "TGV Lyria Express + Mont-Blanc Express Track",
-                    html: `
-                        <div class="space-y-4 text-left font-sans text-xs">
-                            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 uppercase tracking-wider">Leg 1: High-Speed TGV Lyria Array</span>
-                                <div class="mt-2 text-white font-bold">TGV Rail Connection Network</div>
-                                <p class="text-slate-400 mt-1">Express high-speed cross-border rail into Saint-Gervais-les-Bains. Maximum velocity profiles deployed. Distance: 210 km.</p>
-                            </div>
-                            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">Leg 2: Scenic Mountain Rail</span>
-                                <div class="mt-2 text-white font-bold">Mont-Blanc Express Integration</div>
-                                <p class="text-slate-400 mt-1">Climbs the dramatic gorge into Chamonix Center directly beneath the Aiguille du Midi peaks (Base elevation: 1,035 m).</p>
-                            </div>
-                        </div>`
-                },
-                Affordable: {
-                    cost: "€19.00", transit: "Direct Airport Coach Shuttle Array",
-                    html: `
-                        <div class="space-y-4 text-left font-sans text-xs">
-                            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">Leg 1: Direct Budget Coach Loop</span>
-                                <div class="mt-2 text-white font-bold">BlaBlaCar Bus / FlixBus System</div>
-                                <p class="text-slate-400 mt-1">Direct long-distance economic coach looping directly from university transport lines into Chamonix Sud Station. High luggage allowance for bulky winter equipment matrices.</p>
-                            </div>
-                        </div>`
-                }
-            }
-        };
-
-        async function runEngine() {
-            const origin = document.getElementById('paramOrigin').value;
-            const dest = document.getElementById('paramDestination').value;
-            const mode = document.getElementById('paramTravelMode').value;
-            const objective = document.getElementById('paramObjective').value;
-            const consoleBox = document.getElementById('logConsole');
-            const btn = document.getElementById('engineBtn');
-            
-            btn.setAttribute('disabled', 'true');
-            btn.innerHTML = "<i class='fa-solid fa-rotate animate-spin'></i> Syncing Alpine Networks...";
-            consoleBox.innerHTML = `<div class="text-sky-400">> Mapping node route vectors from [Hub: ${origin}] to [Alps: ${dest}] via [Mode: ${mode}]...</div>`;
-            
-            const sleep = ms => new Promise(r => setTimeout(r, ms));
-            await sleep(600);
-            consoleBox.innerHTML += `<div class="text-slate-400">> Scraping real-time telemetry from active Swiss EAWS avalanche monitoring matrices...</div>`;
-            consoleBox.scrollTop = consoleBox.scrollHeight;
-            
-            await sleep(700);
-            consoleBox.innerHTML += `<div class="text-slate-400">> Re-compiling multi-modal routing nodes based on ${mode} structural priorities...</div>`;
-            consoleBox.scrollTop = consoleBox.scrollHeight;
-
-            const key = sessionStorage.getItem('anthropic_key');
-            
-            if (key) {
-                consoleBox.innerHTML += `<div class="text-amber-400 font-bold">> Routing telemetry coordinates to Claude network array...</div>`;
-                consoleBox.scrollTop = consoleBox.scrollHeight;
-                try {
-                    const response = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
-                        method: 'POST',
-                        headers: {
-                            'x-api-key': key,
-                            'anthropic-version': '2023-06-01',
-                            'content-type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            model: 'claude-3-5-sonnet-20241022',
-                            max_tokens: 800,
-                            messages: [{
-                                role: 'user', 
-                                content: `Write a hyper-realistic alpine travel route timeline starting from ${origin} to the specific destination of ${dest} using ${mode} travel methods for a university group doing ${objective}. Use strict metric formatting (km, meters, cm). Structure it into clear HTML cards using Tailwind layout styles. Do not output markdown codeblock ticks.`
-                            }]
-                        })
-                    });
-                    const data = await response.json();
-                    if(data.content && data.content[0]) {
-                        document.getElementById('itineraryContainer').innerHTML = `<div class="text-left text-xs space-y-2 text-slate-300">${data.content[0].text}</div>`;
-                        document.getElementById('matchRate').innerText = "100% Live Claude Sync";
-                    } else { throw new Error("API stream rejected."); }
-                } catch (err) {
-                    consoleBox.innerHTML += `<div class="text-red-400">> Pipeline error. Triggering static matrix fallbacks...</div>`;
-                    executeFallback(dest, mode);
-                }
-            } else {
-                await sleep(500);
-                executeFallback(dest, mode);
-            }
-            
-            consoleBox.innerHTML += `<div class="text-emerald-400 font-bold">> Success. Routing workspace to active Human-In-The-Loop gateway.</div>`;
-            consoleBox.scrollTop = consoleBox.scrollHeight;
-            document.getElementById('hitlContainer').classList.remove('hidden');
-            btn.removeAttribute('disabled');
-            btn.innerHTML = "<i class='fa-solid fa-circle-nodes'></i> Compute Expedition Route";
-        }
-
-        function executeFallback(dest, mode) {
-            // Gracefully match the target destination data or default cleanly to Zermatt
-            const targetData = alpineRoutes[dest] || alpineRoutes["Zermatt"];
-            const specificItinerary = targetData[mode];
-
-            document.getElementById('hudEaws').innerText = targetData.eaws;
-            document.getElementById('hudEaws').className = targetData.eaws.includes("Low") ? "text-emerald-400 font-bold" : "text-amber-400 font-bold";
-            document.getElementById('hudSnow').innerText = targetData.snow;
-            document.getElementById('hudFreeze').innerText = targetData.freeze;
-            
-            document.getElementById('matchRate').innerText = `96% Static Sync (${mode} Mode)`;
-            document.getElementById('itineraryContainer').innerHTML = specificItinerary.html;
-        }
-
-        function triggerSuccess() {
-            alert("Ledger finalized! Verified route data and high-altitude security rosters dispatched to group portals.");
-        }
-    </script>
-</body>
-</html>
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1.5">Group Skill Level</label>
+                                <select id="paramSkill" class="w-full bg-[#05070b] border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-sky-500 transition-colors">
+                                    <option value="Mixed">Mixed — includes beginners</option
