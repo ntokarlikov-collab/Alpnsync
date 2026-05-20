@@ -59,7 +59,7 @@
         <div class="absolute inset-0 bg-gradient-to-b from-[#0c0d0f]/50 via-[#0c0d0f]/30 to-[#f8f9fa] z-10"></div>
         
         <div class="relative z-20 text-center max-w-4xl px-4 space-y-4">
-            <span class="inline-flex items-center gap-2 px-3 py-1 bg-black/40 text-white rounded-full text-[10px] font-bold tracking-widest uppercase backdrop-blur-md border border-white/10 shadow-lg animate-pulse-slow">
+            <span class="inline-flex items-center gap-2 px-3 py-1 bg-black/40 text-white rounded-full text-[10px] font-bold tracking-widest uppercase backdrop-blur-md border border-white/10 shadow-lg">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#E31C25]"></span> MeteoSuisse & SBB Vector Matrix Active
             </span>
             <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight uppercase drop-shadow-xl leading-none">
@@ -70,14 +70,14 @@
             </p>
             <div class="pt-4">
                 <a href="#configure-zone" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest border border-white/20 transition-all shadow-xl">
-                    Configure Expedition Route <i class="fa-solid fa-arrow-down animate-bounce ml-1"></i>
+                    Configure Your Journey <i class="fa-solid fa-arrow-down animate-bounce ml-1"></i>
                 </a>
             </div>
         </div>
     </header>
 
     <section id="configure-zone" class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-30 mb-8">
-        <div class="bg-[#0b0c0e] text-white rounded-3xl p-6 shadow-2xl border border-stone-800">
+        <div class="bg-[#0b0c0e] text-white rounded-3xl p-6 shadow-2xl border border-stone-900">
             <div class="flex justify-between items-center mb-4 border-b border-stone-800 pb-3">
                 <h3 class="text-xs font-black tracking-widest uppercase text-stone-400 flex items-center gap-2">
                     <i class="fa-solid fa-plane-departure text-[#E31C25]"></i> Route Configuration Matrix
@@ -112,13 +112,13 @@
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
                     <label class="text-[9px] text-red-500 font-black uppercase tracking-wider block mb-1">To (Alpine Resort Node)</label>
                     <select id="paramDestination" class="w-full bg-transparent text-white font-medium text-xs focus:outline-none cursor-pointer">
-                        <option value="Zermatt">Zermatt (Matterhorn Gotthard)</option>
-                        <option value="Verbier">Verbier (4 Vallées / Le Châble)</option>
-                        <option value="Grindelwald">Grindelwald (Eiger Express)</option>
+                        <option value="Zermatt">Zermatt (Matterhorn)</option>
+                        <option value="Verbier">Verbier (4 Vallées)</option>
+                        <option value="Grindelwald">Grindelwald (Eiger)</option>
                         <option value="Laax">Laax / Flims Falera Arena</option>
                         <option value="PortesDuSoleil">Portes du Soleil (Champéry)</option>
-                        <option value="Chamonix">Chamonix (Mont Blanc Express)</option>
-                        <option value="CransMontana">Crans-Montana (SMC Funicular)</option>
+                        <option value="Chamonix">Chamonix (Mont Blanc)</option>
+                        <option value="CransMontana">Crans-Montana</option>
                         <option value="Andermatt">Andermatt Sedrun Disentis</option>
                         <option value="StAnton">St. Anton am Arlberg</option>
                         <option value="Cortina">Cortina d'Ampezzo</option>
@@ -202,6 +202,13 @@
                 </div>
             </div>
 
+            <div class="space-y-1 font-mono text-[11px]">
+                <div class="text-[9px] font-sans uppercase font-black text-stone-400 tracking-wider">Background Engine Stream</div>
+                <div id="logConsole" class="bg-stone-50 p-2.5 rounded-xl border border-stone-200 h-14 overflow-y-auto space-y-1 text-stone-600 scrollbar-stark">
+                    <div class="text-stone-400">> Workspace standby tracking. Select parameters above and engage calculation vector loops...</div>
+                </div>
+            </div>
+
             <div class="grid md:grid-cols-5 gap-6">
                 
                 <div class="md:col-span-3 bg-stone-50 border border-stone-200 rounded-2xl p-5 space-y-4">
@@ -280,6 +287,35 @@
     </footer>
 
     <script>
+        // DATA REGISTRIES PLACED TOP-TIER TO AVOID INLINE COMPILER BLOCKING HAZARDS
+        const baseLodgingRegistry = {
+            "Zermatt": [{ name: "Zermatt Youth Hostel", type: "Quad Dorms", price: 55, feature: "Ski lockers" }, { name: "Matterhorn SAC Hütten", type: "Matratzenlager", price: 42, feature: "SAC Discount Verified" }],
+            "Verbier": [{ name: "MAP Verbier Lodge", type: "Team Bunks", price: 68, feature: "Direct Médran lift link" }],
+            "Grindelwald": [{ name: "Downtown Lodge Grindelwald", type: "Group Quarters", price: 52, feature: "Risk briefing layout rooms" }],
+            "Laax": [{ name: "Riders Hotel LAAX", type: "Shared Crew Beds", price: 75, feature: "Freeride club tuning spaces" }],
+            "PortesDuSoleil": [{ name: "Champéry Youth Hostel", type: "Shared Multi-bed Rooms", price: 46, feature: "Footsteps from Planachaux cable link" }],
+            "Chamonix": [{ name: "Chamonix Lodge Hostel", type: "Club Dorms", price: 48, feature: "Drying setups" }],
+            "CransMontana": [{ name: "Bella Lui Youth Hostel", type: "Team Blocks", price: 59, feature: "Panoramic valley view decks" }],
+            "Andermatt": [{ name: "Basecamp Andermatt", type: "Quad Backpacker Dorms", price: 64, feature: "Deep powder access staging" }],
+            "StAnton": [{ name: "Arlberg Youth Quarters", type: "Shared Bunks", price: 58, feature: "Ski storage active" }],
+            "Cortina": [{ name: "Rifugio Lagazuoi Base", type: "Multi-Bed High Dorm", price: 62, feature: "Safety maps briefing platform" }]
+        };
+
+        const stationMappers = {
+            "Geneva": "Genève", "Lausanne": "Lausanne", "Fribourg": "Fribourg", "Neuchatel": "Neuchâtel", "Sion": "Sion",
+            "Zurich": "Zürich HB", "Bern": "Bern", "Basel": "Basel SBB", "Munich": "München Hbf", "Milan": "Milano Centrale",
+            "Zermatt": "Zermatt", "Chamonix": "Chamonix-Mont-Blanc", "Verbier": "Verbier, station", "Grindelwald": "Grindelwald",
+            "StAnton": "St. Anton am Arlberg", "Cortina": "Cortina d'Ampezzo", "Laax": "Flims Dorf, Post",
+            "PortesDuSoleil": "Champéry, télécabine", "CransMontana": "Crans-sur-Sierre", "Andermatt": "Andermatt"
+        };
+
+        const destinationCoordinates = {
+            "Zermatt": { lat: 46.0207, lon: 7.7491 }, "Chamonix": { lat: 45.9227, lon: 6.8685 }, "Verbier": { lat: 46.0961, lon: 7.2286 },
+            "StAnton": { lat: 47.1312, lon: 10.2692 }, "Grindelwald": { lat: 46.6242, lon: 8.0414 }, "Cortina": { lat: 46.5405, lon: 12.1357 },
+            "Laax": { lat: 46.8285, lon: 9.2647 }, "PortesDuSoleil": { lat: 46.1792, lon: 6.8708 }, "CransMontana": { lat: 46.3115, lon: 7.4844 },
+            "Andermatt": { lat: 46.6348, lon: 8.5947 }
+        };
+
         document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
 
         function toggleDevPanel() {
@@ -311,34 +347,6 @@
             }
         }
 
-        const baseLodgingRegistry = {
-            "Zermatt": [{ name: "Zermatt Youth Hostel", type: "Quad Dorms", price: 55, feature: "Ski lockers" }, { name: "Matterhorn SAC Hütten", type: "Matratzenlager", price: 42, feature: "SAC Discount Verified" }],
-            "Verbier": [{ name: "MAP Verbier Lodge", type: "Team Bunks", price: 68, feature: "Direct Médran lift link" }],
-            "Grindelwald": [{ name: "Downtown Lodge Grindelwald", type: "Group Quarters", price: 52, feature: "Risk briefing layout rooms" }],
-            "Laax": [{ name: "Riders Hotel LAAX", type: "Shared Crew Beds", price: 75, feature: "Freeride club tuning spaces" }],
-            "PortesDuSoleil": [{ name: "Champéry Youth Hostel", type: "Shared Multi-bed Rooms", price: 46, feature: "Footsteps from Planachaux cable link" }],
-            "Chamonix": [{ name: "Chamonix Lodge Hostel", type: "Club Dorms", price: 48, feature: "Drying setups" }],
-            "CransMontana": [{ name: "Bella Lui Youth Hostel", type: "Team Blocks", price: 59, feature: "Panoramic valley view decks" }],
-            "Andermatt": [{ name: "Basecamp Andermatt", type: "Quad Backpacker Dorms", price: 64, feature: "Deep powder access staging" }],
-            "StAnton": [{ name: "Arlberg Youth Quarters", type: "Shared Bunks", price: 58, feature: "Ski storage active" }],
-            "Cortina": [{ name: "Rifugio Lagazuoi Base", type: "Multi-Bed High Dorm", price: 62, feature: "Safety maps briefing platform" }]
-        };
-
-        const stationMappers = {
-            "Geneva": "Genève", "Lausanne": "Lausanne", "Fribourg": "Fribourg", "Neuchatel": "Neuchâtel", "Sion": "Sion",
-            "Zurich": "Zürich HB", "Bern": "Bern", "Basel": "Basel SBB", "Munich": "München Hbf", "Milan": "Milano Centrale",
-            "Zermatt": "Zermatt", "Chamonix": "Chamonix-Mont-Blanc", "Verbier": "Verbier, station", "Grindelwald": "Grindelwald",
-            "StAnton": "St. Anton am Arlberg", "Cortina": "Cortina d'Ampezzo", "Laax": "Flims Dorf, Post",
-            "PortesDuSoleil": "Champéry, télécabine", "CransMontana": "Crans-sur-Sierre", "Andermatt": "Andermatt"
-        };
-
-        const destinationCoordinates = {
-            "Zermatt": { lat: 46.0207, lon: 7.7491 }, "Chamonix": { lat: 45.9227, lon: 6.8685 }, "Verbier": { lat: 46.0961, lon: 7.2286 },
-            "StAnton": { lat: 47.1312, lon: 10.2692 }, "Grindelwald": { lat: 46.6242, lon: 8.0414 }, "Cortina": { lat: 46.5405, lon: 12.1357 },
-            "Laax": { lat: 46.8285, lon: 9.2647 }, "PortesDuSoleil": { lat: 46.1792, lon: 6.8708 }, "CransMontana": { lat: 46.3115, lon: 7.4844 },
-            "Andermatt": { lat: 46.6348, lon: 8.5947 }
-        };
-
         async function fetchLiveSwissMeteo(destinationKey) {
             const coords = destinationCoordinates[destinationKey] || destinationCoordinates["Zermatt"];
             try {
@@ -366,7 +374,6 @@
             return { score, description: reasons.length > 0 ? reasons.join(" ") : "Climatological bands perfectly support safe high-alpine operations." };
         }
 
-        // DYNAMIC CLIMATOLOGICAL ATTIRE EVALUATION PIPELINE
         function getVillageAttireRecommendation(temp, wind) {
             let outfit = ""; let layeringNotes = "";
             if (temp <= -5) {
@@ -386,7 +393,6 @@
             return { outfit, layeringNotes };
         }
 
-        // STRUCTURAL ACTIVITY DISCIPLINE INVENTORY MATRICES
         function getTechnicalObjectiveSpecs(objective) {
             if (objective === "Ski Touring") {
                 return {
@@ -433,7 +439,7 @@
             
             consoleBox.innerHTML = `<div class="text-[#E31C25]">> Initiating cross-border railway validation...</div>`;
 
-            // 1. EXECUTE METEOSUISSE SIM INTERCEPT
+            // 1. FETCH WEATHER
             const meteoData = await fetchLiveSwissMeteo(destKey);
             document.getElementById('hudTemp').innerText = `${meteoData.temp} °C`;
             document.getElementById('hudWind').innerText = `${meteoData.wind} km/h`;
@@ -466,7 +472,7 @@
                     <p class="text-stone-500 font-mono text-[10px] leading-relaxed">${ratingResult.description}</p>
                 </div>`;
 
-            // 3. RENDER EXPEDITION OBJECTIVE SPECIFIC CLOTHES/GEAR DECK
+            // 3. RENDER OBJECTIVE SPECIFIC CLOTHES/GEAR
             const objectiveSpecs = getTechnicalObjectiveSpecs(objective);
             document.getElementById('gearDisplayBox').innerHTML = `
                 <div class="space-y-3 font-sans text-xs text-left">
@@ -558,11 +564,9 @@
             container.innerHTML = html || `<div class="p-3 bg-red-50 border border-red-200 text-red-500 text-center rounded-xl text-[10px] font-mono">⚠️ No spaces found matching budget constraints.</div>`;
         }
 
-        // PROGRAMMATIC SBB-INSPIRED INTERACTIVE GRAPHICS FALLBACK RENDERING PATTERNS
         function renderFallbackCard(conn, originStation, dstStation, originKey, destKey) {
             document.getElementById('matchRate').innerText = "100% SBB LOCAL ROUTE ENGINE ACTIVE";
             
-            // Programmatic fleet routing determination
             let lineCode = "IC 1"; let carrierStyle = "bg-[#E31C25] text-white"; let carrierLabel = "SBB CFF FFS";
             if(originKey === "Milan") { lineCode = "EC 34"; carrierStyle = "bg-emerald-700 text-white"; carrierLabel = "Trenitalia EuroCity"; }
             if(originKey === "Munich") { lineCode = "EC 196"; carrierStyle = "bg-red-800 text-white"; carrierLabel = "DB EuroCity"; }
