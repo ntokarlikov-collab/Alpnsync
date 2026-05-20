@@ -24,72 +24,96 @@
 </head>
 <body class="bg-[#fcfdfd] text-neutral-900 font-sans antialiased min-h-screen flex flex-col">
 
-   <nav class="relative border-b border-white/10 text-white sticky top-0 z-50 overflow-hidden">
+   <nav class="sticky top-0 z-50 h-24 overflow-hidden border-b border-white/10">
 
-    <!-- IMAGE BACKGROUND -->
+    <!-- BACKGROUND IMAGE -->
     <div class="absolute inset-0">
-        <img 
-            src="https://images.unsplash.com/photo-1508261303786-0e74c9d1b3f6?q=80&w=2000&auto=format&fit=crop"
-            alt="Swiss Mountains"
+        <img
+            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop"
             class="w-full h-full object-cover"
+            alt="Swiss Mountains"
         >
 
         <!-- DARK OVERLAY -->
-        <div class="absolute inset-0 bg-black/65 backdrop-blur-[2px]"></div>
+        <div class="absolute inset-0 bg-black/55"></div>
 
-        <!-- RED ATMOSPHERIC GLOW -->
-        <div class="absolute inset-0 bg-gradient-to-r from-[#E31C25]/20 via-black/10 to-black/40"></div>
+        <!-- RED CINEMATIC LIGHT -->
+        <div class="absolute inset-0 bg-gradient-to-r from-[#E31C25]/25 via-black/20 to-black/60"></div>
     </div>
 
     <!-- NAV CONTENT -->
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <div class="relative max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
 
-        <!-- LOGO -->
-        <div class="flex items-center gap-3 group cursor-pointer">
-            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#E31C25] to-[#B31218] flex flex-col items-center justify-center shadow-[0_0_20px_rgba(227,28,37,0.45)] group-hover:scale-105 transition-transform border border-white/10">
-                <i class="fa-solid fa-mountain text-white text-xs leading-none relative -top-0.5"></i>
-                <i class="fa-solid fa-plus text-white text-[9px] font-bold mt-0.5"></i>
+        <!-- LEFT -->
+        <div class="flex items-center gap-3">
+
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#E31C25] to-[#B31218]
+                        flex flex-col items-center justify-center
+                        shadow-[0_0_25px_rgba(227,28,37,0.45)]">
+
+                <i class="fa-solid fa-mountain text-white text-xs"></i>
+                <i class="fa-solid fa-plus text-white text-[9px] mt-0.5"></i>
             </div>
 
-            <div class="flex flex-col">
-                <span class="font-black text-2xl tracking-wider leading-none text-white drop-shadow-lg">
+            <div class="leading-none">
+                <div class="text-2xl font-black tracking-wider text-white drop-shadow-lg">
                     ALPEN<span class="text-[#ff3b44]">SYNC</span>
-                </span>
+                </div>
 
-                <span class="text-[9px] font-mono tracking-[0.25em] text-neutral-300 mt-1 uppercase">
+                <div class="text-[9px] uppercase tracking-[0.3em] text-white/70 mt-1">
                     OS 2.95 // SWISS CONTROL
-                </span>
+                </div>
             </div>
+
         </div>
 
-        <!-- CENTER LINKS -->
-        <div class="hidden md:flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.25em] text-neutral-200">
-            <a href="#problem" class="hover:text-[#ff4d55] transition-colors duration-300">
+        <!-- CENTER -->
+        <div class="hidden md:flex gap-10 text-[11px] uppercase font-black tracking-[0.25em] text-white/80">
+
+            <a href="#problem"
+               class="hover:text-[#ff4d55] transition">
                 The Problem
             </a>
 
-            <a href="#dashboard" class="hover:text-[#ff4d55] transition-colors duration-300">
+            <a href="#dashboard"
+               class="hover:text-[#ff4d55] transition">
                 Workspace
             </a>
+
         </div>
 
-        <!-- RIGHT BUTTONS -->
+        <!-- RIGHT -->
         <div class="flex items-center gap-4">
 
-            <button onclick="toggleDevPanel()"
-                class="w-10 h-10 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 text-neutral-300 hover:text-white hover:border-[#E31C25]/60 transition-all flex items-center justify-center text-sm shadow-lg">
+            <button
+                onclick="toggleDevPanel()"
+                class="w-10 h-10 rounded-2xl
+                       bg-black/30 backdrop-blur-md
+                       border border-white/10
+                       text-white/70 hover:text-white
+                       hover:border-[#E31C25]/50
+                       transition">
+
                 <i class="fa-solid fa-code"></i>
             </button>
 
             <a href="#dashboard"
-                class="bg-[#E31C25]/90 hover:bg-[#ff2d37] border border-[#ff5a62]/40 text-white text-[11px] font-black uppercase tracking-[0.2em] px-5 py-3 rounded-2xl transition-all shadow-[0_0_25px_rgba(227,28,37,0.35)] backdrop-blur-md">
+               class="px-5 py-3 rounded-2xl
+                      border border-[#ff4d55]
+                      bg-[#E31C25]/80
+                      hover:bg-[#ff2d37]
+                      text-white text-[11px]
+                      uppercase font-black tracking-[0.2em]
+                      shadow-[0_0_20px_rgba(227,28,37,0.45)]
+                      transition">
+
                 Launch Deck
             </a>
 
         </div>
+
     </div>
 </nav>
-
     <div id="devPanel" class="hidden bg-[#0c0d10] text-white border-b border-amber-500/20 p-6 font-mono text-xs">
         <div class="max-w-3xl mx-auto">
             <div class="flex justify-between items-center mb-3">
