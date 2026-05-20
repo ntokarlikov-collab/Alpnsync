@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         html { scroll-behavior: smooth; }
-        .swiss-glow-frame { box-shadow: 0 10px 30px rgba(227, 28, 37, 0.15); }
+        .swiss-glow-frame { box-shadow: 0 10px 40px rgba(227, 28, 37, 0.2); }
         .scrollbar-stark::-webkit-scrollbar { width: 5px; }
         .scrollbar-stark::-webkit-scrollbar-track { background: #f4f5f7; }
         .scrollbar-stark::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 2px; }
@@ -54,7 +54,7 @@
 
     <header class="relative h-[calc(100vh-64px)] w-full flex flex-col justify-center items-center overflow-hidden">
         <div class="absolute inset-0 w-full h-full pointer-events-none object-cover z-0">
-            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover scale-105 transition-transform duration-[10000ms]" alt="Swiss Alps Peak">
+            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover scale-105" alt="Swiss Alps Peak">
         </div>
         <div class="absolute inset-0 bg-gradient-to-b from-[#0c0d0f]/50 via-[#0c0d0f]/30 to-[#f8f9fa] z-10"></div>
         
@@ -77,7 +77,7 @@
     </header>
 
     <section id="configure-zone" class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-30 mb-8">
-        <div class="bg-[#0b0c0e] text-white rounded-3xl p-6 shadow-2xl border border-stone-800">
+        <div class="bg-[#0b0c0e] text-white rounded-3xl p-6 shadow-2xl border border-stone-900">
             <div class="flex justify-between items-center mb-4 border-b border-stone-800 pb-3">
                 <h3 class="text-xs font-black tracking-widest uppercase text-stone-400 flex items-center gap-2">
                     <i class="fa-solid fa-plane-departure text-[#E31C25]"></i> Flight Deck Parameter Matrix
@@ -127,18 +127,20 @@
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
                     <label class="text-[9px] text-red-500 font-black uppercase tracking-wider block mb-1">Expedition Objective Task</label>
                     <select id="paramObjective" onchange="adjustGearMatrix()" class="w-full bg-transparent text-white text-xs focus:outline-none cursor-pointer">
-                        <option value="Ski Touring">Ski Touring & Freeride Backcountry</option>
-                        <option value="Alpinism">Technical Alpinism & Peak Ascent</option>
-                        <option value="Ice Climbing">Vertical Ice Climbing Fallbacks</option>
+                        <option value="Ski Touring">Ski Touring & Backcountry</option>
+                        <option value="Alpinism">Technical Alpinism Ascent</option>
+                        <option value="Ice Climbing">Vertical Ice Climbing</option>
                         <option value="Glacier Mountaineering">High Glacial Traverse</option>
                     </select>
                 </div>
+            </div>
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans mt-4">
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
-                    <label class="text-[9px] text-stone-400 font-black uppercase tracking-wider block mb-1">Transit Optimization Routing</label>
+                    <label class="text-[9px] text-stone-400 font-black uppercase tracking-wider block mb-1">Transit Optimization</label>
                     <select id="paramTravelMode" class="w-full bg-transparent text-stone-300 focus:outline-none cursor-pointer">
-                        <option value="Preferred">Preferred (High-Speed Line Network)</option>
-                        <option value="Affordable">Most Affordable (FlixBus Loops)</option>
+                        <option value="Preferred">Preferred (High-Speed Lines)</option>
+                        <option value="Affordable">Most Affordable (Budget Rail/Bus)</option>
                     </select>
                 </div>
 
@@ -156,8 +158,8 @@
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
                     <label class="text-[9px] text-stone-400 font-black uppercase tracking-wider block mb-1">Team Capability Profiling</label>
                     <select id="paramSkill" class="w-full bg-transparent text-stone-300 focus:outline-none cursor-pointer">
-                        <option value="Intermediate">Intermediate (Validated Proficiency)</option>
-                        <option value="Expert">Expert (Risk Autonomous Mastery)</option>
+                        <option value="Intermediate">Intermediate (Solid Proficiency)</option>
+                        <option value="Expert">Expert (Autonomous Risk Mastery)</option>
                         <option value="Mixed">Mixed (Includes Beginners)</option>
                     </select>
                 </div>
@@ -181,10 +183,11 @@
             </div>
 
             <div class="border-b border-stone-200 pb-2 flex justify-between items-end">
-                <h2 class="text-xl font-black text-stone-950 tracking-tight uppercase flex items-center gap-2">
-                    Workspace Evaluation Matrix
-                </h2>
-                <span id="matchRate" class="text-[10px] font-mono text-stone-400 font-bold uppercase tracking-wider">0% Calibrated Tracking</span>
+                <h2 class="text-xl font-black text-stone-950 tracking-tight uppercase">Workspace Evaluation Matrix</h2>
+                <div class="flex items-center gap-4 text-[10px] font-mono text-stone-400 font-bold uppercase tracking-wider">
+                    <span class="hidden">Temp: <span id="hudTemp">--</span> Wind: <span id="hudWind">--</span> Cap: <span id="hudEaws">--</span></span>
+                    <span id="matchRate">0% Calibrated Tracking</span>
+                </div>
             </div>
 
             <div class="space-y-1 font-mono text-[11px]">
@@ -257,7 +260,7 @@
         </div>
     </main>
 
-    <footer class="border-t border-stone-200 bg-stone-50 py-6 text-center text-[9px] font-mono text-stone-400 tracking-wider uppercase">
+    <footer class="border-t border-stone-200 bg-stone-50 py-5 text-center text-[9px] font-mono text-stone-400 tracking-wider uppercase mt-auto">
         <p>© 2026 AlpenSync Platforms. Structured inside standardized metric spatial systems.</p>
     </footer>
 
@@ -410,7 +413,7 @@
                     liveConnectionParsed = resolvedData.connections[0];
                 }
             } catch (error) {
-                consoleBox.innerHTML += `<div class="text-stone-400">> Handshake timeout. Loading predictable metrics instead...</div>`;
+                consoleBox.innerHTML += `<div class="text-stone-400">> Handshake timeout. Loading fallback metrics...</div>`;
             }
 
             // 5. CLAUDE INTERCEPT HANDLER
@@ -472,7 +475,7 @@
         }
 
         function renderFallbackCard(conn, originStation, dstStation, travelers, budget, skill, meteo, mode, dateVal, timeVal) {
-            document.getElementById('matchRate').innerText = "100% SBB + METEO SYNC LAYER ACTIVE";
+            document.getElementById('matchRate').innerText = "100% SBB + METEO SYNC ACTIVE";
             if (conn) {
                 const depTime = new Date(conn.from.departure).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 const arrTime = new Date(conn.to.arrival).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
