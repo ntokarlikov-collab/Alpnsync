@@ -372,5 +372,24 @@
         }
         
         // ... (Keep your updateMountainSectors, setSeason, and populateObjectives functions here as well)>
+<script>
+        // Ensure functions are defined globally so buttons can find them
+        let currentSeasonMode = "winter";
+
+        // This ensures the page is ready before the script runs
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("AlpenSync Engine Initialized");
+            document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
+            updateMountainSectors();
+            populateObjectives();
+        });
+
+        // Ensure these functions exist outside the DOMContentLoaded block
+        function setSeason(mode) { /* ... your code ... */ }
+        function updateMountainSectors() { /* ... your code ... */ }
+        function populateObjectives() { /* ... your code ... */ }
+        // ... (rest of your functions)
+    </script>
 </body>
 </html>
+        
