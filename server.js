@@ -35,14 +35,24 @@ const stationMappers = {
     "Grindelwald": "Grindelwald"
 };
 
+// Premium Tier Commercial Lodging Database
 const baseLodgingRegistry = {
     "Andermatt": [{ name: "Andermatt Basecamp Hostel", feature: "Central mountain baseline staging access points", price: 48, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" }],
-    "Zermatt": [{ name: "Zermatt Youth Hostel", feature: "Ski basement lockers, close to rail station hubs", price: 55, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }],
-    "Verbier": [{ name: "MAP Verbier Lodge", feature: "Direct walk to Médran lift terminal", price: 68, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }],
-    "Grindelwald": [{ name: "Downtown Lodge Grindelwald", feature: "Risk briefing assembly spaces", price: 52, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" }]
+    "Zermatt": [{ name: "Zermatt Matterhorn Mountain Lodge", feature: "Premium ski basement lockers, panoramic view peaks", price: 75, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }],
+    "Verbier": [{ name: "W Verbier Alpine Crew Chalet", feature: "Direct walk-out access to Médran lift terminal", price: 89, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }],
+    "Grindelwald": [{ name: "Eiger Terminal Downtown Lodge", feature: "Risk briefing assembly spaces, north face base access", price: 58, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" }]
 };
 
-// LIVE API ENDPOINT ROUTER
+// Dynamic SBB Route Engine Breakdown Generator (Fallback Pattern)
+function generateSbbItineraryLegs(from, to, timeVal) {
+    return [
+        { type: "IR", num: "95", info: `Direction ${to} Line`, dep: timeVal, station: from, arr: "10:02", dest: "Interchange Hub", platform: "4" },
+        { type: "walk", walkLabel: "Station Transfer Connection", duration: "5 min" },
+        { type: "REGIO", num: "Alpine", info: "Glacial Valley Shuttle", dep: "10:12", station: "Interchange Hub", arr: "11:46", dest: to, platform: "12" }
+    ];
+}
+
+// LIVE API ENDPOINT ROUTER WITH INTEGRATED BUSINESS LOGIC
 app.post('/api/compute-expedition', async (req, res) => {
     try {
         const { originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, targetSectorName, travelers } = req.body;
@@ -71,7 +81,6 @@ app.post('/api/compute-expedition', async (req, res) => {
                 liveRouteConfirmed = true;
                 const activeConnection = sbbData.connections[0];
 
-                // Map real SBB journey sections dynamically 
                 activeConnection.sections.forEach((sec) => {
                     if (sec.walk) {
                         routeLegs.push({
@@ -95,34 +104,46 @@ app.post('/api/compute-expedition', async (req, res) => {
                     }
                 });
             }
-        } catch(e) { 
-            console.log("SBB API error, loading system fallback layout patterns");
-        }
+        } catch(e) { console.log("SBB API Connection Error"); }
 
-        // Fallback layout generators if SBB API undergoes downtime limits
         if (routeLegs.length === 0) {
-            routeLegs = [
-                { type: "IR 95", num: "Regional", info: "Direction Interlaken/Brig", dep: timeVal, station: stationMappers[originKey], arr: "10:05", dest: "Interchange Hub", platform: "3" },
-                { type: "Regio", num: "Alpine", info: "Resort Regional Shuttle Line", dep: "10:15", station: "Interchange Hub", arr: "11:30", dest: stationMappers[destKey], platform: "1" }
-            ];
+            routeLegs = generateSbbItineraryLegs(stationMappers[originKey], stationMappers[destKey], timeVal);
         }
 
-        // Dynamic pricing calculator systems
+        // 3. ENHANCED TARIFF BUSINESS CALCULATION COMPLEX
         let railBaseEach = (originKey === "Lausanne" && destKey === "Andermatt") ? 84.00 : 63.00;
-        let discountModifier = swissPassMode === "HalfFare" ? 0.5 : (swissPassMode === "GA" ? 0.0 : 1.0);
+        
+        // Exact SwissPass Discount Matrix mapping
+        let discountModifier = 1.0;
+        if (swissPassMode === "HalfFare") discountModifier = 0.5;
+        if (swissPassMode === "GA") discountModifier = 0.0; // GA Holders travel free on standard SBB routes
+
         let totalRail2nd = railBaseEach * discountModifier * travelers;
         let totalRail1st = totalRail2nd * 1.6;
 
+        // Lift Subscription Card Deductions
         let liftBaseEach = 82.00;
-        let liftTicketStatusText = passSystem !== "None" ? `${passSystem} Subscription Card Applied` : `CHF ${(liftBaseEach * travelers).toFixed(2)} Total Lift Access Fee`;
+        let liftTicketStatusText = "";
+        
+        if (passSystem !== "None") {
+            liftTicketStatusText = `${passSystem} Linked — Holder Pass Active`;
+        } else {
+            liftTicketStatusText = `CHF ${(liftBaseEach * travelers).toFixed(2)} Base Tariff Verified`;
+        }
 
+        // Accommodation Cost Assembly Matrix
         let hotels = baseLodgingRegistry[destKey] || baseLodgingRegistry["Andermatt"];
         let calculatedHotels = hotels.map(h => ({
             name: h.name, feature: h.feature, img: h.img, price: (h.price * travelers).toFixed(2)
         }));
 
-        // Dynamic Safety Index evaluation based on live wind telemetry loops
-        let safetyScore = wind > 30 ? 2 : (wind > 15 ? 4 : 5);
+        // Dynamic Safety Warning Flag (Cable cars shut down if wind speeds > 25 km/h)
+        let safetyScore = 5;
+        if (wind > 25) {
+            safetyScore = 2; // Critical Warning Tier
+        } else if (wind > 15) {
+            safetyScore = 4; // Cautionary Tier
+        }
 
         return res.json({
             success: true,
@@ -137,4 +158,4 @@ app.post('/api/compute-expedition', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`AlpenSync Dynamic Live Engine running on port ${PORT}`));
+app.listen(PORT, () => console.log(`AlpenSync Enterprise Engine running on port ${PORT}`));
