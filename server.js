@@ -5,6 +5,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+// Enable Cross-Origin Resource Sharing (CORS) for Frontend Integrations
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 // Hosts your website from the 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 
