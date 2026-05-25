@@ -1,0 +1,13 @@
+{
+  "name": "alpensync-core",
+  "version": "1.0.0",
+  "description": "Production Swiss Travel Engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0"
+  }
+}
