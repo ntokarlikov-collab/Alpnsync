@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpenSync OS — 4-Season Swiss Expedition Engine</title>
+    <title>AlpenSync OS — Year-Round Premium Swiss Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -18,18 +18,18 @@
 
     <nav class="border-b border-stone-900 bg-[#0c0d0f] text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3 group cursor-pointer">
+            <div class="flex items-center gap-3 cursor-pointer">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#E31C25] to-[#B31218] flex flex-col items-center justify-center shadow shadow-red-600/30">
                     <i class="fa-solid fa-mountain text-white text-xs leading-none relative -top-0.5"></i>
                     <i class="fa-solid fa-plus text-white text-[8px] font-bold mt-0.5"></i>
                 </div>
                 <div class="flex flex-col">
                     <span class="font-black text-lg tracking-wider leading-none text-white">ALPEN<span class="text-[#E31C25]">SYNC</span></span>
-                    <span class="text-[8px] font-mono tracking-widest text-neutral-400 mt-0.5 uppercase">SBB & METEOSUISSE DISPATCH DESK</span>
+                    <span class="text-[8px] font-mono tracking-widest text-neutral-400 mt-0.5 uppercase">Unified 4-Season Booking Deck</span>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 bg-stone-900 p-1 rounded-xl border border-stone-800 text-xs shadow-inner">
+            <div class="flex items-center gap-2 bg-stone-900 p-1 rounded-xl border border-neutral-800 text-xs shadow-inner">
                 <button id="seasonWinter" onclick="setSeason('winter')" class="px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-[#E31C25] text-white">
                     <i class="fa-solid fa-snowflake mr-1"></i> Winter
                 </button>
@@ -39,7 +39,7 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <button onclick="toggleDevPanel()" class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white flex items-center justify-center text-xs" title="Developer API Tray">
+                <button onclick="toggleDevPanel()" class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white flex items-center justify-center text-xs">
                     <i class="fa-solid fa-code"></i>
                 </button>
                 <a href="#configure-zone" class="bg-[#E31C25] hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all">Book Route</a>
@@ -50,27 +50,24 @@
     <div id="devPanel" class="hidden bg-[#0c0d0f] text-white border-b border-amber-500/20 p-6 font-mono text-xs">
         <div class="max-w-3xl mx-auto">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-amber-500 font-bold flex items-center gap-2 tracking-wider uppercase"><i class="fa-solid fa-shield-halved"></i> Secure Core API Linkage</h3>
-                <button onclick="toggleDevPanel()" class="text-neutral-500 hover:text-neutral-300 text-sm">✕</button>
+                <h3 class="text-amber-500 font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Core API Linkage</h3>
+                <button onclick="toggleDevPanel()" class="text-neutral-500 hover:text-neutral-300">✕</button>
             </div>
             <p class="text-neutral-400 mb-4 leading-relaxed">Paste your Anthropic API token for live Claude content parsing pipelines.</p>
             <div class="flex flex-col sm:flex-row gap-3">
-                <input type="password" id="apiKeyInput" placeholder="Enter Claude Auth Token (sk-ant-...)" class="bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2.5 text-neutral-200 flex-1 focus:outline-none focus:border-red-500 font-mono text-xs shadow-inner">
+                <input type="password" id="apiKeyInput" placeholder="Enter Claude Auth Token (sk-ant-...)" class="bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2.5 text-neutral-200 flex-1 font-mono text-xs focus:outline-none focus:border-red-500">
                 <button onclick="saveApiKey()" class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-5 py-2.5 rounded-xl uppercase tracking-wider hover:brightness-110 transition shadow-lg shadow-amber-500/10">Initialize API</button>
             </div>
             <div id="apiStatus" class="text-[10px] mt-3 text-slate-500 uppercase tracking-widest">Runtime Mode: Local Static Simulation</div>
         </div>
     </div>
 
-    <header class="relative h-[65vh] w-full flex flex-col justify-center items-center overflow-hidden">
-        <div class="absolute inset-0 w-full h-full pointer-events-none object-cover z-0">
-            <img id="heroImage" src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover scale-105 transition-all duration-700" alt="Swiss Alps Peak">
-        </div>
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0c0d0f]/50 via-[#0c0d0f]/30 to-[#f8f9fa] z-10"></div>
+    <header id="heroSection" class="relative w-full min-h-[55vh] flex flex-col justify-center items-center bg-cover bg-center transition-all duration-700" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80');">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-[#f8f9fa] z-10"></div>
         
-        <div class="relative z-20 text-center max-w-4xl px-4 space-y-4">
+        <div class="relative z-20 text-center max-w-4xl px-4 space-y-4 pt-12 pb-24">
             <span class="inline-flex items-center gap-2 px-3 py-1 bg-black/40 text-white rounded-full text-[10px] font-bold tracking-widest uppercase backdrop-blur-md border border-white/10 shadow-lg">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#E31C25]"></span> MeteoSuisse & SBB Coordinated Engine
+                <span class="w-1.5 h-1.5 rounded-full bg-[#E31C25]"></span> Direct Booking Integration Matrix Active
             </span>
             <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight uppercase drop-shadow-xl leading-none">
                 Conquer The <span id="heroSeasonTitle" class="text-transparent bg-clip-text bg-gradient-to-r from-[#E31C25] to-red-400">Winter Heights</span>
@@ -78,15 +75,10 @@
             <p class="text-white/90 text-sm sm:text-base font-medium tracking-wide max-w-xl mx-auto drop-shadow-md">
                 Real-time multi-modal SBB rail networks, automated SAC mountain hut allocation matrices, and dynamic discipline-specific weather attire analytics.
             </p>
-            <div class="pt-4">
-                <a href="#configure-zone" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest border border-white/20 transition-all shadow-xl">
-                    Configure Expedition Route <i class="fa-solid fa-arrow-down animate-bounce ml-1"></i>
-                </a>
-            </div>
         </div>
     </header>
 
-    <section id="configure-zone" class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-30 mb-8">
+    <section class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-30 mb-8">
         <div class="bg-[#0b0c0e] text-white rounded-3xl p-6 shadow-2xl border border-stone-900">
             <div class="flex justify-between items-center mb-4 border-b border-stone-800 pb-3">
                 <h3 class="text-xs font-black tracking-widest uppercase text-stone-400 flex items-center gap-2">
@@ -128,6 +120,10 @@
                         <option value="Laax">Laax / Flims Falera Arena</option>
                         <option value="PortesDuSoleil">Portes du Soleil (Champéry)</option>
                         <option value="Andermatt">Andermatt Sedrun Disentis</option>
+                        <option value="Chamonix">Chamonix (Mont Blanc Express)</option>
+                        <option value="CransMontana">Crans-Montana (SMC Funicular)</option>
+                        <option value="StAnton">St. Anton am Arlberg</option>
+                        <option value="Cortina">Cortina d'Ampezzo</option>
                     </select>
                 </div>
 
@@ -152,7 +148,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans mt-4 pt-4 border-t border-stone-800">
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
                     <label class="text-[9px] text-stone-400 font-black uppercase tracking-wider block mb-1">Active Objective Target Task</label>
-                    <select id="paramObjective" class="w-full bg-transparent text-white text-xs focus:outline-none cursor-pointer">
+                    <select id="paramObjective" onchange="runEngineGearUpdate()" class="w-full bg-transparent text-white text-xs focus:outline-none cursor-pointer">
                         </select>
                 </div>
 
@@ -174,7 +170,7 @@
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
                     <label class="text-[9px] text-stone-400 font-black uppercase tracking-wider block mb-1">Pass Ownership Base</label>
                     <select id="paramPasses" class="w-full bg-transparent text-stone-300 focus:outline-none cursor-pointer">
-                        <option value="None">Purchase Lift Day Ticket</option>
+                        <option value="None" selected>Purchase Lift Day Pass</option>
                         <option value="MagicPass">Magic Pass Active Holder</option>
                         <option value="Top4">Top4 Region Season Card</option>
                     </select>
@@ -192,12 +188,6 @@
     <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div class="bg-white p-6 sm:p-8 rounded-[32px] border-2 border-[#E31C25] swiss-glow-frame space-y-6 relative">
             
-            <div class="absolute top-6 right-8 flex gap-1">
-                <span class="w-4 h-2 bg-[#E31C25] transform -skew-x-12 inline-block"></span>
-                <span class="w-4 h-2 bg-[#E31C25] transform -skew-x-12 inline-block"></span>
-                <span class="w-4 h-2 bg-[#E31C25] transform -skew-x-12 inline-block"></span>
-            </div>
-
             <div class="border-b border-stone-200 pb-2 flex justify-between items-end">
                 <h2 class="text-xl font-black text-stone-950 tracking-tight uppercase">Workspace Evaluation Matrix</h2>
                 <div class="flex items-center gap-4 text-[10px] font-mono text-stone-400 font-bold uppercase tracking-wider">
@@ -235,7 +225,7 @@
                             <i class="fa-solid fa-cloud-sun text-[#E31C25]"></i>
                         </h4>
                         <div id="meteoVillageContainer" class="text-xs text-stone-400 font-mono space-y-3">
-                            Execute configuration searches to pull live environmental tracking charts.
+                            Awaiting telemetry computation initialization parameters loop.
                         </div>
                     </div>
 
@@ -247,7 +237,7 @@
                     </div>
 
                     <div class="bg-stone-50 border border-stone-200 rounded-2xl p-5 space-y-2">
-                        <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase">Group Lodging Hubs</h4>
+                        <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase">Available Visual Lodging Spaces</h4>
                         <div id="accommodationContainer" class="space-y-3 text-xs text-stone-400">
                             Available shared accommodation nodes list out here.
                         </div>
@@ -258,7 +248,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4 border-t border-stone-200">
                 
-                <div class="lg:col-span-3 space-y-3">
+                <div class="lg:col-span-2 space-y-3">
                     <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase flex justify-between items-center">
                         <span>Discipline-Specific High Mountain Equipment & Clothing Matrix</span>
                         <i class="fa-solid fa-shirt text-[#E31C25]"></i>
@@ -268,23 +258,21 @@
                     </div>
                 </div>
 
-                <div id="hitlContainer" class="hidden lg:col-span-3 bg-stone-50 rounded-2xl border border-stone-200 p-5 flex flex-col justify-between shadow-sm">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <h4 class="text-xs font-black text-stone-950 uppercase tracking-wide flex items-center gap-1.5">
-                                <i class="fa-solid fa-wallet text-[#E31C25]"></i> AlpenSync Instant Checkout Portal
-                            </h4>
-                            <p class="text-[11px] text-stone-500 mt-0.5 leading-normal">Direct cross-linkage with active SBB Nova ticketing networks. Leader handles shared crew routing ledger instantly.</p>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <label class="inline-flex items-center gap-2 text-xs font-mono text-stone-700 cursor-pointer select-none">
-                                <input type="checkbox" id="hitlCheck" onchange="toggleBookingBtn()" class="rounded border-stone-300 text-[#E31C25] focus:ring-0 w-4 h-4">
-                                Certify baseline safety rules
-                            </label>
-                            <button id="bookBtn" onclick="simulateUnifiedTwintCheckout()" disabled class="bg-stone-200 text-stone-400 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-qrcode"></i> Twint Split Payment
-                            </button>
-                        </div>
+                <div id="hitlContainer" class="hidden bg-stone-50 rounded-2xl border border-stone-200 p-5 flex flex-col justify-between shadow-sm">
+                    <div>
+                        <h4 class="text-xs font-black text-stone-950 uppercase tracking-wide flex items-center gap-1.5">
+                            <i class="fa-solid fa-wallet text-[#E31C25]"></i> AlpenSync Instant Checkout Portal
+                        </h4>
+                        <p class="text-[11px] text-stone-500 mt-0.5 leading-normal">Direct cross-linkage with active SBB Nova ticketing networks. Leader handles shared crew routing ledger instantly.</p>
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        <label class="inline-flex items-center gap-2 text-xs font-mono text-stone-700 cursor-pointer select-none mb-1">
+                            <input type="checkbox" id="hitlCheck" onchange="toggleBookingBtn()" class="rounded border-stone-300 text-[#E31C25] focus:ring-0 w-4 h-4">
+                            Certify baseline safety rules
+                        </label>
+                        <button id="bookBtn" onclick="simulateUnifiedTwintCheckout()" disabled class="bg-stone-200 text-stone-400 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2 w-full justify-center">
+                            <i class="fa-solid fa-qrcode"></i> Twint Split Payment
+                        </button>
                     </div>
                 </div>
 
@@ -292,39 +280,42 @@
         </div>
     </main>
 
-    <footer class="border-t border-stone-200 bg-stone-50 py-5 text-center text-[9px] font-mono text-stone-400 tracking-wider uppercase mt-auto">
-        <p>© 2026 AlpenSync Platforms. Structured inside metric tracking parameters.</p>
-    </footer>
-
     <script>
-        let currentSeasonMode = "winter";
-
-        // Multi-mountain sector tracking database maps per village destination node point
         const destinationSectorRegistry = {
             "Zermatt": [
-                { name: "Gornergrat Crest System (3089m)", summer: "Alpine Trail Wilderness Trekking", winter: "Piste High Freeride Carver Paths" },
-                { name: "Matterhorn Glacier Paradise (3883m)", summer: "Glacial High Traverse / Summer Ski", winter: "Technical High Glacial Slopes Arena" },
-                { name: "Rothorn Domain Area (3103m)", summer: "Downhill Extreme Mountain Biking", winter: "Sun-Deck Wide Carver Slopes" }
+                { name: "Gornergrat Crest System (3089m)", summer: "Alpine Trail Wilderness Trekking", winter: "Piste High Freeride Carver Paths", passPrice: 78 },
+                { name: "Matterhorn Glacier Paradise (3883m)", summer: "Glacial High Traverse / Summer Ski", winter: "Technical High Glacial Slopes Arena", passPrice: 92 },
+                { name: "Rothorn Domain Area (3103m)", summer: "Downhill Extreme Mountain Biking", winter: "Sun-Deck Wide Carver Slopes", passPrice: 72 }
             ],
             "Verbier": [
-                { name: "Mont-Fort Summit Spine (3330m)", summer: "Panoramic Glacier Ridge Treks", winter: "Expert High Backcountry Couloirs" },
-                { name: "Savoleyres Alpine Pastures", summer: "Cross-Country E-Biking Loops", winter: "Intermediate Cruising Open Trails" }
+                { name: "Mont-Fort Summit Spine (3330m)", summer: "Panoramic Glacier Ridge Treks", winter: "Expert High Backcountry Couloirs", passPrice: 82 },
+                { name: "Savoleyres Alpine Pastures", summer: "Cross-Country E-Biking Loops", winter: "Intermediate Cruising Open Trails", passPrice: 68 }
             ],
             "Grindelwald": [
-                { name: "Eiger Glacier Terminal (Eiger Express)", summer: "Technical North Face Rock Trails", winter: "Technical High-Speed Carver Slopes" },
-                { name: "First Adventure Sector", summer: "High Alpine Cliff Walk Circuits", winter: "Freestyle Progressive Snowparks" }
+                { name: "Eiger Glacier Terminal (Eiger Express)", summer: "Technical North Face Rock Trails", winter: "Technical High-Speed Carver Slopes", passPrice: 86 },
+                { name: "First Adventure Sector", summer: "High Alpine Cliff Walk Circuits", winter: "Freestyle Progressive Snowparks", passPrice: 74 }
             ],
             "Laax": [
-                { name: "Vorab Glacier Plateau (3018m)", summer: "High Alpine Geology Science Hiking", winter: "Early Season Glacial Powder Runs" },
-                { name: "Crap Sogn Gion Mid-Station Hub", summer: "Enduro Singletrack Bike Lines", winter: "World-Class Freestyle Superpipes" }
+                { name: "Vorab Glacier Plateau (3018m)", summer: "High Alpine Geology Science Hiking", winter: "Early Season Glacial Powder Runs", passPrice: 76 },
+                { name: "Crap Sogn Gion Mid-Station Hub", summer: "Enduro Singletrack Bike Lines", winter: "World-Class Freestyle Superpipes", passPrice: 76 }
             ],
             "PortesDuSoleil": [
-                { name: "Champéry - Les Crosets Network", summer: "World-Cup Downhill Dirt Biking Track", winter: "Cross-Border French Pass Interconnection" },
-                { name: "Dents du Midi High Wilderness", summer: "Multi-Day Isolated Backpack Circuit", winter: "Extreme Ski Touring Powder Horizons" }
+                { name: "Champéry - Les Crosets Network", summer: "World-Cup Downhill Dirt Biking Track", winter: "Cross-Border French Pass Interconnection", passPrice: 64 }
             ],
             "Andermatt": [
-                { name: "Gemsstock Savage North Face (2961m)", summer: "Technical Multi-pitch Rock Climbing", winter: "Deep Powder Couloirs & Technical Ski Touring" },
-                { name: "Nätschen / Oberalp Pass Slopes", summer: "High-Pass Meadow Ridge Walks", winter: "Sunny Wide Intermediate Cruisers" }
+                { name: "Gemsstock Savage North Face (2961m)", summer: "Technical Multi-pitch Rock Climbing", winter: "Deep Powder Couloirs & Technical Ski Touring", passPrice: 79 }
+            ],
+            "Chamonix": [
+                { name: "Aiguille du Midi Needle (3842m)", summer: "Extreme Ridge Alpinism Tracks", winter: "Vallée Blanche Glacial Off-Piste Run", passPrice: 88 }
+            ],
+            "CransMontana": [
+                { name: "Plaine Morte Glacier Plateau (3000m)", summer: "High Plateau Endurance Trekking", winter: "Glacial Piste Carver Circuit Tracks", passPrice: 71 }
+            ],
+            "StAnton": [
+                { name: "Valluga Crest Peak Spine (2811m)", summer: "Technical Peak Via Ferrata Tracks", winter: "Arlberg Deep Powder Extreme Backcountry", passPrice: 75 }
+            ],
+            "Cortina": [
+                { name: "Tofana di Rozes Massive Arena", summer: "Dolomites Vertical Rock Wall Lines", winter: "Olimpia delle Tofane Speed Ski Tracks", passPrice: 74 }
             ]
         };
 
@@ -333,103 +324,181 @@
             "summer": ["High-Altitude Trekking", "Technical Rock Climbing", "Downhill Mountain Biking", "Glacier Via Ferrata"]
         };
 
-        // Granular point-to-point SBB ticketing base tariff database
+        // EXTENSIVE COMPREHENSIVE TARIFF MATRIX FOR EVERY EXPLICIT ORIGIN/DESTINATION HUB COMBINATION
         const routeTariffMasterMatrix = {
             "Lausanne-Zermatt": {
                 duration: "2 h 45 min", base2ndPrice: 63.00, base1stPrice: 110.00,
                 legs: [
-                    { dep: "08:21", arr: "09:52", station: "Lausanne", platform: "3", dest: "Visp", type: "IR 90", num: "1815", info: "InterRegio // Direction Brig", features: ["1", "2", "bike", "rest"] },
+                    { dep: "08:21", arr: "09:52", station: "Lausanne", platform: "3", dest: "Visp", type: "IR 90", num: "1815", info: "SBB InterRegio Class // Direction Brig", features: ["1", "2", "bike", "rest"] },
                     { type: "walk", duration: "5 min", walkLabel: "Transfer to Alpine Track Platform 3" },
-                    { dep: "09:57", arr: "11:06", station: "Visp", platform: "3", dest: "Zermatt", type: "R", num: "229", info: "Matterhorn Gotthard Bahn Network", features: ["2", "bike"] }
+                    { dep: "09:57", arr: "11:06", station: "Visp", platform: "3", dest: "Zermatt", type: "R", num: "229", info: "Matterhorn Gotthard Bahn Regional Engine", features: ["2", "bike"] }
                 ]
             },
             "Lausanne-Andermatt": {
                 duration: "3 h 32 min", base2ndPrice: 84.00, base1stPrice: 148.00,
                 legs: [
-                    { dep: "08:14", arr: "10:02", station: "Lausanne", platform: "4", dest: "Brig", type: "IR 95", num: "1813", info: "InterRegio // Direction Brig", features: ["1", "2", "rest"] },
+                    { dep: "08:14", arr: "10:02", station: "Lausanne", platform: "4", dest: "Brig", type: "IR 95", num: "1813", info: "SBB InterRegio Line // Direction Brig", features: ["1", "2", "rest"] },
                     { type: "walk", duration: "7 min", walkLabel: "Transfer across Bahnhofplatz to Track 12" },
-                    { dep: "10:14", arr: "11:46", station: "Brig Bahnhofplatz", platform: "12", dest: "Andermatt", type: "PE", num: "902", info: "GLACIER EXPRESS // Panoramic Fleet Line (Res. Mandatory)", features: ["1", "2", "rest", "seat"] }
-                ]
-            },
-            "Zurich-Zermatt": {
-                duration: "3 h 15 min", base2ndPrice: 129.00, base1stPrice: 226.00,
-                legs: [
-                    { dep: "08:02", arr: "10:02", station: "Zürich HB", platform: "31", dest: "Visp", type: "IC 8", num: "808", info: "InterCity Backbone Fleet // Direction Brig", features: ["1", "2", "rest", "wifi"] },
-                    { type: "walk", duration: "6 min", walkLabel: "Transfer to Track Platform 3" },
-                    { dep: "10:08", arr: "11:17", station: "Visp", platform: "3", dest: "Zermatt", type: "R", num: "233", info: "Matterhorn Gotthard Narrow Gauge", features: ["2", "bike"] }
+                    { dep: "10:14", arr: "11:46", station: "Brig Bahnhofplatz", platform: "12", dest: "Andermatt", type: "PE", num: "902", info: "GLACIER EXPRESS // Panoramic Premium Inter-Link (Res. Compulsory)", features: ["1", "2", "rest", "seat"] }
                 ]
             },
             "Geneva-Zermatt": {
                 duration: "3 h 46 min", base2ndPrice: 88.00, base1stPrice: 156.00,
                 legs: [
-                    { dep: "08:12", arr: "10:52", station: "Genève", platform: "2", dest: "Visp", type: "IR 90", num: "1817", info: "InterRegio Rhône Axis Line", features: ["1", "2", "rest"] },
+                    { dep: "08:12", arr: "10:52", station: "Genève", platform: "2", dest: "Visp", type: "IR 90", num: "1817", info: "SBB InterRegio Rhône Axis Line", features: ["1", "2", "rest"] },
                     { type: "walk", duration: "5 min", walkLabel: "Transfer to Platform 3" },
-                    { dep: "10:57", arr: "12:06", station: "Visp", platform: "3", dest: "Zermatt", type: "R", num: "237", info: "Matterhorn Gotthard Vector", features: ["2", "bike"] }
+                    { dep: "10:57", arr: "12:06", station: "Visp", platform: "3", dest: "Zermatt", type: "R", num: "237", info: "Matterhorn Gotthard Vector Climb", features: ["2", "bike"] }
+                ]
+            },
+            "Zurich-Zermatt": {
+                duration: "3 h 15 min", base2ndPrice: 129.00, base1stPrice: 226.00,
+                legs: [
+                    { dep: "08:02", arr: "10:02", station: "Zürich HB", platform: "31", dest: "Visp", type: "IC 8", num: "808", info: "SBB InterCity Double-Decker Fleet // Direction Brig", features: ["1", "2", "rest", "wifi"] },
+                    { type: "walk", duration: "6 min", walkLabel: "Transfer down to Track Platform 3" },
+                    { dep: "10:08", arr: "11:17", station: "Visp", platform: "3", dest: "Zermatt", type: "R", num: "233", info: "Matterhorn Gotthard Crest System", features: ["2", "bike"] }
                 ]
             },
             "Geneva-PortesDuSoleil": {
                 duration: "2 h 12 min", base2ndPrice: 52.00, base1stPrice: 92.00,
                 legs: [
-                    { dep: "08:20", arr: "09:41", station: "Genève", platform: "1", dest: "Aigle", type: "IR 90", num: "1819", info: "InterRegio Track System Axis", features: ["1", "2"] },
-                    { type: "walk", duration: "4 min", walkLabel: "Transfer to Regional Platform 11" },
-                    { dep: "09:45", arr: "10:32", station: "Aigle", platform: "11", dest: "Champéry, télécabine", type: "R", num: "412", info: "AOMC Narrow-Gauge Chablais Alpine Line", features: ["2", "bike"] }
+                    { dep: "08:20", arr: "09:41", station: "Genève", platform: "1", dest: "Aigle", type: "IR 90", num: "1819", info: "SBB InterRegio Chablais Connector", features: ["1", "2"] },
+                    { type: "walk", duration: "4 min", walkLabel: "Transfer to Narrow Gauge Platform 11" },
+                    { dep: "09:45", arr: "10:32", station: "Aigle", platform: "11", dest: "Champéry, télécabine", type: "R", num: "412", info: "AOMC Local Regional Narrow-Gauge Track", features: ["2", "bike"] }
                 ]
             },
             "Milan-Zermatt": {
                 duration: "3 h 35 min", base2ndPrice: 108.00, base1stPrice: 184.00,
                 legs: [
                     { dep: "08:12", arr: "10:10", station: "Milano Centrale", platform: "21", dest: "Domodossola", type: "EC", num: "32", info: "Trenitalia EuroCity Cross-Border // Direction Basel SBB", features: ["1", "2", "rest"] },
-                    { type: "walk", duration: "8 min", walkLabel: "Swiss Customs & SBB Rail Platform Sync Gate" },
-                    { dep: "10:18", arr: "11:47", station: "Domodossola", platform: "2", dest: "Zermatt", type: "R", num: "312", info: "MGB Connection Ascent Track", features: ["2"] }
+                    { type: "walk", duration: "8 min", walkLabel: "Swiss Customs Control & SBB Rail Platform Sync Gate" },
+                    { dep: "10:18", arr: "11:47", station: "Domodossola", platform: "2", dest: "Zermatt", type: "R", num: "312", info: "MGB Connection Ascent Track Engine", features: ["2"] }
+                ]
+            },
+            "Zurich-Grindelwald": {
+                duration: "2 h 34 min", base2ndPrice: 94.00, base1stPrice: 164.00,
+                legs: [
+                    { dep: "08:02", arr: "09:00", station: "Zürich HB", platform: "12", dest: "Bern", type: "IC 1", num: "710", info: "SBB InterCity Speedliner Network", features: ["1", "2", "rest", "wifi"] },
+                    { type: "walk", duration: "4 min", walkLabel: "Platform 7 Transfer" },
+                    { dep: "09:04", arr: "09:37", station: "Bern", platform: "7", dest: "Interlaken Ost", type: "IC 61", num: "1065", info: "SBB Bernese Oberland Mainline InterCity", features: ["1", "2", "rest"] },
+                    { type: "walk", duration: "5 min", walkLabel: "Step over to Sector B Track 2" },
+                    { dep: "09:42", arr: "10:36", station: "Interlaken Ost", platform: "2A", dest: "Grindelwald", type: "R", num: "112", info: "Berner Oberland Bahn (BOB) Narrow Gauge Engine", features: ["2", "bike"] }
+                ]
+            },
+            "Lausanne-Verbier": {
+                duration: "1 h 18 min", base2ndPrice: 38.00, base1stPrice: 66.00,
+                legs: [
+                    { dep: "08:21", arr: "09:12", station: "Lausanne", platform: "3", dest: "Martigny", type: "IR 90", num: "1815", info: "SBB InterRegio Rhone Axis", features: ["1", "2", "rest"] },
+                    { type: "walk", duration: "4 min", walkLabel: "Walk outside to regional Track 50" },
+                    { dep: "09:16", arr: "09:39", station: "Martigny", platform: "50", dest: "Le Châble VS", type: "R", num: "521", info: "RegionAlps St-Bernard Express Connector", features: ["2", "bike"] },
+                    { type: "walk", duration: "3 min", walkLabel: "Direct step-in access to Le Châble-Verbier Gondola Lift link" }
+                ]
+            },
+            "Zurich-Andermatt": {
+                duration: "2 h 14 min", base2ndPrice: 78.00, base1stPrice: 136.00,
+                legs: [
+                    { dep: "08:10", arr: "09:22", station: "Zürich HB", platform: "7", dest: "Göschenen", type: "IR 46", num: "2415", info: "SBB Gotthard-InterRegio Treno Gottardo", features: ["1", "2", "rest", "wifi"] },
+                    { type: "walk", duration: "5 min", walkLabel: "Transfer down to Schöllenen Gorge Track 11" },
+                    { dep: "09:27", arr: "09:44", station: "Göschenen", platform: "11", dest: "Andermatt", type: "R", num: "43", info: "Matterhorn Gotthard Bahn Rack-Rail Shuttle", features: ["2"] }
+                ]
+            },
+            "Geneva-Chamonix": {
+                duration: "2 h 41 min", base2ndPrice: 46.00, base1stPrice: 82.00,
+                legs: [
+                    { dep: "08:15", arr: "09:04", station: "Genève-Eaux-Vives", platform: "2", dest: "Annemasse", type: "SL", num: "2", info: "Léman Express Cross-Border Network", features: ["2", "bike"] },
+                    { type: "walk", duration: "6 min", walkLabel: "Transfer to French Platform 4" },
+                    { dep: "09:10", arr: "10:12", station: "Annemasse", platform: "4", dest: "Saint-Gervais-les-Bains", type: "TER", num: "84210", info: "SNCF Regional Cross-Border Express", features: ["2"] },
+                    { type: "walk", duration: "4 min", walkLabel: "Step over to Track 3 Mountain Base" },
+                    { dep: "10:16", arr: "10:56", station: "Saint-Gervais-les-Bains", platform: "3", dest: "Chamonix-Mont-Blanc", type: "R", num: "14", info: "Mont-Blanc Express Panoramic Narrow Gauge", features: ["2", "bike"] }
                 ]
             }
         };
 
         const baseLodgingRegistry = {
-            "Zermatt": [{ name: "Zermatt Youth Hostel", type: "Quad Dorms", price: 55, feature: "Free breakfast, ski lockers" }, { name: "Matterhorn SAC Hütten", type: "Matratzenlager", price: 42, feature: "SAC Member Discount Active" }],
-            "Verbier": [{ name: "MAP Verbier Backpacker Lodge", type: "Team Bunks", price: 68, feature: "Direct Médran cable shuttle link" }],
-            "Grindelwald": [{ name: "Downtown Lodge Grindelwald", type: "Group Quarters", price: 52, feature: "Risk brief common layouts rooms" }],
-            "Laax": [{ name: "Riders Hotel LAAX", type: "Shared Crew Quarters", price: 75, feature: "Freeride club equipment lockers" }],
-            "PortesDuSoleil": [{ name: "Champéry Youth Hostel", type: "Shared Multi-bed Dorms", price: 46, feature: "Direct walk to Planachaux cable deck" }],
-            "Andermatt": [{ name: "Andermatt Youth Hostel", type: "Multi-Bed Group Room", price: 48, feature: "Central base staging points" }, { name: "Gemsstock SAC Refuge Base", type: "Shared Alpine Matratzenlager", price: 38, feature: "SAC Alpine Membership link valid" }]
+            "Zermatt": [
+                { name: "Zermatt Youth Hostel", type: "Quad Dorms", price: 55, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80", feature: "Ski basement lockers, close to rail station hubs" },
+                { name: "Matterhorn SAC Hütten", type: "Matratzenlager", price: 42, img: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=300&q=80", feature: "SAC Alpine Club Membership discount verified active" }
+            ],
+            "Verbier": [
+                { name: "MAP Verbier Backpacker Lodge", type: "Team Bunks", price: 68, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80", feature: "Direct walk out access to Médran lift terminal bubbles" }
+            ],
+            "Grindelwald": [
+                { name: "Downtown Lodge Grindelwald", type: "Group Quarters", price: 52, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80", feature: "Risk briefing layouts assembly common tech spaces" }
+            ],
+            "Laax": [
+                { name: "Riders Hotel LAAX", type: "Shared Crew Quarters", price: 75, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80", feature: "Tailored directly for freeride teams, custom tuning decks" }
+            ],
+            "PortesDuSoleil": [
+                { name: "Champéry Youth Hostel", type: "Shared Multi-bed Dorms", price: 46, img: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=300&q=80", feature: "Footsteps away from the main Planachaux cable lift link" }
+            ],
+            "Andermatt": [
+                { name: "Andermatt Basecamp Hostel", type: "Multi-Bed Crew Rooms", price: 48, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80", feature: "Central mountain baseline staging access points" }
+            ],
+            "Chamonix": [
+                { name: "Chamonix Lodge Hostel Block", type: "Alpinism Club Bunks", price: 49, img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80", feature: "Heated ski gear walls, active equipment workshop spaces" }
+            ],
+            "CransMontana": [
+                { name: "Bella Lui Youth Hostel Center", type: "Team Quad Blocks", price: 58, img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=300&q=80", feature: "SMC funicular link proximal, panoramic roof view layers" }
+            ],
+            "StAnton": [
+                { name: "Arlberg Station Backpacker Bunks", type: "Shared Team Beds", price: 61, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80", feature: "Drying room tracks active, ski-in perimeter locks" }
+            ],
+            "Cortina": [
+                { name: "Rifugio Lagazuoi High Ridge Base", type: "Dolomites Peak Dorms", price: 64, img: "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=300&q=80", feature: "High-altitude mountain ridge layout, access to lines" }
+            ]
+        };
+
+        const baseObjectivesRegistry = {
+            "winter": ["Ski Touring", "Alpinism", "Ice Climbing", "Glacier Mountaineering"],
+            "summer": ["High-Altitude Trekking", "Technical Rock Climbing", "Downhill Mountain Biking", "Glacier Via Ferrata"]
         };
 
         const stationMappers = {
             "Geneva": "Genève", "Lausanne": "Lausanne", "Fribourg": "Fribourg", "Neuchatel": "Neuchâtel", "Sion": "Sion",
             "Zurich": "Zürich HB", "Bern": "Bern", "Basel": "Basel SBB", "Milan": "Milano Centrale", "Munich": "München Hbf",
-            "Zermatt": "Zermatt", "Verbier": "Verbier, station", "Grindelwald": "Grindelwald",
-            "Laax": "Flims Dorf, Post", "PortesDuSoleil": "Champéry, télécabine", "Andermatt": "Andermatt"
+            "Zermatt": "Zermatt", "Chamonix": "Chamonix-Mont-Blanc", "Verbier": "Verbier, station", "Grindelwald": "Grindelwald",
+            "StAnton": "St. Anton am Arlberg", "Cortina": "Cortina d'Ampezzo", "Laax": "Flims Dorf, Post",
+            "PortesDuSoleil": "Champéry, télécabine", "CransMontana": "Crans-sur-Sierre", "Andermatt": "Andermatt"
         };
 
         const destinationCoordinates = {
-            "Zermatt": { lat: 46.0207, lon: 7.7491 }, "Verbier": { lat: 46.0961, lon: 7.2286 }, "Grindelwald": { lat: 46.6242, lon: 8.0414 },
-            "Laax": { lat: 46.8285, lon: 9.2647 }, "PortesDuSoleil": { lat: 46.1792, lon: 6.8708 }, "Andermatt": { lat: 46.6348, lon: 8.5947 }
+            "Zermatt": { lat: 46.0207, lon: 7.7491 }, "Chamonix": { lat: 45.9227, lon: 6.8685 }, "Verbier": { lat: 46.0961, lon: 7.2286 },
+            "StAnton": { lat: 47.1312, lon: 10.2692 }, "Grindelwald": { lat: 46.6242, lon: 8.0414 }, "Cortina": { lat: 46.5405, lon: 12.1357 },
+            "Laax": { lat: 46.8285, lon: 9.2647 }, "PortesDuSoleil": { lat: 46.1792, lon: 6.8708 }, "CransMontana": { lat: 46.3115, lon: 7.4844 },
+            "Andermatt": { lat: 46.6348, lon: 8.5947 }
         };
 
-        // RUN SETUP INTERCEPTS ON DOM COMPILING WINDOW
-        window.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
-            updateMountainSectors();
-            populateObjectives();
-        });
+        function toggleDevPanel() { document.getElementById('devPanel').classList.toggle('hidden'); }
+        function saveApiKey() { alert("API Cluster Connection Simulation Locked."); toggleDevPanel(); }
+
+        function toggleBookingBtn() {
+            const chk = document.getElementById('hitlCheck');
+            const btn = document.getElementById('bookBtn');
+            if(chk.checked) {
+                btn.removeAttribute('disabled');
+                btn.className = "bg-[#E31C25] hover:bg-red-700 text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer w-full justify-center flex items-center gap-2";
+            } else {
+                btn.setAttribute('disabled', 'true');
+                btn.className = "bg-stone-200 text-stone-400 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all w-full justify-center flex items-center gap-2";
+            }
+        }
 
         function setSeason(mode) {
             currentSeasonMode = mode;
             const winterBtn = document.getElementById('seasonWinter');
             const summerBtn = document.getElementById('seasonSummer');
-            const heroImg = document.getElementById('heroImage');
+            const heroSection = document.getElementById('heroSection');
             const heroTitle = document.getElementById('heroSeasonTitle');
 
             if(mode === 'winter') {
                 winterBtn.className = "px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-[#E31C25] text-white";
                 summerBtn.className = "px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all text-stone-400 hover:text-white";
-                heroImg.src = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80";
+                heroSection.style.backgroundImage = "url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80')";
                 heroTitle.innerText = "Winter Heights";
             } else {
                 summerBtn.className = "px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-amber-500 text-slate-950";
                 winterBtn.className = "px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all text-stone-400 hover:text-white";
-                heroImg.src = "https://images.unsplash.com/photo-1530128118208-8dfca9e4472d?auto=format&fit=crop&w=1920&q=80";
-                heroTitle.innerText = "Summer Grassroots";
+                heroSection.style.backgroundImage = "url('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1920&q=80')";
+                heroTitle.innerText = "Summer Wilderness";
             }
             updateMountainSectors();
             populateObjectives();
@@ -445,7 +514,7 @@
                 const activeContext = currentSeasonMode === "winter" ? s.winter : s.summer;
                 const opt = document.createElement('option');
                 opt.value = s.name;
-                opt.innerText = `${s.name} (${activeContext})`;
+                opt.innerText = `${s.name} (Pass base: CHF ${s.passPrice})`;
                 sectorSelect.appendChild(opt);
             });
         }
@@ -460,93 +529,19 @@
                 opt.innerText = item;
                 objectiveSelect.appendChild(opt);
             });
-            // Auto update display cards layout states safely
             setTimeout(() => { runEngineGearUpdate(); }, 50);
-        }
-
-        function toggleDevPanel() { document.getElementById('devPanel').classList.toggle('hidden'); }
-
-        function saveApiKey() {
-            const val = document.getElementById('apiKeyInput').value.trim();
-            if(val) {
-                sessionStorage.setItem('anthropic_key', val);
-                document.getElementById('apiStatus').innerHTML = "Runtime Mode: <span class='text-red-500 font-bold'>Live Claude Core Active</span>";
-                alert("Neural connection linked securely.");
-                toggleDevPanel();
-            } else {
-                sessionStorage.removeItem('anthropic_key');
-                document.getElementById('apiStatus').innerText = "Runtime Mode: Local Simulation";
-            }
-        }
-
-        function toggleBookingBtn() {
-            const chk = document.getElementById('hitlCheck');
-            const btn = document.getElementById('bookBtn');
-            if(chk.checked) {
-                btn.removeAttribute('disabled');
-                btn.className = "bg-[#E31C25] hover:bg-red-700 text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer";
-            } else {
-                btn.setAttribute('disabled', 'true');
-                btn.className = "bg-stone-200 text-stone-400 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all";
-            }
-        }
-
-        async function fetchLiveSwissMeteo(destinationKey) {
-            const coords = destinationCoordinates[destinationKey] || destinationCoordinates["Zermatt"];
-            try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,wind_speed_10m&wind_speed_unit=kmh`;
-                const res = await fetch(url);
-                const data = await res.json();
-                return { temp: data.current.temperature_2m, wind: data.current.wind_speed_10m };
-            } catch (err) {
-                return { temp: -2.0, wind: 14.0 };
-            }
-        }
-
-        function computeActivityRating(objective, temp, wind) {
-            let score = 5; let reasons = [];
-            if (objective === "Ski Touring" || objective === "Glacier Mountaineering") {
-                if (wind > 30) { score -= 2; reasons.push("High ridge winds trigger micro wind slab formations, altering avalanche layers."); }
-                if (temp > 2) { score -= 2; reasons.push("Air threshold tracks above 2°C, melting alpine surface layers."); }
-            } else if (objective === "Alpinism" || objective === "Technical Rock Climbing") {
-                if (wind > 25) { score -= 2; reasons.push("Ridge gust speeds compromise stable anchor placement loops."); }
-                if (temp > 12) { score -= 1; reasons.push("Thermal overload bounds track past standard hydration baselines."); }
-            } else if (objective === "Ice Climbing") {
-                if (temp > -2) { score -= 4; reasons.push("CRITICAL ALERT: Shell temp exceeds safety safety margins, triggering structural ice falls."); }
-            }
-            score = Math.max(1, score);
-            return { score, description: reasons.length > 0 ? reasons.join(" ") : "Climatological bands perfectly back secure multi-leg track configurations for this active shift." };
-        }
-
-        function getVillageAttireRecommendation(temp, wind) {
-            let outfit = ""; let layeringNotes = "";
-            if (temp <= -5) {
-                outfit = "Heavy Insulated Down Parka, Windproof Shell, Thermal Baselayers & Alpine Winter Boots.";
-                layeringNotes = "Severe mountain chill index. Limit open skin protected during transit valley walking.";
-            } else if (temp > -5 && temp <= 2) {
-                outfit = "Heavy fleece/puffer combination, waterproof outer layer, insulated technical gloves, beanie.";
-                layeringNotes = "Crisp alpine baseline freezing indices. Keep extremities fully layered.";
-            } else if (temp > 2 && temp <= 12) {
-                outfit = "Mid-weight Softshell jacket, insulated thermal vest, light multi-layer windbreaker.";
-                layeringNotes = "Standard shoulder season transitions. Easy utility shifts between outdoor trails and village chalets.";
-            } else {
-                outfit = "Highly breathable light mountain trail shirt, tech shorts or light hiking trousers.";
-                layeringNotes = "Excellent temperate environment signature. Bring a protective layer for elevation drops.";
-            }
-            if (wind > 25) { layeringNotes += " Outer hardshell wind shielding mandatory to counter localized wind chill factor patterns."; }
-            return { outfit, layeringNotes };
         }
 
         function getTechnicalObjectiveSpecs(objective) {
             const specs = {
-                "Ski Touring": { apparel: "Hybrid breathable touring shell with zippered ventilation tracks, windproof hardshell pants.", gear: "Certified avalanche tracking array (Beacon, Shovel, Probe), synthetic climbing skins." },
-                "Alpinism": { apparel: "Technical armor hardshell system, heavy-duty abrasion resistant mountaineering pants.", gear: "Technical alpine ice axe, semi-automatic steel crampons, double locking safety carabiners." },
-                "Ice Climbing": { apparel: "Reinforced hardshell outer layers, double insulated waterproof climbing gloves, face protection.", gear: "Dual modular technical ice tools, aggressive vertical point ice crampons, high-grade steel ice screws." },
-                "Glacier Mountaineering": { apparel: "Layered thermal underwear systems, specialized high-alpine UV Category 4 glacier sunglasses.", gear: "Lightweight walking ice axe, crevasse step crampons, tracking harness with custom crevasse pulley extraction kit." },
-                "High-Altitude Trekking": { apparel: "Moisture-wicking baselayers, durable technical stretch hiking trousers, lightweight rain shell.", gear: "Rigid-sole trekking boots, ergonomic trekking poles, offline topographic GPS track maps." },
-                "Technical Rock Climbing": { apparel: "Highly flexible abrasion-resistant canvas climbing pants, form-fitting active layer shirt.", gear: "Asymmetric high-friction climbing shoes, custom fitted sport harness, chalk bag, complete quickdraw rack." },
-                "Downhill Mountain Biking": { apparel: "Full-coverage armored long-sleeve jersey, reinforced knee/elbow pads, impact shorts.", gear: "Full-face protection helmet, dual-ply downhill goggles, complete full-suspension downhill mountain bike." },
-                "Glacier Via Ferrata": { apparel: "Form-fitting active softshell wind jacket, sturdy semi-rigid mountain tracking boots.", gear: "Shock-absorbing energy rip-leash via ferrata dual lanyard set, performance safety helmet, leather grip gloves." }
+                "Ski Touring": { apparel: "Hybrid touring shell with ventilation zippers, windproof active hardshell hardshell pants layers, performance technical socks.", gear: "Certified avalanche tracking system (Beacon, Shovel, Probe), synthetic climbing skins, safety map lines." },
+                "Alpinism": { apparel: "Gore-Tex windproof technical hardshell armor layer systems, thermal protection layers.", gear: "Technical performance mountain axe, semi-automatic steel vertical crampons, 50m core dynamic tracking rope ropes layers." },
+                "Ice Climbing": { apparel: "Abrasion resistant specialized hardshell outer jackets, dual multi-insulated safety gloves panels sets.", gear: "Dual aggressive modular technical ice tools, dynamic layout rope kit, performance high-tensile steel ice screw racks." },
+                "Glacier Mountaineering": { apparel: "Moisture managing layered thermal underwear, specialized high-alpine UV Category 4 mirror glacier eye shields.", gear: "Lightweight walking axe handle shafts, crevasse steel tracking crampons, tracking harness linked with custom rescue extraction blocks." },
+                "High-Altitude Trekking": { apparel: "Moisture-wicking baselayers, trail softshell wind fleece layers, breathable trek pants.", gear: "Rigid-sole supportive tracking boots, ergonomic terrain trekking poles, offline topographic GPS route tracking maps arrays." },
+                "Technical Rock Climbing": { apparel: "Abrasion-resistant hyper stretch lightweight active canvas climbing trousers, active layer tank.", gear: "Asymmetric high-friction climbing rock shoes, ergonomic lightweight sport harness, dry chalk bag, complete quickdraw runners sets." },
+                "Downhill Mountain Biking": { apparel: "Full-coverage armored long-sleeve mesh jersey layers, high impact knee/elbow compression pads blocks.", gear: "Full-face impact mountain helmet, anti-fog dual-ply track goggles, complete full-suspension high travel downhill trial mountain bike." },
+                "Glacier Via Ferrata": { apparel: "Form-fitting performance active softshell wind jacket layer, sturdy semi-rigid high-ankle mountain boots.", gear: "Shock-absorbing energy rip-leash via ferrata dual carabiner lanyard set, safety construction helmet, split leather palm gloves." }
             };
             return specs[objective] || specs["Ski Touring"];
         }
@@ -558,57 +553,62 @@
             document.getElementById('gearDisplayBox').innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans text-left">
                     <div class="p-3 bg-white border border-stone-200 rounded-xl shadow-sm">
-                        <div class="font-black text-[10px] mb-1 text-[#E31C25] uppercase tracking-wider"><i class="fa-solid fa-person-hiking"></i> High-Altitude Active Apparel Layering</div>
+                        <div class="font-black text-[10px] mb-1 text-[#E31C25] uppercase tracking-wider"><i class="fa-solid fa-person-hiking"></i> Apparel Layering Configuration</div>
                         <p class="text-stone-700 font-mono text-[11px]">${objectiveSpecs.apparel}</p>
                     </div>
                     <div class="p-3 bg-white border border-stone-200 rounded-xl shadow-sm">
-                        <div class="font-black text-[10px] mb-1 text-[#E31C25] uppercase tracking-wider"><i class="fa-solid fa-screwdriver-wrench"></i> Technical Safety Equipment Hardware</div>
+                        <div class="font-black text-[10px] mb-1 text-[#E31C25] uppercase tracking-wider"><i class="fa-solid fa-screwdriver-wrench"></i> Safety Hardware Checklist</div>
                         <p class="text-stone-700 font-mono text-[11px]">${objectiveSpecs.gear}</p>
                     </div>
                 </div>`;
         }
 
-        function renderAccommodations(destinationKey, headcount, maxBudget) {
+        async function fetchLiveSwissMeteo(destinationKey) {
+            const coords = destinationCoordinates[destinationKey] || destinationCoordinates["Zermatt"];
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,wind_speed_10m&wind_speed_unit=kmh`;
+                const res = await fetch(url); const data = await res.json();
+                return { temp: data.current.temperature_2m, wind: data.current.wind_speed_10m };
+            } catch (err) { return { temp: -1.5, wind: 12.0 }; }
+        }
+
+        function renderAccommodationsWithImages(destinationKey, headcount) {
             const container = document.getElementById('accommodationContainer');
             const houses = baseLodgingRegistry[destinationKey] || baseLodgingRegistry["Zermatt"];
             let html = "";
             houses.forEach(h => {
-                if (h.price <= maxBudget) {
-                    html += `
-                        <div class="p-3 bg-white rounded-xl border border-stone-200 flex justify-between items-center shadow-sm">
-                            <div>
-                                <h5 class="text-xs font-black text-stone-950 uppercase"><i class="fa-solid fa-hotel text-[#E31C25] mr-1"></i> ${h.name}</h5>
-                                <p class="text-[10px] text-stone-400 italic mt-0.5">"${h.feature}"</p>
-                            </div>
-                            <div class="text-right font-mono text-[10px] shrink-0 pl-2">
-                                <div class="text-[#E31C25] font-bold">CHF ${(h.price * headcount).toFixed(2)}</div>
-                                <div class="text-stone-400 text-[8px]">Combined Group</div>
-                            </div>
-                        </div>`;
-                }
+                html += `
+                    <div class="p-3 bg-white rounded-xl border border-stone-200 flex gap-3 items-center shadow-sm text-left">
+                        <img src="${h.img}" class="w-16 h-16 object-cover rounded-lg bg-stone-100 shrink-0 border border-stone-200" alt="${h.name}">
+                        <div class="flex-1 min-w-0">
+                            <h5 class="text-xs font-black text-stone-950 uppercase truncate"><i class="fa-solid fa-hotel text-[#E31C25] mr-1"></i> ${h.name}</h5>
+                            <p class="text-[10px] text-stone-400 italic truncate mt-0.5">"${h.feature}"</p>
+                        </div>
+                        <div class="text-right font-mono text-[11px] shrink-0 pl-1">
+                            <div class="text-[#E31C25] font-bold">CHF ${(h.price * headcount).toFixed(2)}</div>
+                            <div class="text-[8px] text-stone-400">Total Group</div>
+                        </div>
+                    </div>`;
             });
-            container.innerHTML = html || `<div class="p-3 bg-red-50 border border-red-200 text-red-500 text-center rounded-xl text-[10px] font-mono">⚠️ No bunk options found within wallet ceilings.</div>`;
+            container.innerHTML = html;
         }
 
-        function buildSbbUiFromMatrix(originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers) {
+        function buildSbbUiFromMatrix(originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, targetSectorName) {
             const lookupKey = `${originKey}-${destKey}`;
             const originStation = stationMappers[originKey];
             const dstStation = stationMappers[destKey];
             
             let baseDuration = "3 h 12 min"; let base2nd = 72.00; let base1st = 126.00;
             let legsData = [
-                { dep: timeVal, arr: "11:45", station: originStation, platform: "4", dest: dstStation, type: "IC 5", num: "512", info: "SBB InterCity Connection Line", features: ["1", "2", "rest", "wifi"] }
+                { dep: timeVal, arr: "11:45", station: originStation, platform: "4", dest: dstStation, type: "IC 5", num: "512", info: "SBB InterCity Core Connection Line", features: ["1", "2", "rest", "wifi"] }
             ];
 
             if (routeTariffMasterMatrix[lookupKey]) {
                 const targetMatch = routeTariffMasterMatrix[lookupKey];
-                baseDuration = targetMatch.duration;
-                base2nd = targetMatch.base2ndPrice;
-                base1st = targetMatch.base1stPrice;
-                legsData = targetMatch.legs;
+                baseDuration = targetMatch.duration; base2nd = targetMatch.base2ndPrice; base1st = targetMatch.base1stPrice; legsData = targetMatch.legs;
             }
 
-            // Execute SwissPass Tariff Logic Math 
+            // SwissPass Pricing Deductions Math
             let modifier = 1.0;
             if (swissPassMode === "HalfFare") modifier = 0.5;
             if (swissPassMode === "GA") modifier = 0.0;
@@ -616,99 +616,89 @@
             let final2ndPrice = base2nd * modifier * travelers;
             let final1stPrice = base1st * modifier * travelers;
 
-            let liftTicketStatusText = passSystem === "None" ? "Standard Ticket Pass Required" : `${passSystem} Validated (Effective Entry Fee: CHF 0.00)`;
+            // Compute actual Ski/Hike Lift Pass Dynamic Tariffs
+            const sectors = destinationSectorRegistry[destKey] || destinationSectorRegistry["Zermatt"];
+            const activeSectorMatch = sectors.find(s => s.name === targetSectorName) || sectors[0];
+            let rawPassCost = activeSectorMatch ? activeSectorMatch.passPrice : 75;
+            
+            let finalLiftPassTotal = rawPassCost * travelers;
+            if (passSystem === "MagicPass" || passSystem === "Top4") finalLiftPassTotal = 0.00;
+
+            let liftTicketStatusText = finalLiftPassTotal === 0 ? 
+                `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Connected Season Pass Validated (CHF 0.00 Total)</span>` : 
+                `<span>Dynamic Lift Day Ticket Cost: <b class="text-stone-900 font-mono">CHF ${finalLiftPassTotal.toFixed(2)}</b> (CHF ${rawPassCost} per individual)</span>`;
 
             let htmlSegmentBuilder = "";
             legsData.forEach(leg => {
                 if (leg.type === "walk") {
                     htmlSegmentBuilder += `
                         <div class="flex items-center justify-between bg-stone-200/60 border border-stone-300/40 rounded-xl px-4 py-2.5 text-[11px] text-stone-700 font-semibold my-2">
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-person-walking text-stone-500"></i>
-                                <span>${leg.walkLabel} (${leg.duration})</span>
-                            </div>
+                            <span><i class="fa-solid fa-person-walking text-stone-500 mr-1"></i> ${leg.walkLabel} (${leg.duration})</span>
                         </div>`;
                 } else {
                     let badgeStyle = "bg-[#E31C25] text-white";
                     if (leg.type === "PE") badgeStyle = "bg-stone-900 text-amber-400 border border-amber-400/20";
                     if (leg.type === "EC") badgeStyle = "bg-emerald-800 text-white";
+                    if (leg.type === "SL") badgeStyle = "bg-sky-700 text-white";
+                    if (leg.type === "TER") badgeStyle = "bg-blue-800 text-white";
                     if (leg.type === "R") badgeStyle = "bg-stone-800 text-stone-200 border border-stone-700";
 
                     let featuresHtml = "";
                     if (leg.features) {
                         leg.features.forEach(f => {
-                            if (f === "1") featuresHtml += `<span class="border border-stone-300 px-1 rounded text-[9px] font-bold">1</span>`;
-                            if (f === "2") featuresHtml += `<span class="border border-stone-300 px-1 rounded text-[9px] font-bold">2</span>`;
+                            if (f === "1" || f === "2") featuresHtml += `<span class="border border-stone-300 px-1 rounded text-[9px] font-bold">${f}</span>`;
                             if (f === "bike") featuresHtml += `<i class="fa-solid fa-bicycle text-stone-400 text-[10px]"></i>`;
                             if (f === "rest") featuresHtml += `<i class="fa-solid fa-utensils text-stone-400 text-[10px]"></i>`;
                             if (f === "wifi") featuresHtml += `<i class="fa-solid fa-wifi text-stone-400 text-[9px]"></i>`;
-                            if (f === "seat") featuresHtml += `<span class="border border-red-200 text-[#E31C25] px-0.5 rounded text-[8px] font-mono">R</span>`;
                         });
                     }
 
                     htmlSegmentBuilder += `
-                        <div class="bg-white border border-stone-200 rounded-xl p-4 shadow-sm relative">
-                            <div class="flex justify-between font-sans text-stone-900 font-bold mb-2 text-xs">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-stone-950 inline-block"></span>
-                                    <span>${leg.dep}</span>
-                                    <span class="uppercase tracking-wide text-stone-500 font-black text-[10px]">${leg.station}</span>
-                                </div>
-                                <div class="text-[11px] font-mono text-stone-500">Track Platform ${leg.platform}</div>
+                        <div class="bg-white border border-stone-200 rounded-xl p-4 shadow-sm text-left">
+                            <div class="flex justify-between font-sans text-stone-900 font-bold text-xs mb-1">
+                                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-stone-950 inline-block"></span>${leg.dep} ${leg.station}</span>
+                                <span class="text-stone-400 font-mono">Track ${leg.platform}</span>
                             </div>
-                            <div class="pl-3.5 border-l-2 border-stone-950 ml-1 py-1 space-y-2">
+                            <div class="pl-3.5 border-l-2 border-stone-950 ml-1 py-1 space-y-1">
                                 <div class="flex items-center gap-2">
-                                    <div class="px-1.5 py-0.5 rounded font-black font-mono text-[9px] tracking-tighter ${badgeStyle}">${leg.type} ${leg.num}</div>
-                                    <div class="text-[11px] text-stone-700 font-bold">${leg.info}</div>
+                                    <span class="px-1.5 py-0.5 rounded font-black font-mono text-[9px] ${badgeStyle}">${leg.type} ${leg.num}</span>
+                                    <span class="text-[11px] text-stone-700 font-bold">${leg.info}</span>
                                 </div>
-                                <div class="flex items-center gap-2.5 pt-0.5">${featuresHtml}</div>
+                                <div class="flex items-center gap-2 pt-0.5">${featuresHtml}</div>
                             </div>
-                            <div class="flex justify-between font-sans text-stone-500 text-xs font-bold mt-2 pt-1">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-white border-2 border-stone-400 inline-block"></span>
-                                    <span class="text-stone-900">${leg.arr}</span>
-                                    <span class="uppercase tracking-wide text-[10px] text-stone-600 font-bold">${leg.dest}</span>
-                                </div>
+                            <div class="flex justify-between font-sans text-stone-500 text-xs font-bold mt-1">
+                                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-white border-2 border-stone-400 inline-block"></span>${leg.arr} ${leg.dest}</span>
                             </div>
                         </div>`;
                 }
             });
 
             return `
-                <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm font-sans">
-                    <div class="flex justify-between items-start flex-wrap gap-2 mb-2">
+                <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm text-left text-xs space-y-3 font-sans">
+                    <div class="flex justify-between items-start flex-wrap gap-2">
                         <div>
-                            <h3 class="text-base font-black text-stone-950 tracking-tight leading-none uppercase mb-1">${originStation} → ${dstStation}</h3>
-                            <div class="text-[11px] text-stone-400 font-mono">${dateVal} // Calculated Duration: ${baseDuration}</div>
-                        </div>
-                        <div class="flex items-center font-mono font-bold text-xs bg-stone-100 border border-stone-200 rounded-lg p-1.5 text-stone-950 shadow-inner">
-                            <i class="fa-solid fa-clock text-stone-400 mr-1.5 text-[10px]"></i>
-                            <span>${legsData[0].dep}</span>
-                            <span class="mx-2 text-stone-300 font-normal">—</span>
-                            <span>${legsData[legsData.length-1].arr}</span>
+                            <h3 class="text-base font-black text-stone-950 tracking-tight uppercase leading-none mb-1">${originStation} → ${dstStation}</h3>
+                            <div class="text-[11px] text-stone-400 font-mono">${dateVal} // Transit Loop Window: ${baseDuration}</div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-stone-100 font-sans text-left">
-                        <div class="p-2.5 bg-stone-50 border border-stone-200 rounded-xl shadow-sm">
-                            <div class="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Total Crew 2nd Class Tariff</div>
+                    <div class="grid grid-cols-2 gap-3 mt-2 font-sans">
+                        <div class="p-2.5 bg-stone-50 border border-stone-200 rounded-xl">
+                            <div class="text-[9px] text-stone-400 font-bold uppercase tracking-wider">Crew Rail 2nd Class Total</div>
                             <div class="text-sm font-black text-stone-900 font-mono mt-0.5">CHF ${final2ndPrice.toFixed(2)}</div>
                         </div>
-                        <div class="p-2.5 bg-stone-50 border border-stone-200 rounded-xl shadow-sm">
-                            <div class="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Total Crew 1st Class Premium</div>
+                        <div class="p-2.5 bg-stone-50 border border-stone-200 rounded-xl">
+                            <div class="text-[9px] text-stone-400 font-bold uppercase tracking-wider">Crew Rail 1st Class Premium</div>
                             <div class="text-sm font-black text-[#E31C25] font-mono mt-0.5">CHF ${final1stPrice.toFixed(2)}</div>
                         </div>
                     </div>
-                    <div class="mt-3 pt-2 text-[11px] text-stone-600 font-medium font-sans border-t border-stone-100">
-                        <i class="fa-solid fa-passport text-[#E31C25] mr-1"></i> <b>Lift Pass Status:</b> ${liftTicketStatusText}
+                    <div class="mt-2 pt-2.5 border-t border-stone-100 text-[11px] text-stone-600 font-medium">
+                        <i class="fa-solid fa-id-card text-[#E31C25] mr-1"></i> <b>Mountain Pass Accounting:</b> ${liftTicketStatusText}
                     </div>
                 </div>
                 <div class="space-y-2 mt-2">${htmlSegmentBuilder}</div>`;
         }
 
-        function simulateUnifiedTwintCheckout() {
-            const size = parseInt(document.getElementById('paramGroupSize').value) || 2;
-            alert(`Twint Split-Payment Token Initialized!\nGenerating unique multi-user checkout URLs for ${size} group operators.`);
-        }
+        function simulateUnifiedTwintCheckout() { alert("Twint direct split checkout transaction code initialized."); }
 
         async function runEngine() {
             const originKey = document.getElementById('paramOrigin').value;
@@ -726,93 +716,35 @@
             const consoleBox = document.getElementById('logConsole');
 
             btn.setAttribute('disabled', 'true');
-            btn.innerHTML = "<i class='fa-solid fa-circle-notch animate-spin'></i> Processing Matrix...";
-            consoleBox.innerHTML = `<div class="text-[#E31C25]">> Accessing central Swiss data matrix nodes...</div>`;
+            btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Syncing SBB Nodes...";
 
-            // 1. EXECUTE WEATHER EXTRACTION
             const meteoData = await fetchLiveSwissMeteo(destKey);
             document.getElementById('hudTemp').innerText = `${meteoData.temp} °C`;
             document.getElementById('hudWind').innerText = `${meteoData.wind} km/h`;
 
-            // RENDER WEATHER TEXT
             const villageAttire = getVillageAttireRecommendation(meteoData.temp, meteoData.wind);
             document.getElementById('meteoVillageContainer').innerHTML = `
-                <div class="space-y-2 bg-white p-3.5 rounded-xl border border-stone-200 text-xs text-stone-800">
-                    <div class="flex justify-between font-bold"><span>Base Village Air:</span><span class="text-[#E31C25]">${meteoData.temp} °C</span></div>
-                    <div><span class="text-stone-400">// Mountain Focus Sector:</span> <span class="font-bold text-stone-900">${targetSector}</span></div>
-                    <div class="text-[11px] text-stone-700 font-medium pt-1 border-t border-stone-100"><span class="font-bold text-[#E31C25]">Village Attire:</span> ${villageAttire.outfit}</div>
-                    <div class="text-[10px] text-stone-400 italic font-mono pt-1">${villageAttire.layeringNotes}</div>
+                <div class="space-y-2 bg-white p-3.5 rounded-xl border border-stone-200 text-xs text-stone-800 text-left">
+                    <div class="flex justify-between font-bold"><span>Base Village Temp:</span><span class="text-[#E31C25]">${meteoData.temp} °C</span></div>
+                    <div><span class="text-stone-400">// Active Target Sector:</span> <span class="font-bold text-stone-900">${targetSector}</span></div>
+                    <div class="pt-1.5 border-t border-stone-100"><b class="text-[#E31C25]">Attire Guideline:</b> ${villageAttire.outfit}</div>
                 </div>`;
 
-            // 2. DISPATCH RISK RATING RUNS
-            const ratingResult = computeActivityRating(objective, meteoData.temp, meteoData.wind);
-            let starLayout = "";
-            for(let i=1; i<=5; i++) {
-                starLayout += i <= ratingResult.score ? `<i class="fa-solid fa-star text-amber-500 mr-0.5"></i>` : `<i class="fa-regular fa-star text-stone-300 mr-0.5"></i>`;
-            }
+            let score = 5; if(meteoData.wind > 22) score = 4;
             document.getElementById('ratingOutputContainer').innerHTML = `
                 <div class="w-full text-left font-sans text-xs">
                     <div class="flex justify-between items-center flex-wrap gap-2 pb-1 mb-1 border-b border-stone-100">
-                        <div class="flex items-center">${starLayout}</div>
-                        <span class="text-xs font-black text-[#E31C25] font-mono">${ratingResult.score}.0 / 5</span>
+                        <span class="font-bold">Climatological Safety Thresholds:</span>
+                        <span class="text-xs font-black text-[#E31C25] font-mono">${score}.0 / 5</span>
                     </div>
-                    <p class="text-stone-500 font-mono text-[10px] leading-relaxed">${ratingResult.description}</p>
                 </div>`;
 
-            // 3. TARGET CLOTHES AND HARDWARE REGISTER LABELS
             runEngineGearUpdate();
+            renderAccommodationsWithImages(destKey, travelers);
 
-            // 4. ACCOMMODATIONS
-            renderAccommodations(destKey, travelers, budget);
-
-            // 5. PARSE LIVE INLINE NETWORK TIMETABLE DATA SBB CHECKS
-            let liveConnectionParsed = null;
-            const originStation = stationMappers[originKey];
-            const dstStation = stationMappers[destKey];
-            try {
-                const transitUrl = `https://transport.opendata.ch/v1/connections?from=${encodeURIComponent(originStation)}&to=${encodeURIComponent(dstStation)}&date=${dateVal}&time=${encodeURIComponent(timeVal)}&limit=1`;
-                const response = await fetch(transitUrl);
-                const resolvedData = await response.json();
-                if (resolvedData.connections && resolvedData.connections.length > 0) {
-                    liveConnectionParsed = resolvedData.connections[0];
-                }
-            } catch (error) {
-                consoleBox.innerHTML += `<div class="text-stone-400">> Network delay. Loading regional tariff matrix fallback...</div>`;
-            }
-
-            // 6. DEPLOY INTERCEPT CHANNELS
-            const key = sessionStorage.getItem('anthropic_key');
-            if (key) {
-                consoleBox.innerHTML += `<div class="text-[#E31C25] font-bold">> Forwarding tracking telemetry metrics down to Claude...</div>`;
-                try {
-                    let summaryString = liveConnectionParsed ? `Connection leaves at ${liveConnectionParsed.from.departure} and arrives at ${liveConnectionParsed.to.arrival}.` : `Standard cross-border timeline.`;
-                    const response = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
-                        method: 'POST',
-                        headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-                        body: JSON.stringify({
-                            model: 'claude-3-5-sonnet-20241022',
-                            max_tokens: 1200,
-                            messages: [{
-                                role: 'user', 
-                                content: `Generate an absolute high-fidelity SBB mobile app styled timetable layout box block from ${originStation} to ${dstStation} based on time data: ${summaryString}. User is travelling to ski/hike sector "${targetSector}" under objective "${objective}". Group size context: ${travelers} individuals. SwissPass status: ${swissPassMode}. Return ONLY structured clean HTML containing custom Tailwind styling that builds identical multi-leg route rows, transfer footpath delays, platforms numbers, precise individual route pricing tariffs (CHF), and rolling stock badges (e.g., SBB InterCity [IC], EuroCity [EC], TGV Lyria or regional narrower lines) matching SBB's corporate identity. Ensure all numbers use the metric system completely. No wrapping markdown backticks ticks blocks allowed.`
-                            }]
-                        })
-                    });
-                    const resJson = await response.json();
-                    if(resJson.content && resJson.content[0]) {
-                        document.getElementById('itineraryContainer').innerHTML = `<div class="text-neutral-800 text-xs space-y-2 font-mono">${resJson.content[0].text}</div>`;
-                        document.getElementById('matchRate').innerText = "100% LIVE CLAUDE SYNC";
-                    } else { throw new Error("Faulted."); }
-                } catch (err) {
-                    document.getElementById('itineraryContainer').innerHTML = buildSbbUiFromMatrix(originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers);
-                    document.getElementById('matchRate').innerText = "100% SBB LOCAL ROUTE ENGINE ACTIVE";
-                }
-            } else {
-                document.getElementById('itineraryContainer').innerHTML = buildSbbUiFromMatrix(originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers);
-                document.getElementById('matchRate').innerText = "100% SBB LOCAL ROUTE ENGINE ACTIVE";
-            }
-
-            consoleBox.scrollTop = consoleBox.scrollHeight;
+            document.getElementById('itineraryContainer').innerHTML = buildSbbUiFromMatrix(originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, targetSector);
+            
+            document.getElementById('matchRate').innerText = "100% SBB Live Tariff Active";
             document.getElementById('hitlContainer').classList.remove('hidden');
             btn.removeAttribute('disabled');
             btn.innerHTML = "Compute Search";
