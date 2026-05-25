@@ -78,7 +78,7 @@
         </div>
     </header>
 
-    <section class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-30 mb-8">
+    <section id="configure-zone" class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-30 mb-8">
         <div class="bg-[#0b0c0e] text-white rounded-3xl p-6 shadow-2xl border border-stone-900">
             <div class="flex justify-between items-center mb-4 border-b border-stone-800 pb-3">
                 <h3 class="text-xs font-black tracking-widest uppercase text-stone-400 flex items-center gap-2">
@@ -188,6 +188,12 @@
     <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div class="bg-white p-6 sm:p-8 rounded-[32px] border-2 border-[#E31C25] swiss-glow-frame space-y-6 relative">
             
+            <div class="absolute top-6 right-8 flex gap-1">
+                <span class="w-4 h-2 bg-[#E31C25] transform -skew-x-12 inline-block"></span>
+                <span class="w-4 h-2 bg-[#E31C25] transform -skew-x-12 inline-block"></span>
+                <span class="w-4 h-2 bg-[#E31C25] transform -skew-x-12 inline-block"></span>
+            </div>
+
             <div class="border-b border-stone-200 pb-2 flex justify-between items-end">
                 <h2 class="text-xl font-black text-stone-950 tracking-tight uppercase">Workspace Evaluation Matrix</h2>
                 <div class="flex items-center gap-4 text-[10px] font-mono text-stone-400 font-bold uppercase tracking-wider">
@@ -280,7 +286,14 @@
         </div>
     </main>
 
+    <footer class="border-t border-stone-200 bg-stone-50 py-5 text-center text-[9px] font-mono text-stone-400 tracking-wider uppercase mt-auto">
+        <p>© 2026 AlpenSync Platforms. Structured inside metric tracking parameters.</p>
+    </footer>
+
     <script>
+        let currentSeasonMode = "winter";
+
+        // Multi-mountain sector tracking database maps per village destination node point
         const destinationSectorRegistry = {
             "Zermatt": [
                 { name: "Gornergrat Crest System (3089m)", summer: "Alpine Trail Wilderness Trekking", winter: "Piste High Freeride Carver Paths", passPrice: 78 },
@@ -447,11 +460,6 @@
             ]
         };
 
-        const baseObjectivesRegistry = {
-            "winter": ["Ski Touring", "Alpinism", "Ice Climbing", "Glacier Mountaineering"],
-            "summer": ["High-Altitude Trekking", "Technical Rock Climbing", "Downhill Mountain Biking", "Glacier Via Ferrata"]
-        };
-
         const stationMappers = {
             "Geneva": "Genève", "Lausanne": "Lausanne", "Fribourg": "Fribourg", "Neuchatel": "Neuchâtel", "Sion": "Sion",
             "Zurich": "Zürich HB", "Bern": "Bern", "Basel": "Basel SBB", "Milan": "Milano Centrale", "Munich": "München Hbf",
@@ -467,20 +475,12 @@
             "Andermatt": { lat: 46.6348, lon: 8.5947 }
         };
 
-        function toggleDevPanel() { document.getElementById('devPanel').classList.toggle('hidden'); }
-        function saveApiKey() { alert("API Cluster Connection Simulation Locked."); toggleDevPanel(); }
-
-        function toggleBookingBtn() {
-            const chk = document.getElementById('hitlCheck');
-            const btn = document.getElementById('bookBtn');
-            if(chk.checked) {
-                btn.removeAttribute('disabled');
-                btn.className = "bg-[#E31C25] hover:bg-red-700 text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer w-full justify-center flex items-center gap-2";
-            } else {
-                btn.setAttribute('disabled', 'true');
-                btn.className = "bg-stone-200 text-stone-400 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all w-full justify-center flex items-center gap-2";
-            }
-        }
+        // RUN SETUP INTERCEPTS ON DOM COMPILING WINDOW
+        window.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
+            updateMountainSectors();
+            populateObjectives();
+        });
 
         function setSeason(mode) {
             currentSeasonMode = mode;
@@ -521,7 +521,7 @@
 
         function populateObjectives() {
             const objectiveSelect = document.getElementById('paramObjective');
-            const arrayItems = seasonObjectivesRegistry[currentSeasonMode];
+            const arrayItems = seasonObjectivesRegistry[currentSeasonMode] || [];
             objectiveSelect.innerHTML = "";
             arrayItems.forEach(item => {
                 const opt = document.createElement('option');
@@ -530,6 +530,18 @@
                 objectiveSelect.appendChild(opt);
             });
             setTimeout(() => { runEngineGearUpdate(); }, 50);
+        }
+
+        function toggleBookingBtn() {
+            const chk = document.getElementById('hitlCheck');
+            const btn = document.getElementById('bookBtn');
+            if(chk && chk.checked) {
+                btn.removeAttribute('disabled');
+                btn.className = "bg-[#E31C25] hover:bg-red-700 text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer w-full justify-center flex items-center gap-2";
+            } else {
+                btn.setAttribute('disabled', 'true');
+                btn.className = "bg-stone-200 text-stone-400 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-not-allowed transition-all w-full justify-center flex items-center gap-2";
+            }
         }
 
         function getTechnicalObjectiveSpecs(objective) {
@@ -563,13 +575,23 @@
                 </div>`;
         }
 
-        async function fetchLiveSwissMeteo(destinationKey) {
-            const coords = destinationCoordinates[destinationKey] || destinationCoordinates["Zermatt"];
-            try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,wind_speed_10m&wind_speed_unit=kmh`;
-                const res = await fetch(url); const data = await res.json();
-                return { temp: data.current.temperature_2m, wind: data.current.wind_speed_10m };
-            } catch (err) { return { temp: -1.5, wind: 12.0 }; }
+        function getVillageAttireRecommendation(temp, wind) {
+            let outfit = ""; let layeringNotes = "";
+            if (temp <= -5) {
+                outfit = "Heavy Insulated Down Parka, Windproof Shell, Thermal Baselayers & Alpine Winter Boots.";
+                layeringNotes = "Severe mountain chill index. Limit open skin protected during transit valley walking.";
+            } else if (temp > -5 && temp <= 2) {
+                outfit = "Heavy fleece/puffer combination, waterproof outer layer, insulated technical gloves, beanie.";
+                layeringNotes = "Crisp alpine baseline freezing indices. Keep extremities fully layered.";
+            } else if (temp > 2 && temp <= 12) {
+                outfit = "Mid-weight Softshell jacket, insulated thermal vest, light multi-layer windbreaker.";
+                layeringNotes = "Standard shoulder season transitions. Easy utility shifts between outdoor trails and village chalets.";
+            } else {
+                outfit = "Highly breathable light mountain trail shirt, tech shorts or light hiking trousers.";
+                layeringNotes = "Excellent temperate environment signature. Bring a protective layer for elevation drops.";
+            }
+            if (wind > 25) { layeringNotes += " Outer hardshell wind shielding mandatory to counter localized wind chill factor patterns."; }
+            return { outfit, layeringNotes };
         }
 
         function renderAccommodationsWithImages(destinationKey, headcount) {
@@ -707,7 +729,6 @@
             const swissPassMode = document.getElementById('paramSwissPass').value;
             const passSystem = document.getElementById('paramPasses').value;
             const targetSector = document.getElementById('paramSector').value;
-            const budget = 150;
             const travelers = parseInt(document.getElementById('paramGroupSize').value) || 2;
             const dateVal = document.getElementById('paramDate').value;
             const timeVal = document.getElementById('paramTime').value;
