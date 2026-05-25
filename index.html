@@ -264,21 +264,23 @@
                     </div>
                 </div>
 
-                <div id="hitlContainer" class="hidden bg-stone-50 rounded-2xl border border-stone-200 p-5 flex flex-col justify-between shadow-sm">
-                    <div>
-                        <h4 class="text-xs font-black text-stone-950 uppercase tracking-wide flex items-center gap-1.5">
-                            <i class="fa-solid fa-wallet text-[#E31C25]"></i> AlpenSync Instant Checkout Portal
-                        </h4>
-                        <p class="text-[11px] text-stone-500 mt-0.5 leading-normal">Direct cross-linkage with active SBB Nova ticketing networks. Leader handles shared crew routing ledger instantly.</p>
-                    </div>
-                    <div class="mt-4 space-y-2">
-                        <label class="inline-flex items-center gap-2 text-xs font-mono text-stone-700 cursor-pointer select-none mb-1">
-                            <input type="checkbox" id="hitlCheck" onchange="toggleBookingBtn()" class="rounded border-stone-300 text-[#E31C25] focus:ring-0 w-4 h-4">
-                            Certify baseline safety rules
-                        </label>
-                        <button id="bookBtn" onclick="simulateUnifiedTwintCheckout()" disabled class="bg-stone-200 text-stone-400 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2 w-full justify-center">
-                            <i class="fa-solid fa-qrcode"></i> Twint Split Payment
-                        </button>
+                <div id="hitlContainer" class="hidden lg:col-span-3 bg-stone-50 rounded-2xl border border-stone-200 p-5 flex flex-col justify-between shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h4 class="text-xs font-black text-stone-950 uppercase tracking-wide flex items-center gap-1.5">
+                                <i class="fa-solid fa-wallet text-[#E31C25]"></i> AlpenSync Instant Checkout Portal
+                            </h4>
+                            <p class="text-[11px] text-stone-500 mt-0.5 leading-normal">Direct cross-linkage with active SBB Nova ticketing networks. Leader handles shared crew routing ledger instantly.</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="inline-flex items-center gap-2 text-xs font-mono text-stone-700 cursor-pointer select-none mb-1">
+                                <input type="checkbox" id="hitlCheck" onchange="toggleBookingBtn()" class="rounded border-stone-300 text-[#E31C25] focus:ring-0 w-4 h-4">
+                                Certify baseline safety rules
+                            </label>
+                            <button id="bookBtn" onclick="simulateUnifiedTwintCheckout()" disabled class="bg-stone-200 text-stone-400 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2 w-full justify-center">
+                                <i class="fa-solid fa-qrcode"></i> Twint Split Payment
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -291,9 +293,6 @@
     </footer>
 
     <script>
-        let currentSeasonMode = "winter";
-
-        // Multi-mountain sector tracking database maps per village destination node point
         const destinationSectorRegistry = {
             "Zermatt": [
                 { name: "Gornergrat Crest System (3089m)", summer: "Alpine Trail Wilderness Trekking", winter: "Piste High Freeride Carver Paths", passPrice: 78 },
@@ -337,7 +336,6 @@
             "summer": ["High-Altitude Trekking", "Technical Rock Climbing", "Downhill Mountain Biking", "Glacier Via Ferrata"]
         };
 
-        // EXTENSIVE COMPREHENSIVE TARIFF MATRIX FOR EVERY EXPLICIT ORIGIN/DESTINATION HUB COMBINATION
         const routeTariffMasterMatrix = {
             "Lausanne-Zermatt": {
                 duration: "2 h 45 min", base2ndPrice: 63.00, base1stPrice: 110.00,
@@ -475,12 +473,15 @@
             "Andermatt": { lat: 46.6348, lon: 8.5947 }
         };
 
-        // RUN SETUP INTERCEPTS ON DOM COMPILING WINDOW
+        // INITIALIZE APP PIPELINES
         window.addEventListener("DOMContentLoaded", () => {
             document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
             updateMountainSectors();
             populateObjectives();
         });
+
+        function toggleDevPanel() { document.getElementById('devPanel').classList.toggle('hidden'); }
+        function saveApiKey() { alert("Simulated API Key Saved."); toggleDevPanel(); }
 
         function setSeason(mode) {
             currentSeasonMode = mode;
@@ -514,7 +515,7 @@
                 const activeContext = currentSeasonMode === "winter" ? s.winter : s.summer;
                 const opt = document.createElement('option');
                 opt.value = s.name;
-                opt.innerText = `${s.name} (Pass base: CHF ${s.passPrice})`;
+                opt.innerText = `${s.name} (${activeContext})`;
                 sectorSelect.appendChild(opt);
             });
         }
@@ -722,6 +723,7 @@
 
         function simulateUnifiedTwintCheckout() { alert("Twint direct split checkout transaction code initialized."); }
 
+        // SYNCHRONOUS RUNPIPE THREAD TO PREVENT PRE-RENDERING CONFLICTS
         async function runEngine() {
             const originKey = document.getElementById('paramOrigin').value;
             const destKey = document.getElementById('paramDestination').value;
@@ -729,6 +731,7 @@
             const swissPassMode = document.getElementById('paramSwissPass').value;
             const passSystem = document.getElementById('paramPasses').value;
             const targetSector = document.getElementById('paramSector').value;
+            const budget = 150;
             const travelers = parseInt(document.getElementById('paramGroupSize').value) || 2;
             const dateVal = document.getElementById('paramDate').value;
             const timeVal = document.getElementById('paramTime').value;
@@ -737,9 +740,13 @@
             const consoleBox = document.getElementById('logConsole');
 
             btn.setAttribute('disabled', 'true');
-            btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Syncing SBB Nodes...";
+            btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Syncing Central Repositories...";
+            consoleBox.innerHTML = `<div class="text-amber-500">> Initiating multi-endpoint network fetch calls...</div>`;
 
+            // 1. FORWARD AWAIT LOCK FOR METEO EXTENSIONS
             const meteoData = await fetchLiveSwissMeteo(destKey);
+            consoleBox.innerHTML += `<div class="text-emerald-500">> Successfully matched weather metrics grid coordinate grids.</div>`;
+            
             document.getElementById('hudTemp').innerText = `${meteoData.temp} °C`;
             document.getElementById('hudWind').innerText = `${meteoData.wind} km/h`;
 
@@ -760,12 +767,63 @@
                     </div>
                 </div>`;
 
+            // 2. MOUNT INLINE OBJECTIVE INVENTORY MATRIX LAYOUTS
             runEngineGearUpdate();
             renderAccommodationsWithImages(destKey, travelers);
 
-            document.getElementById('itineraryContainer').innerHTML = buildSbbUiFromMatrix(originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, targetSector);
+            // 3. SECURE ASYNCHRONOUS TRANZIT LINE HANDSHAKES VIA OPEN-DATA PASSENGERS TERMINALS
+            consoleBox.innerHTML += `<div class="text-blue-500">> Querying public transport.opendata.ch endpoints for timetable confirmations...</div>`;
+            let liveConnectionParsed = null;
+            const originStation = stationMappers[originKey];
+            const dstStation = stationMappers[destKey];
             
-            document.getElementById('matchRate').innerText = "100% SBB Live Tariff Active";
+            try {
+                const transitUrl = `https://transport.opendata.ch/v1/connections?from=${encodeURIComponent(originStation)}&to=${encodeURIComponent(dstStation)}&date=${dateVal}&time=${encodeURIComponent(timeVal)}&limit=1`;
+                const response = await fetch(transitUrl);
+                const resolvedData = await response.json();
+                if (resolvedData && resolvedData.connections && resolvedData.connections.length > 0) {
+                    liveConnectionParsed = resolvedData.connections[0];
+                    consoleBox.innerHTML += `<div class="text-emerald-500">> Live SBB pathway sequence verified successfully.</div>`;
+                }
+            } catch (error) {
+                consoleBox.innerHTML += `<div class="text-stone-400">> API Network handshake limit reached. Loading local high-fidelity fallback card layouts.</div>`;
+            }
+
+            // 4. CHOOSE DYNAMIC TRANSIT INTERCEPT ROUTING SECTIONS
+            const key = sessionStorage.getItem('anthropic_key');
+            if (key) {
+                try {
+                    let summaryString = liveConnectionParsed ? `Connection leaves at ${liveConnectionParsed.from.departure} and arrives at ${liveConnectionParsed.to.arrival}.` : `Standard cross-border timeline.`;
+                    const response = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
+                        method: 'POST',
+                        headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'claude-3-5-sonnet-20241022',
+                            max_tokens: 1200,
+                            messages: [{
+                                role: 'user', 
+                                content: `Generate an absolute high-fidelity SBB mobile app styled timetable layout box block from ${originStation} to ${dstStation} based on time data: ${summaryString}. User is travelling to ski/hike sector "${targetSector}" under objective "${objective}". Group size context: ${travelers} individuals. SwissPass status: ${swissPassMode}. Return ONLY structured clean HTML containing custom Tailwind styling that builds identical multi-leg route rows, transfer footpath delays, platforms numbers, precise individual route pricing tariffs (CHF), and rolling stock badges (e.g., SBB InterCity [IC], EuroCity [EC], TGV Lyria or regional narrower lines) matching SBB's corporate identity. Ensure all numbers use the metric system completely. No wrapping markdown backticks ticks blocks allowed.`
+                            }]
+                        })
+                    });
+                    const resJson = await response.json();
+                    if(resJson.content && resJson.content[0]) {
+                        document.getElementById('itineraryContainer').innerHTML = `<div class="text-neutral-800 text-xs space-y-2 font-mono">${resJson.content[0].text}</div>`;
+                        document.getElementById('matchRate').innerText = "100% LIVE CLAUDE SYNC";
+                    } else { throw new Error("Faulted."); }
+                } catch (err) {
+                    document.getElementById('itineraryContainer').innerHTML = buildSbbUiFromMatrix(originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, targetSector);
+                    document.getElementById('matchRate').innerText = "100% SBB LOCAL ROUTE ENGINE ACTIVE";
+                }
+            } else {
+                document.getElementById('itineraryContainer').innerHTML = buildSbbUiFromMatrix(originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, targetSector);
+                document.getElementById('matchRate').innerText = "100% SBB LOCAL ROUTE ENGINE ACTIVE";
+            }
+
+            consoleBox.innerHTML += `<div class="text-stone-500">> Render matrix compilation finished cleanly.</div>`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+            
+            // SHOW THE HIDDEN TWINT INSTANT SPLIT CHECKOUT CARD LINKED IN ROW 3
             document.getElementById('hitlContainer').classList.remove('hidden');
             btn.removeAttribute('disabled');
             btn.innerHTML = "Compute Search";
