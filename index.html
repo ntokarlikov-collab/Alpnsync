@@ -64,7 +64,7 @@
 
     <header class="relative h-[calc(100vh-64px)] w-full flex flex-col justify-center items-center overflow-hidden">
         <div class="absolute inset-0 w-full h-full pointer-events-none object-cover z-0">
-            <img id="heroImage" src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover scale-105" alt="Swiss Alps Peak">
+            <img id="heroImage" src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover scale-105 transition-all duration-700" alt="Swiss Alps Peak">
         </div>
         <div class="absolute inset-0 bg-gradient-to-b from-[#0c0d0f]/50 via-[#0c0d0f]/30 to-[#f8f9fa] z-10"></div>
         
@@ -127,11 +127,7 @@
                         <option value="Grindelwald">Grindelwald Terminal</option>
                         <option value="Laax">Laax / Flims Falera Arena</option>
                         <option value="PortesDuSoleil">Portes du Soleil (Champéry)</option>
-                        <option value="Chamonix">Chamonix (Mont Blanc)</option>
-                        <option value="CransMontana">Crans-Montana</option>
                         <option value="Andermatt">Andermatt Sedrun Disentis</option>
-                        <option value="StAnton">St. Anton am Arlberg</option>
-                        <option value="Cortina">Cortina d'Ampezzo</option>
                     </select>
                 </div>
 
@@ -156,7 +152,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans mt-4 pt-4 border-t border-stone-800">
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
                     <label class="text-[9px] text-stone-400 font-black uppercase tracking-wider block mb-1">Active Objective Target Task</label>
-                    <select id="paramObjective" class="w-full bg-transparent text-white text-xs focus:outline-none cursor-pointer">
+                    <select id="paramObjective" onchange="runEngineGearUpdate()" class="w-full bg-transparent text-white text-xs focus:outline-none cursor-pointer">
                         </select>
                 </div>
 
@@ -239,21 +235,21 @@
                             <i class="fa-solid fa-cloud-sun text-[#E31C25]"></i>
                         </h4>
                         <div id="meteoVillageContainer" class="text-xs text-stone-400 font-mono space-y-3">
-                            Awaiting telemetry computation initialization parameters loop.
+                            Execute configuration searches to pull live environmental tracking charts.
                         </div>
                     </div>
 
                     <div class="bg-stone-50 border border-stone-200 rounded-2xl p-5 space-y-2">
                         <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase">Safety Rating</h4>
                         <div id="ratingOutputContainer" class="text-xs text-stone-400 font-mono">
-                            Climatological activity stability thresholds calculate here.
+                            Risk metrics update instantly upon computational runs.
                         </div>
                     </div>
 
                     <div class="bg-stone-50 border border-stone-200 rounded-2xl p-5 space-y-2">
                         <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase">Group Lodging Hubs</h4>
                         <div id="accommodationContainer" class="space-y-3 text-xs text-stone-400">
-                            Available alpine club bunk allocations render here.
+                            Available shared accommodation nodes list out here.
                         </div>
                     </div>
 
@@ -329,11 +325,7 @@
             "Andermatt": [
                 { name: "Gemsstock Savage North Face (2961m)", summer: "Technical Multi-pitch Rock Climbing", winter: "Deep Powder Couloirs & Technical Ski Touring" },
                 { name: "Nätschen / Oberalp Pass Slopes", summer: "High-Pass Meadow Ridge Walks", winter: "Sunny Wide Intermediate Cruisers" }
-            ],
-            "Chamonix": [{ name: "Aiguille du Midi (3842m)", summer: "High Alpinism Base", winter: "Vallée Blanche Glacier Run" }],
-            "CransMontana": [{ name: "Plaine Morte Glacier (3000m)", summer: "Glacier Plateau Trails", winter: "High Alpine Piste Loops" }],
-            "StAnton": [{ name: "Valluga Crest Peak (2811m)", summer: "Technical Peak Treks", winter: "Famous Deep Snow Backcountry Runs" }],
-            "Cortina": [{ name: "Tofana di Rozes Arena", summer: "Dolomites Via Ferrata Lines", winter: "Olimpia delle Tofane Speed Downhill" }]
+            ]
         };
 
         const seasonObjectivesRegistry = {
@@ -399,26 +391,12 @@
             "Grindelwald": [{ name: "Downtown Lodge Grindelwald", type: "Group Quarters", price: 52, feature: "Risk brief common layouts rooms" }],
             "Laax": [{ name: "Riders Hotel LAAX", type: "Shared Crew Quarters", price: 75, feature: "Freeride club equipment lockers" }],
             "PortesDuSoleil": [{ name: "Champéry Youth Hostel", type: "Shared Multi-bed Dorms", price: 46, feature: "Direct walk to Planachaux cable deck" }],
-            "Chamonix": [{ name: "Chamonix Lodge Hostel", type: "Club Shared Bunks", price: 48, feature: "Gear drying walls, team kitchen" }],
-            "CransMontana": [{ name: "Bella Lui Youth Hostel", type: "Modern Team Quarters", price: 59, feature: "Terrace overlooks Rhône Valley floor" }],
-            "Andermatt": [{ name: "Andermatt Youth Hostel (Jugendherberge)", type: "Multi-Bed Group Room", price: 48, feature: "Central base staging points" }, { name: "Gemsstock SAC Refuge Base", type: "Shared Alpine Matratzenlager", price: 38, feature: "SAC Alpine Membership link valid" }],
-            "StAnton": [{ name: "Arlberg Youth Quarters", type: "Shared Bunks", price: 58, feature: "Ski storage active" }],
-            "Cortina": [{ name: "Rifugio Lagazuoi Base", type: "Multi-Bed High Dorm", price: 62, feature: "Safety mountain map platform briefs" }]
-        };
-
-        const stationMappers = {
-            "Geneva": "Genève", "Lausanne": "Lausanne", "Fribourg": "Fribourg", "Neuchatel": "Neuchâtel", "Sion": "Sion",
-            "Zurich": "Zürich HB", "Bern": "Bern", "Basel": "Basel SBB", "Milan": "Milano Centrale", "Munich": "München Hbf",
-            "Zermatt": "Zermatt", "Chamonix": "Chamonix-Mont-Blanc", "Verbier": "Verbier, station", "Grindelwald": "Grindelwald",
-            "StAnton": "St. Anton am Arlberg", "Cortina": "Cortina d'Ampezzo", "Laax": "Flims Dorf, Post",
-            "PortesDuSoleil": "Champéry, télécabine", "CransMontana": "Crans-sur-Sierre", "Andermatt": "Andermatt"
+            "Andermatt": [{ name: "Andermatt Youth Hostel", type: "Multi-Bed Group Room", price: 48, feature: "Central base staging points" }, { name: "Gemsstock SAC Refuge Base", type: "Shared Alpine Matratzenlager", price: 38, feature: "SAC Alpine Membership link valid" }]
         };
 
         const destinationCoordinates = {
-            "Zermatt": { lat: 46.0207, lon: 7.7491 }, "Chamonix": { lat: 45.9227, lon: 6.8685 }, "Verbier": { lat: 46.0961, lon: 7.2286 },
-            "StAnton": { lat: 47.1312, lon: 10.2692 }, "Grindelwald": { lat: 46.6242, lon: 8.0414 }, "Cortina": { lat: 46.5405, lon: 12.1357 },
-            "Laax": { lat: 46.8285, lon: 9.2647 }, "PortesDuSoleil": { lat: 46.1792, lon: 6.8708 }, "CransMontana": { lat: 46.3115, lon: 7.4844 },
-            "Andermatt": { lat: 46.6348, lon: 8.5947 }
+            "Zermatt": { lat: 46.0207, lon: 7.7491 }, "Verbier": { lat: 46.0961, lon: 7.2286 }, "Grindelwald": { lat: 46.6242, lon: 8.0414 },
+            "Laax": { lat: 46.8285, lon: 9.2647 }, "PortesDuSoleil": { lat: 46.1792, lon: 6.8708 }, "Andermatt": { lat: 46.6348, lon: 8.5947 }
         };
 
         // RUN SETUP INTERCEPTS ON DOM COMPILING WINDOW
@@ -562,6 +540,22 @@
                 "Glacier Via Ferrata": { apparel: "Form-fitting active softshell wind jacket, sturdy semi-rigid mountain tracking boots.", gear: "Shock-absorbing energy rip-leash via ferrata dual lanyard set, performance safety helmet, leather grip gloves." }
             };
             return specs[objective] || specs["Ski Touring"];
+        }
+
+        function runEngineGearUpdate() {
+            const objective = document.getElementById('paramObjective').value;
+            const objectiveSpecs = getTechnicalObjectiveSpecs(objective);
+            document.getElementById('gearDisplayBox').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans text-left">
+                    <div class="p-3 bg-white border border-stone-200 rounded-xl shadow-sm">
+                        <div class="font-black text-[10px] mb-1 text-[#E31C25] uppercase tracking-wider"><i class="fa-solid fa-person-hiking"></i> High-Altitude Active Apparel Layering</div>
+                        <p class="text-stone-700 font-mono text-[11px]">${objectiveSpecs.apparel}</p>
+                    </div>
+                    <div class="p-3 bg-white border border-stone-200 rounded-xl shadow-sm">
+                        <div class="font-black text-[10px] mb-1 text-[#E31C25] uppercase tracking-wider"><i class="fa-solid fa-screwdriver-wrench"></i> Technical Safety Equipment Hardware</div>
+                        <p class="text-stone-700 font-mono text-[11px]">${objectiveSpecs.gear}</p>
+                    </div>
+                </div>`;
         }
 
         function renderAccommodations(destinationKey, headcount, maxBudget) {
@@ -713,7 +707,7 @@
             const swissPassMode = document.getElementById('paramSwissPass').value;
             const passSystem = document.getElementById('paramPasses').value;
             const targetSector = document.getElementById('paramSector').value;
-            const budget = parseInt(document.getElementById('paramBudget').value) || 150;
+            const budget = 150;
             const travelers = parseInt(document.getElementById('paramGroupSize').value) || 2;
             const dateVal = document.getElementById('paramDate').value;
             const timeVal = document.getElementById('paramTime').value;
@@ -722,7 +716,7 @@
             const consoleBox = document.getElementById('logConsole');
 
             btn.setAttribute('disabled', 'true');
-            btn.innerHTML = "<i class='fa-solid fa-circle-notch animate-spin'></i> Querying SBB Infrastructure...";
+            btn.innerHTML = "<i class='fa-solid fa-circle-notch animate-spin'></i> Processing Matrix...";
             consoleBox.innerHTML = `<div class="text-[#E31C25]">> Accessing central Swiss data matrix nodes...</div>`;
 
             // 1. EXECUTE WEATHER EXTRACTION
@@ -756,18 +750,7 @@
                 </div>`;
 
             // 3. TARGET CLOTHES AND HARDWARE REGISTER LABELS
-            const objectiveSpecs = getTechnicalObjectiveSpecs(objective);
-            document.getElementById('gearDisplayBox').innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans text-left">
-                    <div class="p-3 bg-white border border-stone-200 rounded-xl shadow-sm">
-                        <div class="font-black text-[10px] mb-1 text-[#E31C25] uppercase tracking-wider"><i class="fa-solid fa-person-hiking"></i> High-Altitude Active Apparel Layering</div>
-                        <p class="text-stone-700 font-mono text-[11px]">${objectiveSpecs.apparel}</p>
-                    </div>
-                    <div class="p-3 bg-white border border-stone-200 rounded-xl shadow-sm">
-                        <div class="font-black text-[10px] mb-1 text-[#E31C25] uppercase tracking-wider"><i class="fa-solid fa-screwdriver-wrench"></i> Technical Safety Equipment Hardware</div>
-                        <p class="text-stone-700 font-mono text-[11px]">${objectiveSpecs.gear}</p>
-                    </div>
-                </div>`;
+            runEngineGearUpdate();
 
             // 4. ACCOMMODATIONS
             renderAccommodations(destKey, travelers, budget);
@@ -790,7 +773,7 @@
             // 6. DEPLOY INTERCEPT CHANNELS
             const key = sessionStorage.getItem('anthropic_key');
             if (key) {
-                consoleBox.innerHTML += `<div class="text-[#E31C25] font-bold">> Forwarding tracking telemetry metrics down to Claude cluster...</div>`;
+                consoleBox.innerHTML += `<div class="text-[#E31C25] font-bold">> Forwarding tracking telemetry metrics down to Claude...</div>`;
                 try {
                     let summaryString = liveConnectionParsed ? `Connection leaves at ${liveConnectionParsed.from.departure} and arrives at ${liveConnectionParsed.to.arrival}.` : `Standard cross-border timeline.`;
                     const response = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
@@ -801,7 +784,7 @@
                             max_tokens: 1200,
                             messages: [{
                                 role: 'user', 
-                                content: `Generate an absolute high-fidelity SBB mobile app styled timetable layout box block from ${originStation} to ${dstStation} based on time data: ${summaryString}. User is travelling to ski/hike sector "${targetSector}" under objective "${objective}". Group size context: ${travelers} individuals. SwissPass status: ${swissPassMode}. Return ONLY pure styled visual HTML with precise line change delays, platform tracks, accurate local currency tariffs (CHF), and proper rail rolling stock tags (IC, IR, PE Glacier Express, etc). All spatial entries metrics system configuration.`
+                                content: `Generate an absolute high-fidelity SBB mobile app styled timetable layout box block from ${originStation} to ${dstStation} based on time data: ${summaryString}. User is travelling to ski/hike sector "${targetSector}" under objective "${objective}". Group size context: ${travelers} individuals. SwissPass status: ${swissPassMode}. Return ONLY structured clean HTML containing custom Tailwind styling that builds identical multi-leg route rows, transfer footpath delays, platforms numbers, precise individual route pricing tariffs (CHF), and rolling stock badges (e.g., SBB InterCity [IC], EuroCity [EC], TGV Lyria or regional narrower lines) matching SBB's corporate identity. Ensure all numbers use the metric system completely. No wrapping markdown backticks ticks blocks allowed.`
                             }]
                         })
                     });
