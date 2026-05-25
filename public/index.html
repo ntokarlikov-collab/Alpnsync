@@ -330,6 +330,47 @@
                 </div>`;
             runEngineGearUpdate();
         }
-    </script>
+    let currentSeasonMode = "winter";
+
+        window.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
+            updateMountainSectors();
+            populateObjectives();
+        });
+
+        async function executeClientSideCompute() {
+            const btn = document.getElementById('engineBtn');
+            btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Computing...";
+            
+            const payload = {
+                originKey: document.getElementById('paramOrigin').value,
+                destKey: document.getElementById('paramDestination').value,
+                dateVal: document.getElementById('paramDate').value,
+                timeVal: document.getElementById('paramTime').value,
+                travelers: parseInt(document.getElementById('paramGroupSize').value) || 1
+            };
+
+            try {
+                // This talks to your server.js backend!
+                const response = await fetch('/api/compute-expedition', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if(data.success) {
+                    document.getElementById('hudTemp').innerText = `${data.telemetry.temp} °C`;
+                    document.getElementById('hudWind').innerText = `${data.telemetry.wind} km/h`;
+                    document.getElementById('matchRate').innerText = "Live Engine Online";
+                    alert("Expedition Computed! Total Rail Cost: CHF " + data.railTariffs.total.toFixed(2));
+                }
+            } catch (err) {
+                alert("Server connection failed. Ensure your backend is deployed on Render.");
+            }
+            btn.innerHTML = "Compute Search";
+        }
+        
+        // ... (Keep your updateMountainSectors, setSeason, and populateObjectives functions here as well)>
 </body>
 </html>
