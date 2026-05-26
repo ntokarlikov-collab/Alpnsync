@@ -169,7 +169,7 @@
                 > System operational. Select metrics and click Compute Search to query full-stack backend routers...
             </div>
 
-            <div class="grid grid-cols-1 grid-cols-5 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <div class="lg:col-span-3 bg-[#f4f5f6] border border-stone-200 rounded-2xl p-4 sm:p-6 space-y-4">
                     <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase border-b border-stone-200 pb-2 flex justify-between items-center">
                         <span>SBB Timetable Card Breakdown</span>
@@ -274,17 +274,48 @@
         let mapInstance = null;
         let activeRoutingEngineInstance = null;
 
+        // DYNAMIC MULTI-LIFT CHAIRLIFT SECTOR REGISTRY MATRIX (TASK RESTORATION OVERLAY)
         const destinationSectorRegistry = {
-            "Zermatt": [{ name: "Gornergrat Crest System", summer: "Trekking", winter: "Skiing" }],
-            "Andermatt": [{ name: "Gemsstock Savage Face", summer: "Climbing", winter: "Ski Touring" }],
-            "Verbier": [{ name: "Mont-Fort Summit Spine", summer: "Ridge Treks", winter: "Couloirs" }],
-            "Grindelwald": [{ name: "Eiger Glacier Terminal", summer: "Face Trails", winter: "Carver Slopes" }],
-            "St. Moritz": [{ name: "Corvatsch Glacier", summer: "Trekking", winter: "Powder Slopes" }],
-            "Davos": [{ name: "Parsenn Arena System", summer: "Biking", winter: "Downhill" }],
-            "Engelberg": [{ name: "Titlis High Ridge", summer: "Via Ferrata", winter: "Glacial Valley" }],
-            "Gryon": [{ name: "Frience Plateau Hub", summer: "Lake Hiking", winter: "Family Snowparks" }],
-            "Villars-sur-Ollon": [{ name: "Roc d'Orsay Domain", summer: "Trail Running", winter: "Intermediate Cruising" }],
-            "Les Diablerets": [{ name: "Isenau Basin", summer: "Alpine Pastures", winter: "Glacier 3000 Access" }]
+            "Zermatt": [
+                { name: "Gornergrat Station", summer: "Panoramic Open Ridge Trekking", winter: "Sunny Piste Carver Slopes" },
+                { name: "Matterhorn Glacier Paradise", summer: "Glacial Ice Palace Traverses", winter: "Technical High Altitude Glacier Arena" }
+            ],
+            "Andermatt": [
+                { name: "Gemsstock Peak Terminal", summer: "Extreme Multi-Pitch Rock Climbing", winter: "Deep Off-Piste Powder Touring" },
+                { name: "Nätschen Family Sector", summer: "Alpine Flower Meadow Hikes", winter: "Groomed Sledding & Beginner Runs" }
+            ],
+            "Verbier": [
+                { name: "Mont-Fort Glacier Terminal", summer: "High Mountain Pass Ridge Scrambling", winter: "Expert Backcountry Couloirs" },
+                { name: "Savoleyres Ridgeway", summer: "Panoramic Downhill Bike Trails", winter: "Sunny Intermediate Cruise Belts" }
+            ],
+            "Grindelwald": [
+                { name: "Eiger Gletscher Terminal", summer: "Technical North Face Observation Hikes", winter: "High-Speed Mountain Carver Tracks" },
+                { name: "First Adventure Peak", summer: "Cliff Walks & Zip-lining Circuits", winter: "Progressive Snowparks & Freestyle Jumps" }
+            ],
+            "St. Moritz": [
+                { name: "Corvatsch Glacier Station", summer: "High Plateau Ice Field Trails", winter: "Deep North-Facing Powder Shelves" },
+                { name: "Corviglia Snowpark Hub", summer: "Extreme Singletrack Flow Trails", winter: "Official World Cup Giant Slalom Pistes" }
+            ],
+            "Davos": [
+                { name: "Parsenn Weissfluhjoch", summer: "High Altitude Rocky Pass Crossings", winter: "Massive 12km Classic Downhill Runs" },
+                { name: "Jakobshorn Freeride Arena", summer: "Technical Singletrack Dirt Descents", winter: "Jumps, Pipes & Progressive Freestyle Parks" }
+            ],
+            "Engelberg": [
+                { name: "Titlis Stand Glacier", summer: "Glacier Suspension Bridge Treks", winter: "Famous 2,000m Vertical Laub Drop" },
+                { name: "Brunni Sunny Slopes", summer: "Rigid Via Ferrata Climbing Routes", winter: "Sunny South-Facing Family Ski Trails" }
+            ],
+            "Gryon": [
+                { name: "Les Chaux Cableway", summer: "Panoramic Valley View Hikes", winter: "Budget Tree-Lined Powder Meadows" },
+                { name: "Frience Family Play-Zone", summer: "Natural Mountain Eco-Swimming Lake", winter: "Sledding Arenas & Magic Carpets" }
+            ],
+            "Villars-sur-Ollon": [
+                { name: "Roc d'Orsay Gondola", summer: "Downhill Grass Mountain Karting", winter: "Wide Cruising Snow Basins" },
+                { name: "Bretaye Rail Terminal", summer: "Chalet Alpine Dining Loops", winter: "Direct Ski-in/Ski-out Transit Links" }
+            ],
+            "Les Diablerets": [
+                { name: "Glacier 3000 Col du Pillon", summer: "High Altitude Alpine Coaster Rides", winter: "Year-Round Glacial Alpine Ski Pistes" },
+                { name: "Isenau Traditional Sector", summer: "Quiet Alpine Pasture Walking Trails", winter: "Untouched Scenic Snowshoe Trails" }
+            ]
         };
 
         const seasonObjectivesRegistry = {
@@ -432,7 +463,7 @@
             const perPerson = document.getElementById('tableGrandEach').innerText;
             const grossTotal = document.getElementById('tableGrandTotal').innerText;
 
-            const chatTemplateString = `🇨🇭 *ALPENYSNC EXPEDITION COALITION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Mountain Crew Members\n• *Locked Alpine Cabin:* ${activeSelectedHotelObj.name}\n\n📊 *FINANCIAL SPLIT MATRIX*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
+            const chatTemplateString = `🇨🇭 *ALPENYSNC RESORT EXCURSION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Base Lodge Stay:* ${activeSelectedHotelObj.name}\n\n📊 *GROUP BUDGET BREAKDOWN*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
 
             navigator.clipboard.writeText(chatTemplateString);
             document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chalet layout copied! Paste directly into your crew group chat.</span>`;
@@ -487,7 +518,7 @@
                         const stopPoint = [data.geoCoordinates.dest.lat, data.geoCoordinates.dest.lon];
 
                         L.marker(startPoint).addTo(mapInstance).bindPopup(`<b>Start Hub:</b> ${payload.originKey}`).openPopup();
-                        L.marker(stopPoint).addTo(mapInstance).bindPopup(`<b>Alpine Base Node:</b> ${payload.destKey}`);
+                        L.marker(stopPoint).addTo(mapInstance).bindPopup(`<b>${payload.targetSectorName}</b>`);
 
                         document.getElementById('mapWrapperFrame').classList.remove('hidden');
 
