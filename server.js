@@ -1,5 +1,4 @@
 const express = require('express');
-const fetch = require('node-fetch');
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -70,7 +69,7 @@ const stationMappers = {
 
 const baseLodgingRegistry = {
     "Zermatt": [
-        { id: "z1", name: "Gandegghütte Alpine Outpost", feature: "SAC-style glacier hut at 3,030m. Bunk platforms & hearty stews.", price: 55, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "z1", name: "Gandegghütte Alpine Outpost", feature: "SAC-style glacier hut at 3030m. Bunk platforms & hearty stews.", price: 55, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
         { id: "z2", name: "Chalet Findeln Timber Mazot", feature: "19th-century private sun-blackened barn. Wood-fire oven.", price: 210, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
     ],
     "Andermatt": [
@@ -106,7 +105,7 @@ const baseLodgingRegistry = {
         { id: "vi2", name: "Chalet Bretaye Ridge Cabin", feature: "Ski-in/ski-out timber structure located directly on the mountain pass line.", price: 110, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }
     ],
     "Les Diablerets": [
-        { id: "ld1", name: "Cabane des Diablerets (SAC)", feature: "High limestone cliff bunker at 2,485m built specifically for technical mountain crews.", price: 42, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" },
+        { id: "ld1", name: "Cabane des Diablerets (SAC)", feature: "High limestone cliff bunker at 2485m built specifically for technical mountain crews.", price: 42, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" },
         { id: "ld2", name: "Refuge de l'Espace Glacier Overlook", feature: "Boutique timber structural grid hanging right off a vertical mountain face drop.", price: 140, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" }
     ]
 };
@@ -129,13 +128,14 @@ app.post('/api/compute-expedition', async (req, res) => {
         
         let temp = 11.5, wind = 12.0;
         try {
+            // Refactored to utilize global native runtime fetch protocols
             const meteoRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,wind_speed_10m&wind_speed_unit=kmh`);
             const meteoData = await meteoRes.json();
             if(meteoData?.current) {
                 temp = meteoData.current.temperature_2m;
                 wind = meteoData.current.wind_speed_10m;
             }
-        } catch (e) { console.log("Meteo loop safe bypass triggered"); }
+        } catch (e) { console.log("Meteo framework bypass active"); }
 
         let routeLegs = [];
         try {
@@ -158,7 +158,7 @@ app.post('/api/compute-expedition', async (req, res) => {
                     }
                 });
             }
-        } catch(e) { console.log("SBB fallback asset looping active"); }
+        } catch(e) { console.log("SBB metrics connection bypass active"); }
 
         if (routeLegs.length === 0) {
             routeLegs = generateSbbItineraryLegs(stationMappers[originKey], stationMappers[destKey], timeVal);
@@ -217,4 +217,4 @@ app.post('/api/compute-expedition', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`AlpenSync Core Framework active on port ${PORT}`));
+app.listen(PORT, () => console.log(`AlpenSync Framework engine live on port ${PORT}`));
