@@ -6,12 +6,15 @@
     <title>AlpenSync OS — Year-Round Production Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         html { scroll-behavior: smooth; }
         .swiss-glow-frame { box-shadow: 0 15px 50px rgba(227, 28, 37, 0.18); }
         .scrollbar-stark::-webkit-scrollbar { width: 5px; }
         .scrollbar-stark::-webkit-scrollbar-track { background: #f4f5f7; }
         .scrollbar-stark::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 2px; }
+        #alpineMap { height: 260px; width: 100%; border-radius: 16px; z-index: 10; border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body class="bg-[#f8f9fa] text-slate-900 font-sans antialiased min-h-screen flex flex-col">
@@ -140,6 +143,10 @@
                 > System operational. Select metrics and click Compute Search to query full-stack backend routers...
             </div>
 
+            <div class="grid grid-cols-1 gap-4">
+                <div id="alpineMap"></div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <div class="lg:col-span-3 bg-[#f4f5f6] border border-stone-200 rounded-2xl p-4 sm:p-6 space-y-4">
                     <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase border-b border-stone-200 pb-2 flex justify-between items-center">
@@ -158,9 +165,54 @@
                     </div>
 
                     <div class="bg-stone-50 border border-stone-200 rounded-2xl p-5">
-                        <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase mb-3">Available Accommodations</h4>
-                        <div id="accommodationContainer" class="space-y-3 text-xs text-stone-400">No rooms loaded.</div>
+                        <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase mb-3 flex justify-between items-center">
+                            <span>Available Accommodations</span>
+                            <span class="text-[10px] text-stone-400 font-mono" id="selectedHotelTally">None Chosen</span>
+                        </h4>
+                        <div id="accommodationContainer" class="space-y-3 text-xs text-stone-400">
+                            No rooms loaded yet. Click Compute Search to view baseline local options.
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <div id="expenseLedgerSection" class="hidden border border-stone-200 rounded-2xl p-5 bg-gradient-to-br from-stone-50 to-stone-100/50 space-y-3">
+                <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase border-b pb-2 flex justify-between items-center">
+                    <span><i class="fa-solid fa-calculator text-[#E31C25] mr-1"></i> Crew Expedition Cost Ledger Spreadsheet</span>
+                    <span id="ledgerGroupSizeBadge" class="bg-stone-950 text-white font-mono px-2 py-0.5 rounded-md text-[10px]">1 Crew Member</span>
+                </h4>
+                <div class="overflow-x-auto text-xs font-sans text-slate-800">
+                    <table class="w-full text-left border-collapse bg-white rounded-xl overflow-hidden border border-stone-200">
+                        <thead>
+                            <tr class="bg-stone-900 text-white font-bold text-[10px] uppercase tracking-wider">
+                                <th class="p-3">Expense Category Description</th>
+                                <th class="p-3">Rate Per Person</th>
+                                <th class="p-3 text-right">Group Total Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-100">
+                            <tr>
+                                <td class="p-3 font-medium">SBB Transport Transit Passes (Standard 2nd Class Baseline)</td>
+                                <td class="p-3 font-mono" id="tableCostSbbEach">CHF 0.00</td>
+                                <td class="p-3 font-mono font-bold text-right" id="tableCostSbbTotal">CHF 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-medium">Mountain Target Resort Lift Access Tickets</td>
+                                <td class="p-3 font-mono" id="tableCostLiftEach">CHF 0.00</td>
+                                <td class="p-3 font-mono font-bold text-right" id="tableCostLiftTotal">CHF 0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-medium">Active Selection Alpine Staging Stays (Lodging Tally)</td>
+                                <td class="p-3 font-mono" id="tableCostHotelEach">CHF 0.00</td>
+                                <td class="p-3 font-mono font-bold text-right" id="tableCostHotelTotal">CHF 0.00</td>
+                            </tr>
+                            <tr class="bg-stone-950 text-white font-black">
+                                <td class="p-3 uppercase tracking-wider">Calculated Expedition Split Matrix Tally</td>
+                                <td class="p-3 font-mono text-red-400" id="tableGrandEach">CHF 0.00 / individual</td>
+                                <td class="p-3 font-mono text-right text-emerald-400 text-sm" id="tableGrandTotal">CHF 0.00 Total</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -173,6 +225,8 @@
 
     <script>
         let currentSeasonMode = "winter";
+        let globalCalculatedCache = null; // Storing computation data frames to feed ledger splits dynamically
+        let mapInstance = null;
 
         const destinationSectorRegistry = {
             "Zermatt": [
@@ -203,16 +257,23 @@
             "Alpinism": "Heavy shell weather defense jackets, hard abrasion-resistant mount gear sets, and safety crampons.",
             "Ice Climbing": "Reinforced water resistant outer coatings, double layers isolated utility ice climbing gloves, and dual ice tools.",
             "Glacier Mountaineering": "High-altitude UV Category 4 glacier reflection glasses, thermal base undershirts, and dynamic ropes.",
-            "High-Altitude Trekking": "Moisture-wicking active base layers, stretch trail trekking canvas trousers, light rain pack shell.",
+            "High-Altitude Trekking": "Moisture-wicking active base layers, stretch trail trekking canvas diameters, light rain pack shell.",
             "Technical Rock Climbing": "Form-fitting highly durable canvas stretch climbing segments, chalk gear utilities, and climbing harness.",
             "Downhill Mountain Biking": "Long-sleeve armored protection mesh layers, impact absorbing composite joint armor pads, and full-face helmet.",
             "Glacier Via Ferrata": "Active protective softshell element tracking coat, specialized via ferrata lanyard absorber system, and high-traction boots."
         };
 
+        // LAUNCH INITIAL ENGINE MAP DEPLOYMENT HOOK
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
             updateMountainSectors();
             populateObjectives();
+            
+            // Boot map framework pointing default view at Swiss geographic center
+            mapInstance = L.map('alpineMap').setView([46.8182, 8.2275], 8);
+            L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data: &copy; OpenTopoMap contributors'
+            }).addTo(mapInstance);
         });
 
         function setSeason(mode) {
@@ -270,6 +331,44 @@
             document.getElementById('gearDisplayBox').innerText = text;
         }
 
+        // REAL-TIME LEDGER INTERACTIVE ACCOUNTING SPLITTER FORMULA CALCULATORS
+        function selectAccommodationChoice(id, name, totalVolumePrice, singleNightBasePrice) {
+            document.getElementById('selectedHotelTally').innerText = `Selected: CHF ${totalVolumePrice}`;
+            document.getElementById('logConsole').innerHTML = `> Accommodation selection locked: Registered space at ${name}.`;
+            
+            if (!globalCalculatedCache) return;
+
+            const crewSize = parseInt(document.getElementById('paramGroupSize').value) || 1;
+            const sbbTotal = globalCalculatedCache.railTariffs.cost2nd;
+            const sbbEach = sbbTotal / crewSize;
+
+            let liftTotal = 0;
+            if (globalCalculatedCache.resortPass.statusText.includes("Tariff")) {
+                liftTotal = parseFloat(globalCalculatedCache.resortPass.statusText.replace(/[^0-9.]/g, '')) || 0;
+            }
+            const liftEach = liftTotal / crewSize;
+
+            const hotelTotal = parseFloat(totalVolumePrice);
+            const hotelEach = parseFloat(singleNightBasePrice);
+
+            const grandTotal = sbbTotal + liftTotal + hotelTotal;
+            const grandEach = grandTotal / crewSize;
+
+            // Paint data spreadsheet fields
+            document.getElementById('tableCostSbbEach').innerText = `CHF ${sbbEach.toFixed(2)}`;
+            document.getElementById('tableCostSbbTotal').innerText = `CHF ${sbbTotal.toFixed(2)}`;
+            document.getElementById('tableCostLiftEach').innerText = `CHF ${liftEach.toFixed(2)}`;
+            document.getElementById('tableCostLiftTotal').innerText = `CHF ${liftTotal.toFixed(2)}`;
+            document.getElementById('tableCostHotelEach').innerText = `CHF ${hotelEach.toFixed(2)}`;
+            document.getElementById('tableCostHotelTotal').innerText = `CHF ${hotelTotal.toFixed(2)}`;
+            
+            document.getElementById('tableGrandEach').innerText = `CHF ${grandEach.toFixed(2)} / individual`;
+            document.getElementById('tableGrandTotal').innerText = `CHF ${grandTotal.toFixed(2)} Gross Total`;
+            
+            document.getElementById('ledgerGroupSizeBadge').innerText = `${crewSize} Crew Members Active`;
+            document.getElementById('expenseLedgerSection').classList.remove('hidden');
+        }
+
         async function executeClusterCalculation() {
             const btn = document.getElementById('engineBtn');
             const consoleBox = document.getElementById('logConsole');
@@ -296,12 +395,30 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                const data = await response.json();
+                data = await response.json();
+                globalCalculatedCache = data; // Caching dataframe frames locally
 
                 if(data.success) {
                     consoleBox.innerHTML = `> Core metrics synchronised. Live SBB Route Connection: ${data.liveRouteConfirmed}`;
                     
-                    // --- RESPONSIVE WEATHER UI THEME ADAPTATION SYSTEM ---
+                    // --- MAP MARKER ENGINE FLUID ROUTE PAN ANIMATOR ---
+                    if (mapInstance && data.geoCoordinates) {
+                        // Clear out older markers by rebuilding container layout layer views cleanly
+                        mapInstance.eachLayer((layer) => {
+                            if (!!layer.toGeoJSON) mapInstance.removeLayer(layer);
+                        });
+                        L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+
+                        const startPoint = [data.geoCoordinates.origin.lat, data.geoCoordinates.origin.lon];
+                        const stopPoint = [data.geoCoordinates.dest.lat, data.geoCoordinates.dest.lon];
+
+                        const markerA = L.marker(startPoint).addTo(mapInstance).bindPopup(`<b>Origin Station:</b> ${payload.originKey}`).openPopup();
+                        const markerB = L.marker(stopPoint).addTo(mapInstance).bindPopup(`<b>Expedition Target:</b> ${payload.destKey}`);
+
+                        const routeVectorLine = L.polyline([startPoint, stopPoint], { color: '#E31C25', weight: 4, opacity: 0.85, dashArray: '8, 8' }).addTo(mapInstance);
+                        mapInstance.fitBounds(routeVectorLine.getBounds(), { padding: [40, 40] });
+                    }
+
                     const hudTemp = document.getElementById('hudTemp');
                     const hudWind = document.getElementById('hudWind');
                     const matchRate = document.getElementById('matchRate');
@@ -313,74 +430,76 @@
                     meteoContainer.className = "text-xs p-5 rounded-2xl border font-mono transition-all duration-500 shadow-sm";
 
                     if (data.telemetry.score === 2) {
-                        matchRate.innerText = "🚨 WEATHER RISK DETECTED";
+                        matchRate.innerText = "🚨 WEATHER RISK METRICS REACHED";
                         matchRate.className = "text-red-600 font-black animate-pulse";
                         
-                        meteoContainer.classList.add("bg-red-50", "border-red-300", "text-red-900");
+                        meteoContainer.classList.add("bg-gradient-to-br", "from-red-50", "to-rose-100", "border-red-300", "text-red-950");
                         meteoContainer.innerHTML = `
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2 font-black text-red-700 uppercase tracking-wider text-[11px]">
-                                    <i class="fa-solid fa-triangle-exclamation animate-bounce"></i> Severe Operations Warning
-                                </div>
-                                <p class="text-[11px] text-red-700 font-sans mt-1 mb-2 font-medium">
-                                    High wind velocities detected (${data.telemetry.wind} km/h). Alpine lift infrastructure and high-altitude transport sectors may undergo emergency technical shutdowns.
-                                </p>
-                                <div class="grid grid-cols-2 gap-2 text-[11px] border-t border-red-200 pt-2 font-bold">
-                                    <div>Sector Temp: <span class="font-mono">${data.telemetry.temp} °C</span></div>
-                                    <div>Wind Velocity: <span class="font-mono text-red-600">${data.telemetry.wind} km/h</span></div>
+                            <div class="flex gap-4 items-start">
+                                <div class="text-red-600 text-3xl animate-bounce pt-1"><i class="fa-solid fa-wind"></i></div>
+                                <div class="space-y-1 flex-1">
+                                    <div class="font-black text-red-800 uppercase tracking-wider text-[11px]">Severe Cable Car Advisory</div>
+                                    <p class="text-[11px] text-red-800 font-sans leading-relaxed">
+                                        Dangerous crosswinds discovered at peak sections (${data.telemetry.wind} km/h). Mountain lifts, cable frameworks, and high altitude tracking regions are under operational hold.
+                                    </p>
                                 </div>
                             </div>`;
                     } else if (data.telemetry.score === 4) {
-                        matchRate.innerText = "⚠️ Cautionary Environment Alert";
-                        matchRate.className = "text-amber-500 font-bold";
+                        matchRate.innerText = "⚠️ Cautionary Climate State";
+                        matchRate.className = "text-amber-600 font-bold";
                         
-                        meteoContainer.classList.add("bg-amber-50", "border-amber-300", "text-amber-900");
+                        meteoContainer.classList.add("bg-gradient-to-br", "from-amber-50", "to-orange-100", "border-amber-300", "text-amber-950");
                         meteoContainer.innerHTML = `
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2 font-black text-amber-700 uppercase tracking-wider text-[11px]">
-                                    <i class="fa-solid fa-cloud-sun"></i> Variable Alpine Environment
-                                </div>
-                                <p class="text-[11px] text-amber-700 font-sans mt-1 mb-2">
-                                    Moderate trail crosswinds active. Verify local peak updates before starting secondary alpine climbing or mountaineering objectives.
-                                </p>
-                                <div class="grid grid-cols-2 gap-2 text-[11px] border-t border-amber-200 pt-2 font-bold">
-                                    <div>Sector Temp: <span class="font-mono">${data.telemetry.temp} °C</span></div>
-                                    <div>Wind Velocity: <span class="font-mono">${data.telemetry.wind} km/h</span></div>
+                            <div class="flex gap-4 items-start">
+                                <div class="text-amber-600 text-3xl pt-1"><i class="fa-solid fa-cloud-sun-rain animate-pulse"></i></div>
+                                <div class="space-y-1 flex-1">
+                                    <div class="font-black text-amber-800 uppercase tracking-wider text-[11px]">Unstable Weather Front</div>
+                                    <p class="text-[11px] text-amber-800 font-sans leading-relaxed">
+                                        Moderate wind streams matching ${data.telemetry.wind} km/h detected. Exercise extreme navigation care on open ridge structures.
+                                    </p>
                                 </div>
                             </div>`;
                     } else {
-                        matchRate.innerText = "🟢 Safe Technical Window";
-                        matchRate.className = "text-emerald-500 font-bold";
+                        matchRate.innerText = "🟢 Optimal Technical Window";
+                        matchRate.className = "text-emerald-600 font-bold";
                         
-                        meteoContainer.classList.add("bg-emerald-50", "border-emerald-300", "text-emerald-900");
+                        meteoContainer.classList.add("bg-gradient-to-br", "from-emerald-50", "to-teal-50", "border-emerald-300", "text-emerald-950");
                         meteoContainer.innerHTML = `
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2 font-black text-emerald-700 uppercase tracking-wider text-[11px]">
-                                    <i class="fa-solid fa-circle-check"></i> Optimal Expedition Conditions
-                                </div>
-                                <p class="text-[11px] text-emerald-600 font-sans mt-1 mb-2">
-                                    Stable high-pressure window verified. Ideal conditions present across all designated mountain target sectors.
-                                </p>
-                                <div class="grid grid-cols-2 gap-2 text-[11px] border-t border-emerald-200 pt-2 font-bold">
-                                    <div>Sector Temp: <span class="font-mono">${data.telemetry.temp} °C</span></div>
-                                    <div>Wind Velocity: <span class="font-mono">${data.telemetry.wind} km/h</span></div>
+                            <div class="flex gap-4 items-start">
+                                <div class="text-emerald-500 text-3xl animate-spin [animation-duration:12s] pt-1"><i class="fa-solid fa-sun"></i></div>
+                                <div class="space-y-1 flex-1">
+                                    <div class="font-black text-emerald-800 uppercase tracking-wider text-[11px]">Clear Alpine Blue Skies</div>
+                                    <p class="text-[11px] text-emerald-700 font-sans leading-relaxed">
+                                        Ideal clear visibility parameters active across your target nodes. Safe operations window completely verified.
+                                    </p>
                                 </div>
                             </div>`;
                     }
 
-                    // --- HOUSING ROOM ASSEMBLY GENERATOR ---
+                    // --- INTERACTIVE ACCOMMODATION CHECKBOX VIEW ---
                     let lodgHtml = "";
-                    data.lodging.forEach(l => {
+                    data.lodging.forEach((l, index) => {
+                        const checkedAttr = index === 0 ? "checked" : "";
                         lodgHtml += `
-                            <div class='flex gap-3 items-center bg-white p-2.5 rounded-xl border border-stone-200 shadow-sm hover:border-stone-400 transition-all'>
-                                <img src='${l.img}' class='w-12 h-12 object-cover rounded-lg border'>
-                                <div class='flex-1'><div class='font-bold text-stone-900 text-xs'>${l.name}</div><div class='text-[10px] text-stone-400'>${l.feature}</div></div>
-                                <div class='font-mono font-black text-red-600 text-xs shrink-0'>CHF ${l.price}</div>
-                            </div>`;
+                            <label class='flex gap-3 items-center bg-white p-3 rounded-xl border border-stone-200 shadow-sm cursor-pointer hover:border-[#E31C25] transition-all block relative'>
+                                <input type="radio" name="accommodationOption" value="${l.id}" ${checkedAttr} 
+                                    onclick="selectAccommodationChoice('${l.id}', '${l.name}', '${l.price}', '${l.baseIndividualPrice}')"
+                                    class="accent-[#E31C25] h-4 w-4 shrink-0 focus:ring-0">
+                                <img src='${l.img}' class='w-12 h-12 object-cover rounded-lg border ml-1'>
+                                <div class='flex-1 min-w-0'>
+                                    <div class='font-bold text-stone-900 text-xs truncate'>${l.name}</div>
+                                    <div class='text-[10px] text-stone-400 truncate'>${l.feature}</div>
+                                </div>
+                                <div class='font-mono font-black text-red-600 text-xs shrink-0 pl-1'>CHF ${l.price}</div>
+                            </label>`;
                     });
                     document.getElementById('accommodationContainer').innerHTML = lodgHtml;
 
-                    // --- SBB ROUTE ENGINE BREAKDOWN GENERATOR ---
+                    // Trigger baseline billing calculations update loop matching index array item 0
+                    if (data.lodging.length > 0) {
+                        selectAccommodationChoice(data.lodging[0].id, data.lodging[0].name, data.lodging[0].price, data.lodging[0].baseIndividualPrice);
+                    }
+
                     let sbbLegsHtml = "";
                     if (data.railTariffs.legs) {
                         data.railTariffs.legs.forEach(leg => {
