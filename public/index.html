@@ -20,10 +20,9 @@
         .scrollbar-stark::-webkit-scrollbar-track { background: #f4f5f7; }
         .scrollbar-stark::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 2px; }
         
-        /* Optimized Map Container dimensions and visual parameters */
-        #alpineMap { height: 260px; width: 100%; border-radius: 24px; z-index: 10; border: 2px solid #e2e8f0; }
+        #alpineMap { height: 280px; width: 100%; border-radius: 24px; z-index: 10; border: 2px solid #e2e8f0; }
         
-        /* STRICTLY FORCE-HIDE THE ROUTING MACHINE DIRECTIONS TEXT CONTAINER PANEL */
+        /* Hides the text direction summary panel overlay */
         .leaflet-routing-container { display: none !important; }
     </style>
 </head>
@@ -276,7 +275,7 @@
         let globalCalculatedCache = null;
         let activeSelectedHotelObj = null;
         let mapInstance = null;
-        let activeRoutingEngineInstance = null; // Tracking control pointer to reset routes cleanly
+        let activeRoutingEngineInstance = null;
 
         const destinationSectorRegistry = {
             "Zermatt": [{ name: "Gornergrat Crest System", summer: "Trekking", winter: "Skiing" }],
@@ -325,11 +324,11 @@
             updateMountainSectors();
             populateObjectives();
             
-            // Generate standard background topology map cache frame
+            // Replaced tile mapping route nodes with ultra-stable standard OpenStreetMap CDN
             mapInstance = L.map('alpineMap').setView([46.8182, 8.2275], 8);
-            L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17,
-                attribution: '&copy; OpenTopoMap contributors'
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '&copy; OpenStreetMap contributors'
             }).addTo(mapInstance);
         });
 
@@ -437,7 +436,7 @@
             const perPerson = document.getElementById('tableGrandEach').innerText;
             const grossTotal = document.getElementById('tableGrandTotal').innerText;
 
-            const chatTemplateString = `🇨🇭 *ALPENYSNC RESORT EXCURSION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Base Lodge Stay:* ${activeSelectedHotelObj.name}\n\n📊 *GROUP BUDGET BREAKDOWN*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
+            const chatTemplateString = `🇨🇭 *ALPENSYNC RESORT EXCURSION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Base Lodge Stay:* ${activeSelectedHotelObj.name}\n\n📊 *GROUP BUDGET BREAKDOWN*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
 
             navigator.clipboard.writeText(chatTemplateString);
             document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chat invite string copied to clipboard smoothly! Paste into WhatsApp to sync your team.</span>`;
@@ -480,9 +479,8 @@
                 if(data.success) {
                     consoleBox.innerHTML = `> Core metrics synchronised. Live SBB Route Connection: ${data.liveRouteConfirmed}`;
                     
-                    // --- HIGH FIDELITY TOPOLOGICAL ROUTING ENGINE (TASK OVERLAY) ---
+                    // --- HIGH FIDELITY TOPOLOGICAL ROUTING ENGINE & VISUAL SIZE INVALIDATOR ---
                     if (mapInstance && data.geoCoordinates) {
-                        // Wipe old routing controls or markers off the layout viewport canvas cleanly
                         if (activeRoutingEngineInstance) {
                             mapInstance.removeControl(activeRoutingEngineInstance);
                         }
@@ -493,23 +491,26 @@
                         const startPoint = [data.geoCoordinates.origin.lat, data.geoCoordinates.origin.lon];
                         const stopPoint = [data.geoCoordinates.dest.lat, data.geoCoordinates.dest.lon];
 
-                        // Drop high-fidelity pinpoint markers at the start/end terminal points
                         L.marker(startPoint).addTo(mapInstance).bindPopup(`<b>Start Hub:</b> ${payload.originKey}`).openPopup();
                         L.marker(stopPoint).addTo(mapInstance).bindPopup(`<b>Alpine Base Node:</b> ${payload.destKey}`);
 
-                        // Inject the actual topological terrain router machine control block
-                        activeRoutingEngineInstance = L.Routing.control({
-                            waypoints: [L.latLng(startPoint[0], startPoint[1]), L.latLng(stopPoint[0], stopPoint[1])],
-                            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
-                            lineOptions: { styles: [{ color: '#E31C25', opacity: 0.85, weight: 5 }] },
-                            addWaypoints: false,
-                            draggableWaypoints: false,
-                            fitSelectedRoutes: true,
-                            show: false
-                        }).addTo(mapInstance);
-
-                        // Slide open the hidden map wrapper framework card lower on layout stack
+                        // Open the wrapper div container first
                         document.getElementById('mapWrapperFrame').classList.remove('hidden');
+
+                        // EXPLICIT VIEWPORT CORRECTION: Force map to recognize size changes instantly
+                        setTimeout(() => {
+                            mapInstance.invalidateSize();
+                            
+                            activeRoutingEngineInstance = L.Routing.control({
+                                waypoints: [L.latLng(startPoint[0], startPoint[1]), L.latLng(stopPoint[0], stopPoint[1])],
+                                router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
+                                lineOptions: { styles: [{ color: '#E31C25', opacity: 0.85, weight: 5 }] },
+                                addWaypoints: false,
+                                draggableWaypoints: false,
+                                fitSelectedRoutes: true,
+                                show: false
+                            }).addTo(mapInstance);
+                        }, 100);
                     }
 
                     const activitySection = document.getElementById('activityRadarSection');
