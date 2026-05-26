@@ -23,7 +23,7 @@ const originCoordinates = {
     "Basel": { lat: 47.5596, lon: 7.5886 }
 };
 
-// 10 Balanced Destinations Matrix (Premium + Niche Budget Hubs)
+// 10 Destination Coordinates Matrix
 const destinationCoordinates = {
     "Zermatt": { lat: 46.0207, lon: 7.7491 }, 
     "Andermatt": { lat: 46.6348, lon: 8.5947 },
@@ -44,44 +44,47 @@ const stationMappers = {
     "Gryon": "Gryon", "Villars-sur-Ollon": "Villars-sur-Ollon", "Les Diablerets": "Les Diablerets"
 };
 
-// Expanded Staging Lodging Database with Budget-Friendly Tiers
+// TRADITIONAL EUROPEAN & SWISS ALPINE LODGING REGISTRY
 const baseLodgingRegistry = {
     "Zermatt": [
-        { id: "z1", name: "Zermatt Matterhorn Mountain Lodge", feature: "Ski locker systems near rail hubs", price: 75, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" },
-        { id: "z2", name: "The Omnia Premium Alpine Peak", feature: "Luxury view frames matching high peak faces", price: 280, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
+        { id: "z1", name: "Gandegghütte Alpine Outpost", feature: "SAC-style glacier hut at 3,030m. Bunk platform & hearty mountain stew.", price: 55, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "z2", name: "Chalet Findeln Timber Mazot", feature: "19th-century private sun-blackened timber barn. Wood-fire stove.", price: 210, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
     ],
     "Andermatt": [
-        { id: "a1", name: "Andermatt Basecamp Hostel", feature: "Central baseline staging access nodes", price: 48, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "a2", name: "The Radisson Blu Reussen", feature: "Premium wellness elements & restoration spas", price: 145, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
+        { id: "a1", name: "Albert-Heim Refuge (SAC)", feature: "Granite high-altitude refuge. Traditional long-table group dining.", price: 46, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "a2", name: "Walser Chalet Urserntal", feature: "Historic exposed-beam family cottage in a quiet mountain meadow.", price: 125, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
     ],
     "Verbier": [
-        { id: "v1", name: "MAP Verbier Cabin Stays", feature: "3 min direct staging path to Médran lines", price: 68, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" },
-        { id: "v2", name: "W Verbier Luxury Retreat", feature: "5-star direct ski-in/ski-out village access", price: 310, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
+        { id: "v1", name: "Cabane du Mont-Fort", feature: "Authentic stone mountain refuge located directly on the high backcountry route.", price: 58, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" },
+        { id: "v2", name: "Chalet Les Attelas Premium", feature: "Hand-crafted heavy log design. Vaulted ceilings and outdoor cedar hot tub.", price: 290, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
     ],
     "Grindelwald": [
-        { id: "g1", name: "Eiger Terminal Downtown Lodge", feature: "Risk briefing rooms, glacier base corridors", price: 58, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "g2", name: "Belvedere Alpine Grid Hub", feature: "Thermal mountain-view outdoor springs", price: 195, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
+        { id: "g1", name: "Berghaus Alpiglen Station", feature: "Rustic wooden lodge sitting at the foot of the Eiger North Face.", price: 52, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "g2", name: "Oberland Heritage Log Chalet", feature: "Private 3-floor luxury chalet with panoramic mountain view balconies.", price: 185, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
     ],
     "St. Moritz": [
-        { id: "sm1", name: "St. Moritz Youth Hostel", feature: "Close to cross-country trail networks", price: 62, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "sm2", name: "Badrutt's Palace Enterprise Resort", feature: "Elite traditional 5-star glacial overlook", price: 340, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
+        { id: "sm1", name: "Chamanna Coaz Alpine Shelter", feature: "Remote mountaineering base surrounded by ice fields. Simple bunk layout.", price: 48, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "sm2", name: "Channa Engadina Private Barn", feature: "Restored stone-walled sheep barn. Open stone hearth fireplace.", price: 260, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
     ],
     "Davos": [
-        { id: "d1", name: "Davos Mountain Base Cabin", feature: "Parsenn railway portal shortcut access", price: 54, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "d2", name: "Steigenberger Grand Hotel", feature: "Premium conference & recovery arrays", price: 210, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
+        { id: "d1", name: "Clavadeler Alp Berghaus", feature: "Working dairy farm alpine hut. Fresh cheese breakfasts included.", price: 50, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "d2", name: "Sertig Valley Walser Cabin", feature: "Isolated historic log cabin down a glacial valley run.", price: 165, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
     ],
     "Engelberg": [
-        { id: "e1", name: "Engelberg Trailhead Hostel", feature: "Titlis rotair dynamic transit station near link", price: 46, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "e2", name: "Kempinski Palace Engelberg Hub", feature: "Luxury historic spa elements directly at train node", price: 235, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
+        { id: "e1", name: "Brunnihütte Mountain Hut", feature: "High-perch active refuge with panoramic terrace beds.", price: 44, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "e2", name: "Grafenort Valley Forester House", feature: "Charming isolated wood lodge. Private pine wood finish saunas.", price: 155, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
     ],
     "Gryon": [
-        { id: "gr1", name: "Chalets de Gryon Budget Outpost", feature: "Ultra-budget community base camp layout, open fireplace", price: 34, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" }
+        { id: "gr1", name: "Cergnement Valley Alpine Outpost", feature: "Ultra-budget community stone cottage with an open roaring fireplace.", price: 34, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "gr2", name: "Chalet de Frience Eco-Cabin", feature: "Local solar-powered family chalet directly next to the natural swimming lake.", price: 88, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
     ],
     "Villars-sur-Ollon": [
-        { id: "vi1", name: "Villars Alpine Backpacker Hub", feature: "Bex-Villars mountain cog railway access lanes", price: 38, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" }
+        { id: "vi1", name: "Col de Soud Forest Hideaway", feature: "Traditional mountain restaurant attic bunks. Fresh fontina fondues.", price: 38, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "vi2", name: "Chalet Bretaye Ridge Cabin", feature: "Ski-in/ski-out classic heavy-timber chalet located right on the pass loop.", price: 110, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }
     ],
     "Les Diablerets": [
-        { id: "ld1", name: "Diablerets Glacier BaseCamp Lodge", feature: "Close to Glacier 3000 tram access lines", price: 42, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }
+        { id: "ld1", name: "Cabane des Diablerets (SAC)", feature: "High limestone cliff shelter at 2,485m. Built for technical crews.", price: 42, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" },
+        { id: "ld2", name: "Refuge de l'Espace Glacier Overlook", feature: "Boutique timber frame structure hanging off a vertical rock wall.", price: 140, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" }
     ]
 };
 
@@ -108,7 +111,7 @@ app.post('/api/compute-expedition', async (req, res) => {
                 temp = meteoData.current.temperature_2m;
                 wind = meteoData.current.wind_speed_10m;
             }
-        } catch (e) { console.log("Meteo fallback routing active"); }
+        } catch (e) { console.log("Meteo telemetry loop active"); }
 
         let routeLegs = [];
         try {
@@ -131,13 +134,12 @@ app.post('/api/compute-expedition', async (req, res) => {
                     }
                 });
             }
-        } catch(e) { console.log("SBB API Fallback activated"); }
+        } catch(e) { console.log("SBB Timeout Fallback active"); }
 
         if (routeLegs.length === 0) {
             routeLegs = generateSbbItineraryLegs(stationMappers[originKey], stationMappers[destKey], timeVal);
         }
 
-        // Expanded 50-Route Accurate SBB Full-Fare One-Way Matrix (Featuring Low Cost Vaud Alps)
         const sbbBaseTariffs = {
             "Geneva": { "Zermatt": 102.00, "Andermatt": 78.50, "Verbier": 56.00, "Grindelwald": 93.00, "St. Moritz": 134.00, "Davos": 122.00, "Engelberg": 88.00, "Gryon": 38.00, "Villars-sur-Ollon": 41.00, "Les Diablerets": 44.00 },
             "Lausanne": { "Zermatt": 71.00, "Andermatt": 68.00, "Verbier": 33.60, "Grindelwald": 73.00, "St. Moritz": 116.00, "Davos": 104.00, "Engelberg": 70.00, "Gryon": 22.00, "Villars-sur-Ollon": 25.00, "Les Diablerets": 28.00 },
@@ -155,7 +157,6 @@ app.post('/api/compute-expedition', async (req, res) => {
         let totalRail2nd = baseFareUnit * discountModifier * travelers;
         let totalRail1st = (baseFareUnit * 1.65) * discountModifier * travelers;
 
-        // Smaller mountains have significantly cheaper lift pass structures (e.g. CHF 54 instead of CHF 82)
         let localLiftPricePerDay = ["Gryon", "Villars-sur-Ollon", "Les Diablerets"].includes(destKey) ? 54.00 : 82.00;
         let liftBaseEach = localLiftPricePerDay * durationNights;
         let liftTicketStatusText = passSystem !== "None" ? `${passSystem} Card Active` : `CHF ${(liftBaseEach * travelers).toFixed(2)} Fee`;
@@ -192,4 +193,4 @@ app.post('/api/compute-expedition', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`AlpenSync Dynamic Node online on port ${PORT}`));
+app.listen(PORT, () => console.log(`AlpenSync Traditional Infra Active on port ${PORT}`));
