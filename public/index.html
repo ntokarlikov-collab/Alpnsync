@@ -154,7 +154,7 @@
                 <div class="flex flex-col gap-2 justify-end">
                     <label class="flex items-center gap-2 text-[10px] text-stone-400 select-none cursor-pointer pb-1">
                         <input type="checkbox" id="privacyConsent" checked class="accent-red-600 rounded">
-                        <span>Accept transient processing under <b class="text-white hover:underline" onclick="togglePrivacyModal()">Swiss FADP Protocols</b></span>
+                        <span>Accept transient computing under <b class="text-white hover:underline" onclick="togglePrivacyModal()">Swiss FADP Protocols</b></span>
                     </label>
                     <button onclick="executeClusterCalculation()" id="engineBtn" class="w-full bg-gradient-to-r from-[#E31C25] to-[#B31218] hover:brightness-110 text-white font-black py-2.5 rounded-xl uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
                         <i class="fa-solid fa-circle-nodes"></i> Compute Search
@@ -231,7 +231,7 @@
                             <img src="https://www.twint.ch/content/uploads/2021/04/favicon.ico" class="w-3.5 h-3.5 rounded">
                             <span>Organizer TWINT Paylink:</span>
                         </div>
-                        <input type="text" id="twintBaseInput" oninput="recomputeLedgerSplitsWithTwint()" placeholder="https://www.twint.ch/paylink/..." value="https://www.twint.ch/pay/test-link" class="bg-stone-50 text-[11px] font-mono border text-stone-900 rounded-lg px-2 py-1 focus:outline-none min-w-[200px]">
+                        <input type="text" id="twintBaseInput" oninput="recomputeLedgerSplitsWithTwint()" placeholder="https://www.twint.ch/paylink/..." value="https://www.twint.ch/pay/alpensync-split" class="bg-stone-50 text-[11px] font-mono border text-stone-900 rounded-lg px-2 py-1 focus:outline-none min-w-[200px]">
                     </div>
 
                     <div class="flex gap-2 text-[10px] uppercase font-bold">
@@ -292,8 +292,8 @@
         </div>
     </main>
 
-    <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 antialiased">
-        <div class="bg-white max-w-md w-full rounded-2xl p-6 space-y-4 shadow-2xl border border-stone-200">
+    <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full rounded-2xl p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="text-sm font-black uppercase tracking-wider text-stone-950 flex items-center gap-1.5">
                     <i class="fa-solid fa-user-shield text-emerald-600"></i> Swiss nFADP Declaration Framework
@@ -302,7 +302,7 @@
             </div>
             <div class="text-xs text-stone-600 space-y-2 font-sans leading-relaxed">
                 <p><b>1. Transient Ephemeral Compute Array:</b> AlpenSync processes SBB transit route metrics and Open-Meteo climate variables entirely on-the-fly. No long-term storage records or trip tracking entries are written to databases.</p>
-                <p><b>2. Zero Cookie Footprints:</b> We collect no profiling track structures, sell no traveler data to international agencies, and respect full user autonomy under the new Federal Act on Data Protection (nFADP).</p>
+                <p><b>2. Zero Cookie Footprints:</b> We collect no profiling structures, sell no traveler data to international agencies, and respect full user autonomy under the new Federal Act on Data Protection (nFADP).</p>
                 <p><b>3. Localized Security:</b> Financial ledgers remain isolated inside the client's transient app cache layer.</p>
             </div>
             <button onclick="togglePrivacyModal()" class="w-full bg-stone-950 text-white font-bold text-xs py-2 rounded-xl uppercase tracking-wider">Acknowledge Policy</button>
@@ -432,23 +432,19 @@
 
         function selectAccommodationChoice(id, name, totalVolumePrice, singleNightBasePrice) {
             document.getElementById('selectedHotelTally').innerText = `Selected: CHF ${totalVolumePrice}`;
-            
             activeSelectedHotelObj = { id, name, totalVolumePrice, singleNightBasePrice };
             if (!globalCalculatedCache) return;
 
             recomputeLedgerSplitsWithTwint();
         }
 
-        // DYNAMIC PRE-FILLED TWINT PAYMENT BUTTON ROUTER INFRASTRUCTURE
         function generatePreFilledTwintLink(basePaylink, splitAmount, travelerIndex) {
             try {
                 const cleanUrl = new URL(basePaylink);
-                // Append official parameters for pre-filling merchant portal targets cleanly
                 cleanUrl.searchParams.set('amount', parseFloat(splitAmount).toFixed(2));
                 cleanUrl.searchParams.set('trxInfo', `AlpenSync_Crew_P${travelerIndex}`);
                 return cleanUrl.toString();
             } catch (e) {
-                // Safe baseline fallback link if the input value format is a text pattern
                 return `${basePaylink}?amount=${parseFloat(splitAmount).toFixed(2)}&trxInfo=AlpenSync_Crew_P${travelerIndex}`;
             }
         }
@@ -486,12 +482,10 @@
             document.getElementById('tableGrandEach').innerText = `CHF ${grandEach.toFixed(2)} / individual`;
             document.getElementById('tableGrandTotal').innerText = `CHF ${grandTotal.toFixed(2)} Gross Total`;
 
-            // RENDER INDIVIDUAL DYNAMIC TWINT BUTTON PADS FOR THE TEAM
             const twintBase = document.getElementById('twintBaseInput').value || "https://www.twint.ch/pay/alpensync";
             const btnContainer = document.getElementById('twintButtonsContainer');
             btnContainer.innerHTML = "";
 
-            // The organizer (Crew Member 1) pays themselves, so links deploy for peers 2+
             for (let i = 1; i <= crewSize; i++) {
                 const isOrganizer = i === 1;
                 const computedPaylink = generatePreFilledTwintLink(twintBase, grandEach, i);
@@ -529,10 +523,12 @@
             const grossTotal = document.getElementById('tableGrandTotal').innerText;
             const twintBase = document.getElementById('twintBaseInput').value;
 
-            const chatTemplateString = `🇨🇭 *ALBENSYNC MOUNTAIN EXCURSION* 🇨🇭\n\n• *Objective Route:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Count:* ${crew} Staging Members\n• *Selected Stay:* ${activeSelectedHotelObj.name}\n\n📊 *FINANCIAL SETTLEMENT SPLITS*:\n• *Individual Share:* ${perPerson}\n• *Gross Trip Cost:* ${grossTotal}\n\n📲 *SETTLE INSTANTLY VIA TWINT*:\nSettle your share with the group organizer pre-filled here:\n${twintBase}?amount=${parseFloat(grandEach).toFixed(2)}\n\n_Generated securely via AlpenSync Port under FADP transient data compliance boundaries._`;
+            const cleanNumericAmount = parseFloat(perPerson.replace(/[^0-9.]/g, '')) || 0;
+
+            const chatTemplateString = `🇨🇭 *ALPENYSNC EXPEDITION COALITION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Mountain Crew Members\n• *Locked Alpine Cabin:* ${activeSelectedHotelObj.name}\n\n📊 *FINANCIAL SPLIT MATRIX*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n📲 *SETTLE INSTANTLY VIA TWINT*:\nSettle your share with the group organizer pre-filled here:\n${twintBase}?amount=${cleanNumericAmount.toFixed(2)}\n\n_Generated securely via AlpenSync Port under FADP transient data compliance boundaries._`;
 
             navigator.clipboard.writeText(chatTemplateString);
-            document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chat ledger invite string copied! Paste into WhatsApp to split with your team.</span>`;
+            document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chalet layout copied! Paste directly into your crew group chat.</span>`;
         }
 
         function triggerPrintInvoiceWindow() {
@@ -543,9 +539,8 @@
             const consentCheck = document.getElementById('privacyConsent');
             const consoleBox = document.getElementById('logConsole');
 
-            // FADP ENFORCEMENT GUARD: Block calculations if data privacy consent is unverified
             if (!consentCheck.checked) {
-                consoleBox.innerHTML = `<span class="text-red-600 font-bold">🚨 FADP Compliance Error: You must accept the transient telemetry data processing terms before executing queries.</span>`;
+                consoleBox.innerHTML = `<span class="text-red-600 font-bold">🚨 FADP Compliance Error: You must accept the transient data processing terms before executing mountain queries.</span>`;
                 return;
             }
 
@@ -734,4 +729,4 @@
         }
     </script>
 </body>
-</html>s
+</html>
