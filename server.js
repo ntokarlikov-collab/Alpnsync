@@ -37,7 +37,7 @@ const destinationCoordinates = {
     "Les Diablerets": { lat: 46.3481, lon: 7.1578 }
 };
 
-// HIGH-RESOLUTION MOUNTAIN CHAIRLIFT SECTOR COORDINATE REGISTRY
+// High-Resolution Mountain Lift Station Coordinates
 const sectorCoordinates = {
     "Gornergrat Station": { lat: 45.9864, lon: 7.7857 },
     "Matterhorn Glacier Paradise": { lat: 45.9383, lon: 7.7294 },
@@ -70,44 +70,44 @@ const stationMappers = {
 
 const baseLodgingRegistry = {
     "Zermatt": [
-        { id: "z1", name: "Gandegghütte Alpine Outpost", feature: "SAC-style glacier hut at 3,030m. Bunk platform & hearty mountain stew.", price: 55, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "z2", name: "Chalet Findeln Timber Mazot", feature: "19th-century private sun-blackened timber barn. Wood-fire stove.", price: 210, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
+        { id: "z1", name: "Gandegghütte Alpine Outpost", feature: "SAC-style glacier hut at 3,030m. Bunk platforms & hearty stews.", price: 55, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "z2", name: "Chalet Findeln Timber Mazot", feature: "19th-century private sun-blackened barn. Wood-fire oven.", price: 210, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
     ],
     "Andermatt": [
-        { id: "a1", name: "Albert-Heim Refuge (SAC)", feature: "Granite high-altitude refuge. Traditional long-table group dining.", price: 46, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "a2", name: "Walser Chalet Urserntal", feature: "Historic exposed-beam family cottage in a quiet mountain meadow.", price: 125, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
+        { id: "a1", name: "Albert-Heim Refuge (SAC)", feature: "Granite high-altitude sanctuary. Traditional long-table family dining.", price: 46, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "a2", name: "Walser Chalet Urserntal", feature: "Historic exposed-beam cottage situated inside a silent snow meadow.", price: 125, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
     ],
     "Verbier": [
-        { id: "v1", name: "Cabane du Mont-Fort", feature: "Authentic stone mountain refuge located directly on the high backcountry route.", price: 58, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" },
-        { id: "v2", name: "Chalet Les Attelas Premium", feature: "Hand-crafted heavy log design. Vaulted ceilings and outdoor cedar hot tub.", price: 290, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
+        { id: "v1", name: "Cabane du Mont-Fort", feature: "Authentic stone refuge sitting directly on the high backcountry route tracking lines.", price: 58, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" },
+        { id: "v2", name: "Chalet Les Attelas Premium", feature: "Hand-crafted heavy log design framework. Vaulted cedar hot tubs.", price: 290, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
     ],
     "Grindelwald": [
-        { id: "g1", name: "Berghaus Alpiglen Station", feature: "Rustic wooden lodge sitting at the foot of the Eiger North Face.", price: 52, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "g2", name: "Oberland Heritage Log Chalet", feature: "Private 3-floor luxury chalet with panoramic mountain view balconies.", price: 185, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
+        { id: "g1", name: "Berghaus Alpiglen Station", feature: "Rustic wooden lodge anchored right at the foot of the Eiger North Face wall.", price: 52, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "g2", name: "Oberland Heritage Log Chalet", feature: "Private multi-level luxury chalet layout with deep view balconies.", price: 185, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
     ],
     "St. Moritz": [
-        { id: "sm1", name: "Chamanna Coaz Alpine Shelter", feature: "Remote mountaineering base surrounded by ice fields. Simple bunk layout.", price: 48, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "sm2", name: "Channa Engadina Private Barn", feature: "Restored stone-walled sheep barn. Open stone hearth fireplace.", price: 260, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
+        { id: "sm1", name: "Chamanna Coaz Alpine Shelter", feature: "Isolated mountaineering base grid wrapped by active ice fields.", price: 48, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "sm2", name: "Channa Engadina Private Barn", feature: "Beautifully restored traditional Engadin sheep barn with open stone hearths.", price: 260, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
     ],
     "Davos": [
-        { id: "d1", name: "Clavadeler Alp Berghaus", feature: "Working dairy farm alpine hut. Fresh cheese breakfasts included.", price: 50, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "d2", name: "Sertig Valley Walser Cabin", feature: "Isolated historic log cabin down a glacial valley run.", price: 165, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
+        { id: "d1", name: "Clavadeler Alp Berghaus", feature: "Working dairy farm chalet shelter. Fresh mountain cheese parameters included.", price: 50, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "d2", name: "Sertig Valley Walser Cabin", feature: "Quiet single log structure situated deep down an off-piste run corridor.", price: 165, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
     ],
     "Engelberg": [
-        { id: "e1", name: "Brunnihütte Mountain Hut", feature: "High-perch active refuge with panoramic terrace beds.", price: 44, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "e2", name: "Grafenort Valley Forester House", feature: "Charming isolated wood lodge. Private pine wood finish saunas.", price: 155, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
+        { id: "e1", name: "Brunnihütte Mountain Hut", feature: "High-altitude perching station with massive panoramic sundeck beds.", price: 44, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "e2", name: "Grafenort Valley Forester House", feature: "Charming timber house with private built-in outdoor finish saunas.", price: 155, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
     ],
     "Gryon": [
-        { id: "gr1", name: "Cergnement Valley Alpine Outpost", feature: "Ultra-budget community stone cottage with an open roaring fireplace.", price: 34, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "gr2", name: "Chalet de Frience Eco-Cabin", feature: "Local solar-powered family chalet directly next to the natural swimming lake.", price: 88, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
+        { id: "gr1", name: "Cergnement Valley Alpine Outpost", feature: "Ultra-budget stone cottage outpost equipped with an open wood fire hearth.", price: 34, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "gr2", name: "Chalet de Frience Eco-Cabin", feature: "Solar-powered tracking cabin sitting right beside the biological swimming lake.", price: 88, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
     ],
     "Villars-sur-Ollon": [
-        { id: "vi1", name: "Col de Soud Forest Hideaway", feature: "Traditional mountain restaurant attic bunks. Fresh fontina fondues.", price: 38, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "vi2", name: "Chalet Bretaye Ridge Cabin", feature: "Ski-in/ski-out classic heavy-timber chalet located right on the pass loop.", price: 110, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }
+        { id: "vi1", name: "Col de Soud Forest Hideaway", feature: "Traditional mountain chalet attic berths. Fresh fontina cheese pots.", price: 38, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "vi2", name: "Chalet Bretaye Ridge Cabin", feature: "Ski-in/ski-out timber structure located directly on the mountain pass line.", price: 110, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }
     ],
     "Les Diablerets": [
-        { id: "ld1", name: "Cabane des Diablerets (SAC)", feature: "High limestone cliff shelter at 2,485m. Built for technical crews.", price: 42, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" },
-        { id: "ld2", name: "Refuge de l'Espace Glacier Overlook", feature: "Boutique timber frame structure hanging off a vertical rock wall.", price: 140, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" }
+        { id: "ld1", name: "Cabane des Diablerets (SAC)", feature: "High limestone cliff bunker at 2,485m built specifically for technical mountain crews.", price: 42, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" },
+        { id: "ld2", name: "Refuge de l'Espace Glacier Overlook", feature: "Boutique timber structural grid hanging right off a vertical mountain face drop.", price: 140, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" }
     ]
 };
 
@@ -123,12 +123,11 @@ app.post('/api/compute-expedition', async (req, res) => {
     try {
         const { originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, daysCount, targetSectorName } = req.body;
         
-        // OVERRIDE: Check if specific chairlift sector coordinate rules apply smoothly
         const coords = sectorCoordinates[targetSectorName] || destinationCoordinates[destKey] || destinationCoordinates["Andermatt"];
         const startCoords = originCoordinates[originKey] || originCoordinates["Geneva"];
         const durationNights = parseInt(daysCount) || 1;
         
-        let temp = 12.0, wind = 14.0;
+        let temp = 11.5, wind = 12.0;
         try {
             const meteoRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,wind_speed_10m&wind_speed_unit=kmh`);
             const meteoData = await meteoRes.json();
@@ -136,7 +135,7 @@ app.post('/api/compute-expedition', async (req, res) => {
                 temp = meteoData.current.temperature_2m;
                 wind = meteoData.current.wind_speed_10m;
             }
-        } catch (e) { console.log("Meteo fallback router triggered"); }
+        } catch (e) { console.log("Meteo loop safe bypass triggered"); }
 
         let routeLegs = [];
         try {
@@ -159,7 +158,7 @@ app.post('/api/compute-expedition', async (req, res) => {
                     }
                 });
             }
-        } catch(e) { console.log("SBB OpenData trace error"); }
+        } catch(e) { console.log("SBB fallback asset looping active"); }
 
         if (routeLegs.length === 0) {
             routeLegs = generateSbbItineraryLegs(stationMappers[originKey], stationMappers[destKey], timeVal);
@@ -218,4 +217,4 @@ app.post('/api/compute-expedition', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`AlpenSync Multi-Lift Engine Active on port ${PORT}`));
+app.listen(PORT, () => console.log(`AlpenSync Core Framework active on port ${PORT}`));
