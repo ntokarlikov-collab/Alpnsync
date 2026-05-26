@@ -35,6 +35,10 @@
                 <span class="font-black text-lg tracking-wider text-white">ALPEN<span class="text-[#E31C25]">SYNC</span></span>
             </div>
 
+            <div class="hidden sm:flex items-center gap-2 text-stone-400 font-mono text-[10px] uppercase font-bold tracking-wider mr-4">
+                <i class="fa-solid fa-shield-halved text-emerald-500"></i> FADP / DSG Compliant
+            </div>
+
             <div class="flex items-center gap-2 bg-stone-900 p-1 rounded-xl border border-stone-800 text-xs">
                 <button id="seasonWinter" onclick="setSeason('winter')" class="px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-[#E31C25] text-white">
                     <i class="fa-solid fa-snowflake mr-1"></i> Winter
@@ -147,8 +151,12 @@
                     </select>
                 </div>
 
-                <div class="flex items-end">
-                    <button onclick="executeClusterCalculation()" id="engineBtn" class="w-full bg-gradient-to-r from-[#E31C25] to-[#B31218] hover:brightness-110 text-white font-black py-3.5 rounded-xl uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
+                <div class="flex flex-col gap-2 justify-end">
+                    <label class="flex items-center gap-2 text-[10px] text-stone-400 select-none cursor-pointer pb-1">
+                        <input type="checkbox" id="privacyConsent" checked class="accent-red-600 rounded">
+                        <span>Accept transient processing under <b class="text-white hover:underline" onclick="togglePrivacyModal()">Swiss FADP Protocols</b></span>
+                    </label>
+                    <button onclick="executeClusterCalculation()" id="engineBtn" class="w-full bg-gradient-to-r from-[#E31C25] to-[#B31218] hover:brightness-110 text-white font-black py-2.5 rounded-xl uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
                         <i class="fa-solid fa-circle-nodes"></i> Compute Search
                     </button>
                 </div>
@@ -166,7 +174,7 @@
             </div>
 
             <div id="logConsole" class="bg-stone-50 p-2.5 rounded-xl border border-stone-200 h-12 overflow-y-auto text-[11px] font-mono text-stone-600 scrollbar-stark">
-                > System operational. Select metrics and click Compute Search to query full-stack backend routers...
+                > System operational. Accept FADP metrics and click Compute Search to query full-stack backend routers...
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -211,16 +219,27 @@
             </div>
 
             <div id="expenseLedgerSection" class="hidden border border-stone-200 rounded-2xl p-5 bg-gradient-to-br from-stone-50 to-stone-100/50 space-y-4">
-                <div class="border-b pb-2 flex flex-col sm:flex-row gap-2 justify-between items-start sm:items-center">
-                    <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase flex items-center">
-                        <span><i class="fa-solid fa-calculator text-[#E31C25] mr-1"></i> Crew Expedition Cost Ledger Spreadsheet</span>
-                    </h4>
+                <div class="border-b pb-2 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                    <div>
+                        <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase flex items-center">
+                            <span><i class="fa-solid fa-calculator text-[#E31C25] mr-1"></i> Crew Expedition Cost Ledger Spreadsheet</span>
+                        </h4>
+                    </div>
+                    
+                    <div class="w-full sm:w-auto bg-white p-2 rounded-xl border border-stone-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <div class="flex items-center gap-1.5 px-2 text-[10px] uppercase font-black text-slate-700">
+                            <img src="https://www.twint.ch/content/uploads/2021/04/favicon.ico" class="w-3.5 h-3.5 rounded">
+                            <span>Organizer TWINT Paylink:</span>
+                        </div>
+                        <input type="text" id="twintBaseInput" oninput="recomputeLedgerSplitsWithTwint()" placeholder="https://www.twint.ch/paylink/..." value="https://www.twint.ch/pay/test-link" class="bg-stone-50 text-[11px] font-mono border text-stone-900 rounded-lg px-2 py-1 focus:outline-none min-w-[200px]">
+                    </div>
+
                     <div class="flex gap-2 text-[10px] uppercase font-bold">
                         <button onclick="shareToWhatsAppClipboard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition-all">
                             <i class="fa-brands fa-whatsapp text-xs"></i> Copy Share String
                         </button>
                         <button onclick="triggerPrintInvoiceWindow()" class="bg-stone-900 hover:bg-black text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition-all">
-                            <i class="fa-solid fa-file-pdf"></i> Print / Save Invoice
+                            <i class="fa-solid fa-file-pdf"></i> Print Invoice
                         </button>
                     </div>
                 </div>
@@ -258,6 +277,12 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="pt-2">
+                    <div class="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">Individual Crew Member TWINT Settlement Portals:</div>
+                    <div id="twintButtonsContainer" class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                        </div>
+                </div>
             </div>
 
             <div class="p-4 bg-stone-50 border border-stone-200 rounded-xl">
@@ -267,6 +292,23 @@
         </div>
     </main>
 
+    <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 antialiased">
+        <div class="bg-white max-w-md w-full rounded-2xl p-6 space-y-4 shadow-2xl border border-stone-200">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="text-sm font-black uppercase tracking-wider text-stone-950 flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-shield text-emerald-600"></i> Swiss nFADP Declaration Framework
+                </h3>
+                <button onclick="togglePrivacyModal()" class="text-stone-400 hover:text-stone-950"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="text-xs text-stone-600 space-y-2 font-sans leading-relaxed">
+                <p><b>1. Transient Ephemeral Compute Array:</b> AlpenSync processes SBB transit route metrics and Open-Meteo climate variables entirely on-the-fly. No long-term storage records or trip tracking entries are written to databases.</p>
+                <p><b>2. Zero Cookie Footprints:</b> We collect no profiling track structures, sell no traveler data to international agencies, and respect full user autonomy under the new Federal Act on Data Protection (nFADP).</p>
+                <p><b>3. Localized Security:</b> Financial ledgers remain isolated inside the client's transient app cache layer.</p>
+            </div>
+            <button onclick="togglePrivacyModal()" class="w-full bg-stone-950 text-white font-bold text-xs py-2 rounded-xl uppercase tracking-wider">Acknowledge Policy</button>
+        </div>
+    </div>
+
     <script>
         let currentSeasonMode = "winter";
         let globalCalculatedCache = null;
@@ -274,48 +316,17 @@
         let mapInstance = null;
         let activeRoutingEngineInstance = null;
 
-        // DYNAMIC MULTI-LIFT CHAIRLIFT SECTOR REGISTRY MATRIX (TASK RESTORATION OVERLAY)
         const destinationSectorRegistry = {
-            "Zermatt": [
-                { name: "Gornergrat Station", summer: "Panoramic Open Ridge Trekking", winter: "Sunny Piste Carver Slopes" },
-                { name: "Matterhorn Glacier Paradise", summer: "Glacial Ice Palace Traverses", winter: "Technical High Altitude Glacier Arena" }
-            ],
-            "Andermatt": [
-                { name: "Gemsstock Peak Terminal", summer: "Extreme Multi-Pitch Rock Climbing", winter: "Deep Off-Piste Powder Touring" },
-                { name: "Nätschen Family Sector", summer: "Alpine Flower Meadow Hikes", winter: "Groomed Sledding & Beginner Runs" }
-            ],
-            "Verbier": [
-                { name: "Mont-Fort Glacier Terminal", summer: "High Mountain Pass Ridge Scrambling", winter: "Expert Backcountry Couloirs" },
-                { name: "Savoleyres Ridgeway", summer: "Panoramic Downhill Bike Trails", winter: "Sunny Intermediate Cruise Belts" }
-            ],
-            "Grindelwald": [
-                { name: "Eiger Gletscher Terminal", summer: "Technical North Face Observation Hikes", winter: "High-Speed Mountain Carver Tracks" },
-                { name: "First Adventure Peak", summer: "Cliff Walks & Zip-lining Circuits", winter: "Progressive Snowparks & Freestyle Jumps" }
-            ],
-            "St. Moritz": [
-                { name: "Corvatsch Glacier Station", summer: "High Plateau Ice Field Trails", winter: "Deep North-Facing Powder Shelves" },
-                { name: "Corviglia Snowpark Hub", summer: "Extreme Singletrack Flow Trails", winter: "Official World Cup Giant Slalom Pistes" }
-            ],
-            "Davos": [
-                { name: "Parsenn Weissfluhjoch", summer: "High Altitude Rocky Pass Crossings", winter: "Massive 12km Classic Downhill Runs" },
-                { name: "Jakobshorn Freeride Arena", summer: "Technical Singletrack Dirt Descents", winter: "Jumps, Pipes & Progressive Freestyle Parks" }
-            ],
-            "Engelberg": [
-                { name: "Titlis Stand Glacier", summer: "Glacier Suspension Bridge Treks", winter: "Famous 2,000m Vertical Laub Drop" },
-                { name: "Brunni Sunny Slopes", summer: "Rigid Via Ferrata Climbing Routes", winter: "Sunny South-Facing Family Ski Trails" }
-            ],
-            "Gryon": [
-                { name: "Les Chaux Cableway", summer: "Panoramic Valley View Hikes", winter: "Budget Tree-Lined Powder Meadows" },
-                { name: "Frience Family Play-Zone", summer: "Natural Mountain Eco-Swimming Lake", winter: "Sledding Arenas & Magic Carpets" }
-            ],
-            "Villars-sur-Ollon": [
-                { name: "Roc d'Orsay Gondola", summer: "Downhill Grass Mountain Karting", winter: "Wide Cruising Snow Basins" },
-                { name: "Bretaye Rail Terminal", summer: "Chalet Alpine Dining Loops", winter: "Direct Ski-in/Ski-out Transit Links" }
-            ],
-            "Les Diablerets": [
-                { name: "Glacier 3000 Col du Pillon", summer: "High Altitude Alpine Coaster Rides", winter: "Year-Round Glacial Alpine Ski Pistes" },
-                { name: "Isenau Traditional Sector", summer: "Quiet Alpine Pasture Walking Trails", winter: "Untouched Scenic Snowshoe Trails" }
-            ]
+            "Zermatt": [{ name: "Gornergrat Station", summer: "Trekking", winter: "Skiing" }, { name: "Matterhorn Glacier Paradise", summer: "Glacier Paths", winter: "Glacial Arena" }],
+            "Andermatt": [{ name: "Gemsstock Peak Terminal", summer: "Climbing", winter: "Ski Touring" }, { name: "Nätschen Family Sector", summer: "Meadow Hikes", winter: "Sledding Tracks" }],
+            "Verbier": [{ name: "Mont-Fort Glacier Terminal", summer: "Ridge Treks", winter: "Couloirs" }, { name: "Savoleyres Ridgeway", summer: "Bike Trails", winter: "Cruise Belts" }],
+            "Grindelwald": [{ name: "Eiger Gletscher Terminal", summer: "Face Trails", winter: "Carver Slopes" }, { name: "First Adventure Peak", summer: "Cliff Walks", winter: "Freestyle Parks" }],
+            "St. Moritz": [{ name: "Corvatsch Glacier Station", summer: "Ice Trails", winter: "Powder Shelves" }, { name: "Corviglia Snowpark Hub", summer: "Flow Trails", winter: "Slalom Pistes" }],
+            "Davos": [{ name: "Parsenn Weissfluhjoch", summer: "Rocky Crossings", winter: "Classic Runs" }, { name: "Jakobshorn Freeride Arena", summer: "Dirt Descents", winter: "Freestyle Parks" }],
+            "Engelberg": [{ name: "Titlis Stand Glacier", summer: "Suspension Bridge", winter: "Laub vertical drop" }, { name: "Brunni Sunny Slopes", summer: "Via Ferrata", winter: "Family Ski Tracks" }],
+            "Gryon": [{ name: "Les Chaux Cableway", summer: "Valley Hikes", winter: "Powder Meadows" }, { name: "Frience Family Play-Zone", summer: "Eco-Swimming Lake", winter: "Sledding Arenas" }],
+            "Villars-sur-Ollon": [{ name: "Roc d'Orsay Gondola", summer: "Mountain Karting", winter: "Cruising Basins" }, { name: "Bretaye Rail Terminal", summer: "Dining Loops", winter: "Transit Links" }],
+            "Les Diablerets": [{ name: "Glacier 3000 Col du Pillon", summer: "Coaster Rides", winter: "Glacial Ski Pistes" }, { name: "Isenau Traditional Sector", summer: "Walking Trails", winter: "Snowshoe Trails" }]
         };
 
         const seasonObjectivesRegistry = {
@@ -358,6 +369,11 @@
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(mapInstance);
         });
+
+        function togglePrivacyModal() {
+            const modal = document.getElementById('privacyModal');
+            modal.classList.toggle('hidden');
+        }
 
         function setSeason(mode) {
             currentSeasonMode = mode;
@@ -420,6 +436,26 @@
             activeSelectedHotelObj = { id, name, totalVolumePrice, singleNightBasePrice };
             if (!globalCalculatedCache) return;
 
+            recomputeLedgerSplitsWithTwint();
+        }
+
+        // DYNAMIC PRE-FILLED TWINT PAYMENT BUTTON ROUTER INFRASTRUCTURE
+        function generatePreFilledTwintLink(basePaylink, splitAmount, travelerIndex) {
+            try {
+                const cleanUrl = new URL(basePaylink);
+                // Append official parameters for pre-filling merchant portal targets cleanly
+                cleanUrl.searchParams.set('amount', parseFloat(splitAmount).toFixed(2));
+                cleanUrl.searchParams.set('trxInfo', `AlpenSync_Crew_P${travelerIndex}`);
+                return cleanUrl.toString();
+            } catch (e) {
+                // Safe baseline fallback link if the input value format is a text pattern
+                return `${basePaylink}?amount=${parseFloat(splitAmount).toFixed(2)}&trxInfo=AlpenSync_Crew_P${travelerIndex}`;
+            }
+        }
+
+        function recomputeLedgerSplitsWithTwint() {
+            if (!globalCalculatedCache || !activeSelectedHotelObj) return;
+
             const crewSize = parseInt(document.getElementById('paramGroupSize').value) || 1;
             const nights = globalCalculatedCache.durationNights || 1;
             
@@ -434,8 +470,8 @@
             }
             const liftEach = liftTotal / crewSize;
 
-            const hotelTotal = parseFloat(totalVolumePrice);
-            const hotelEach = parseFloat(singleNightBasePrice);
+            const hotelTotal = parseFloat(activeSelectedHotelObj.totalVolumePrice);
+            const hotelEach = parseFloat(activeSelectedHotelObj.singleNightBasePrice);
 
             const grandTotal = sbbTotal + liftTotal + hotelTotal;
             const grandEach = grandTotal / crewSize;
@@ -449,6 +485,35 @@
             
             document.getElementById('tableGrandEach').innerText = `CHF ${grandEach.toFixed(2)} / individual`;
             document.getElementById('tableGrandTotal').innerText = `CHF ${grandTotal.toFixed(2)} Gross Total`;
+
+            // RENDER INDIVIDUAL DYNAMIC TWINT BUTTON PADS FOR THE TEAM
+            const twintBase = document.getElementById('twintBaseInput').value || "https://www.twint.ch/pay/alpensync";
+            const btnContainer = document.getElementById('twintButtonsContainer');
+            btnContainer.innerHTML = "";
+
+            // The organizer (Crew Member 1) pays themselves, so links deploy for peers 2+
+            for (let i = 1; i <= crewSize; i++) {
+                const isOrganizer = i === 1;
+                const computedPaylink = generatePreFilledTwintLink(twintBase, grandEach, i);
+                
+                const cardHtml = isOrganizer ? `
+                    <div class="bg-stone-100 border border-stone-200 rounded-xl p-2 flex flex-col justify-center text-center opacity-70">
+                        <span class="font-bold font-mono text-[11px] text-stone-600">Crew Member ${i} (You)</span>
+                        <span class="text-[9px] uppercase font-bold text-stone-400">Group Organizer</span>
+                    </div>
+                ` : `
+                    <a href="${computedPaylink}" target="_blank" class="bg-[#FFF0F2] hover:bg-[#FFE0E4] border border-[#FFD2D8] rounded-xl p-2 flex items-center justify-between transition-all group shadow-sm">
+                        <div class="text-left">
+                            <div class="font-black font-mono text-[11px] text-stone-900">Crew Member ${i}</div>
+                            <div class="text-[9px] text-stone-500 font-mono">Owes CHF ${grandEach.toFixed(2)}</div>
+                        </div>
+                        <span class="bg-[#E31C25] text-white font-black text-[8px] uppercase tracking-wider px-2 py-1 rounded-lg shadow-sm group-hover:scale-105 transition-transform shrink-0">
+                            <i class="fa-solid fa-mobile-screen mr-0.5"></i> TWINT
+                        </span>
+                    </a>
+                `;
+                btnContainer.innerHTML += cardHtml;
+            }
             
             document.getElementById('expenseLedgerSection').classList.remove('hidden');
         }
@@ -462,11 +527,12 @@
             const crew = document.getElementById('paramGroupSize').value;
             const perPerson = document.getElementById('tableGrandEach').innerText;
             const grossTotal = document.getElementById('tableGrandTotal').innerText;
+            const twintBase = document.getElementById('twintBaseInput').value;
 
-            const chatTemplateString = `🇨🇭 *ALPENYSNC RESORT EXCURSION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Base Lodge Stay:* ${activeSelectedHotelObj.name}\n\n📊 *GROUP BUDGET BREAKDOWN*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
+            const chatTemplateString = `🇨🇭 *ALBENSYNC MOUNTAIN EXCURSION* 🇨🇭\n\n• *Objective Route:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Count:* ${crew} Staging Members\n• *Selected Stay:* ${activeSelectedHotelObj.name}\n\n📊 *FINANCIAL SETTLEMENT SPLITS*:\n• *Individual Share:* ${perPerson}\n• *Gross Trip Cost:* ${grossTotal}\n\n📲 *SETTLE INSTANTLY VIA TWINT*:\nSettle your share with the group organizer pre-filled here:\n${twintBase}?amount=${parseFloat(grandEach).toFixed(2)}\n\n_Generated securely via AlpenSync Port under FADP transient data compliance boundaries._`;
 
             navigator.clipboard.writeText(chatTemplateString);
-            document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chalet layout copied! Paste directly into your crew group chat.</span>`;
+            document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chat ledger invite string copied! Paste into WhatsApp to split with your team.</span>`;
         }
 
         function triggerPrintInvoiceWindow() {
@@ -474,12 +540,20 @@
         }
 
         async function executeClusterCalculation() {
-            const btn = document.getElementById('engineBtn');
+            const consentCheck = document.getElementById('privacyConsent');
             const consoleBox = document.getElementById('logConsole');
+
+            // FADP ENFORCEMENT GUARD: Block calculations if data privacy consent is unverified
+            if (!consentCheck.checked) {
+                consoleBox.innerHTML = `<span class="text-red-600 font-bold">🚨 FADP Compliance Error: You must accept the transient telemetry data processing terms before executing queries.</span>`;
+                return;
+            }
+
+            const btn = document.getElementById('engineBtn');
             const destKey = document.getElementById('paramDestination').value;
             
             btn.setAttribute('disabled', 'true');
-            btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Computing...";
+            btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Syncing...";
 
             const payload = {
                 originKey: document.getElementById('paramOrigin').value,
@@ -504,7 +578,7 @@
                 globalCalculatedCache = data;
 
                 if(data.success) {
-                    consoleBox.innerHTML = `> Core metrics synchronised. Live SBB Route Connection: ${data.liveRouteConfirmed}`;
+                    consoleBox.innerHTML = `> Core metrics synchronised under Swiss Data Safety Guards. SBB Route Secure: ${data.liveRouteConfirmed}`;
                     
                     if (mapInstance && data.geoCoordinates) {
                         if (activeRoutingEngineInstance) {
@@ -660,4 +734,4 @@
         }
     </script>
 </body>
-</html>
+</html>s
