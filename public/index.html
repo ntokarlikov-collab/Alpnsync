@@ -54,21 +54,29 @@
         <div class="bg-[#0b0c0e] text-white rounded-3xl p-6 shadow-2xl border border-stone-900">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans">
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
-                    <label class="text-[9px] text-red-500 font-black uppercase tracking-wider block mb-1">From (SBB Station)</label>
+                    <label class="text-[9px] text-red-500 font-black uppercase tracking-wider block mb-1">From (SBB Departure Hub)</label>
                     <select id="paramOrigin" class="w-full bg-transparent text-white focus:outline-none cursor-pointer">
-                        <option value="Lausanne" selected>Lausanne Central</option>
+                        <option value="Geneva" selected>Geneva Cornavin</option>
+                        <option value="Lausanne">Lausanne Central</option>
                         <option value="Zurich">Zürich HB</option>
-                        <option value="Geneva">Genève Central</option>
+                        <option value="Bern">Bern Hauptbahnhof</option>
+                        <option value="Basel">Basel SBB</option>
                     </select>
                 </div>
 
                 <div class="bg-[#14161a] p-3 rounded-xl border border-stone-800">
-                    <label class="text-[9px] text-red-500 font-black uppercase tracking-wider block mb-1">To (Resort Hub)</label>
+                    <label class="text-[9px] text-red-500 font-black uppercase tracking-wider block mb-1">To (Target Alpine Resort)</label>
                     <select id="paramDestination" onchange="updateMountainSectors()" class="w-full bg-transparent text-white focus:outline-none cursor-pointer">
                         <option value="Zermatt" selected>Zermatt (Matterhorn)</option>
+                        <option value="Andermatt">Andermatt Sedrun</option>
                         <option value="Verbier">Verbier (4 Vallées)</option>
                         <option value="Grindelwald">Grindelwald Terminal</option>
-                        <option value="Andermatt">Andermatt Sedrun</option>
+                        <option value="St. Moritz">St. Moritz Engadin</option>
+                        <option value="Davos">Davos Platz</option>
+                        <option value="Crans-Montana">Crans-Montana Valais</option>
+                        <option value="Engelberg">Engelberg Titlis</option>
+                        <option value="Saas-Fee">Saas-Fee Terminal</option>
+                        <option value="Flims-Laax">Flims-Laax Arena</option>
                     </select>
                 </div>
 
@@ -208,7 +216,7 @@
                         <thead>
                             <tr class="bg-stone-900 text-white font-bold text-[10px] uppercase tracking-wider">
                                 <th class="p-3">Expense Category Description</th>
-                                <th class="p-3" id="ledgerTableDurationHeader">Rate Per Person (1 Night)</th>
+                                <th class="p-3" id="ledgerTableDurationHeader">Rate Per Person</th>
                                 <th class="p-3 text-right">Group Total Volume</th>
                             </tr>
                         </thead>
@@ -251,23 +259,18 @@
         let activeSelectedHotelObj = null;
         let mapInstance = null;
 
+        // Expanded Sector References mapping out 10 distinct regions
         const destinationSectorRegistry = {
-            "Zermatt": [
-                { name: "Gornergrat Crest System (3089m)", summer: "Alpine Trail Wilderness Trekking", winter: "Piste High Freeride Paths" },
-                { name: "Matterhorn Glacier Paradise (3883m)", summer: "Glacial High Traverse / Summer Ski", winter: "Technical High Glacial Arena" },
-                { name: "Rothorn Domain Area (3103m)", summer: "Downhill Extreme Mountain Biking", winter: "Sun-Deck Wide Carver Slopes" }
-            ],
-            "Verbier": [
-                { name: "Mont-Fort Summit Spine (3330m)", summer: "Panoramic Glacier Ridge Treks", winter: "Expert High Backcountry Couloirs" },
-                { name: "Savoleyres Alpine Pastures", summer: "Cross-Country E-Biking Loops", winter: "Intermediate Cruising Open Trails" }
-            ],
-            "Grindelwald": [
-                { name: "Eiger Glacier Terminal", summer: "Technical North Face Rock Trails", winter: "Technical High-Speed Carver Slopes" },
-                { name: "First Adventure Sector", summer: "High Alpine Cliff Walk Circuits", winter: "Freestyle Progressive Snowparks" }
-            ],
-            "Andermatt": [
-                { name: "Gemsstock Savage North Face (2961m)", summer: "Technical Multi-pitch Rock Climbing", winter: "Deep Powder Ski Touring" }
-            ]
+            "Zermatt": [{ name: "Gornergrat Crest System (3089m)", summer: "Wilderness Trekking", winter: "Piste Freeride Paths" }, { name: "Matterhorn Glacier Paradise (3883m)", summer: "Glacial High Traverse", winter: "Technical Glacial Arena" }],
+            "Andermatt": [{ name: "Gemsstock Savage North Face", summer: "Rock Climbing", winter: "Deep Powder Ski Touring" }],
+            "Verbier": [{ name: "Mont-Fort Summit Spine (3330m)", summer: "Ridge Treks", winter: "Backcountry Couloirs" }],
+            "Grindelwald": [{ name: "Eiger Glacier Terminal", summer: "North Face Trails", winter: "High-Speed Carver Slopes" }],
+            "St. Moritz": [{ name: "Corvatsch Glacier Peak", summer: "High Trekking Trails", winter: "Premium Powder Slopes" }],
+            "Davos": [{ name: "Parsenn Arena System", summer: "Panoramic Biking", winter: "Long-Run Downhill Pistes" }],
+            "Crans-Montana": [{ name: "Plaine Morte High Glacier", summer: "Ice Cave Walking", winter: "Wide Carver Slopes" }],
+            "Engelberg": [{ name: "Titlis High Ridge Arena", summer: "Via Ferrata Trails", winter: "Glacial Valley Runs" }],
+            "Saas-Fee": [{ name: "Mittelallalin Glacier (3500m)", summer: "Summer Ski Arena", winter: "Expert Ice Cascades" }],
+            "Flims-Laax": [{ name: "Vorab Glacier Snowpark", summer: "Extreme Singletrack Biking", winter: "Freestyle Pro Kickers" }]
         };
 
         const seasonObjectivesRegistry = {
@@ -276,14 +279,14 @@
         };
 
         const technicalApparelRegistry = {
-            "Ski Touring": "Breathable technical touring softshell coats, protective safety avalanche tracking beacons, and wind blocks.",
-            "Alpinism": "Heavy shell weather defense jackets, hard abrasion-resistant mount gear sets, and safety crampons.",
-            "Ice Climbing": "Reinforced water resistant outer coatings, double layers isolated utility ice climbing gloves, and dual ice tools.",
-            "Glacier Mountaineering": "High-altitude UV Category 4 glacier reflection glasses, thermal base undershirts, and dynamic ropes.",
-            "High-Altitude Trekking": "Moisture-wicking active base layers, stretch trail trekking canvas trousers, light rain pack shell.",
-            "Technical Rock Climbing": "Form-fitting highly durable canvas stretch climbing segments, chalk gear utilities, and climbing harness.",
-            "Downhill Mountain Biking": "Long-sleeve armored protection mesh layers, impact absorbing composite joint armor pads, and full-face helmet.",
-            "Glacier Via Ferrata": "Active protective softshell element tracking coat, specialized via ferrata lanyard absorber system, and high-traction boots."
+            "Ski Touring": "Breathable touring softshells, avalanche beacon sets, snow probes.",
+            "Alpinism": "Heavy shell weather jackets, crampons, technical ice axes.",
+            "Ice Climbing": "Waterproof shells, rigid climbing boots, dual ice tooling lines.",
+            "Glacier Mountaineering": "UV Category 4 glacier eyewear, harness sets, dynamic climbing ropes.",
+            "High-Altitude Trekking": "Moisture-wicking base layers, canvas mountain trousers, light packable rain cover.",
+            "Technical Rock Climbing": "Durable stretch climbing segments, chalk buckets, fitted active harness.",
+            "Downhill Mountain Biking": "Long-sleeve armored protection mesh layers, impact armor pads, full-face helmet.",
+            "Glacier Via Ferrata": "Softshell element coat, via ferrata lanyard energy absorber system, high-traction boots."
         };
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -355,7 +358,6 @@
 
         function selectAccommodationChoice(id, name, totalVolumePrice, singleNightBasePrice) {
             document.getElementById('selectedHotelTally').innerText = `Selected: CHF ${totalVolumePrice}`;
-            document.getElementById('logConsole').innerHTML = `> Accommodation selection locked: Registered space at ${name}.`;
             
             activeSelectedHotelObj = { id, name, totalVolumePrice, singleNightBasePrice };
             if (!globalCalculatedCache) return;
@@ -393,7 +395,6 @@
             document.getElementById('expenseLedgerSection').classList.remove('hidden');
         }
 
-        // TASK 4: DYNAMIC EXPORTER FUNCTIONS FOR CHAT INFRASTRUCTURES
         function shareToWhatsAppClipboard() {
             if (!globalCalculatedCache || !activeSelectedHotelObj) return;
 
@@ -404,15 +405,14 @@
             const perPerson = document.getElementById('tableGrandEach').innerText;
             const grossTotal = document.getElementById('tableGrandTotal').innerText;
 
-            const chatTemplateString = `🇨🇭 *ALBENSYNC EXPEDITION OVERVIEW* 🇨🇭\n\n• *Route:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Selected Base Stay:* ${activeSelectedHotelObj.name}\n\n📊 *FINANCIAL SPLIT LEDGER*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Generated via AlpenSync Cloud Port. Secure your train seats directly:_ \n${globalCalculatedCache.sbbBookingUrl}`;
+            const chatTemplateString = `🇨🇭 *ALBENSYNC EXPEDITION OVERVIEW* 🇨🇭\n\n• *Route:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Selected Stay:* ${activeSelectedHotelObj.name}\n\n📊 *FINANCIAL SPLIT LEDGER*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Link:_ \n${globalCalculatedCache.sbbBookingUrl}`;
 
             navigator.clipboard.writeText(chatTemplateString);
-            const consoleBox = document.getElementById('logConsole');
-            consoleBox.innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chat invite string copied to clipboard smoothly! Paste into WhatsApp to sync your team.</span>`;
+            document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chat invite string copied to clipboard smoothly! Paste into WhatsApp to sync your team.</span>`;
         }
 
         function triggerPrintInvoiceWindow() {
-            window.print(); // Access clean internal page rendering pipeline layout
+            window.print();
         }
 
         async function executeClusterCalculation() {
@@ -421,7 +421,6 @@
             
             btn.setAttribute('disabled', 'true');
             btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Computing...";
-            consoleBox.innerHTML = `> Querying live cloud server endpoints securely...`;
 
             const payload = {
                 originKey: document.getElementById('paramOrigin').value,
@@ -491,7 +490,7 @@
 
                     meteoContainer.innerHTML = `
                         <div class="flex gap-4 items-start">
-                            <div class="text-xl pt-1"><i class="fa-solid fa-mountain-sun"></i></div>
+                            <div class="text-emerald-500 text-3xl animate-spin [animation-duration:15s] pt-1"><i class="fa-solid fa-sun"></i></div>
                             <div class="space-y-1 flex-1">
                                 <div class="font-black uppercase tracking-wider text-[11px]">Telemetry Forecast Hub</div>
                                 <p class="text-[11px] font-sans leading-relaxed text-stone-600">
