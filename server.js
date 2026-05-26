@@ -23,7 +23,7 @@ const originCoordinates = {
     "Basel": { lat: 47.5596, lon: 7.5886 }
 };
 
-// 10 Destination Coordinates Matrix
+// Village Baseline Coordinates
 const destinationCoordinates = {
     "Zermatt": { lat: 46.0207, lon: 7.7491 }, 
     "Andermatt": { lat: 46.6348, lon: 8.5947 },
@@ -37,6 +37,30 @@ const destinationCoordinates = {
     "Les Diablerets": { lat: 46.3481, lon: 7.1578 }
 };
 
+// HIGH-RESOLUTION MOUNTAIN CHAIRLIFT SECTOR COORDINATE REGISTRY
+const sectorCoordinates = {
+    "Gornergrat Station": { lat: 45.9864, lon: 7.7857 },
+    "Matterhorn Glacier Paradise": { lat: 45.9383, lon: 7.7294 },
+    "Gemsstock Peak Terminal": { lat: 46.6022, lon: 8.6111 },
+    "Nätschen Family Sector": { lat: 46.6431, lon: 8.6186 },
+    "Mont-Fort Glacier Terminal": { lat: 46.0825, lon: 7.3312 },
+    "Savoleyres Ridgeway": { lat: 46.1132, lon: 7.2185 },
+    "Eiger Gletscher Terminal": { lat: 46.5752, lon: 8.0124 },
+    "First Adventure Peak": { lat: 46.6562, lon: 8.0531 },
+    "Corvatsch Glacier Station": { lat: 46.4194, lon: 9.8211 },
+    "Corviglia Snowpark Hub": { lat: 46.5055, lon: 9.8144 },
+    "Parsenn Weissfluhjoch": { lat: 46.8344, lon: 9.8081 },
+    "Jakobshorn Freeride Arena": { lat: 46.7781, lon: 9.8512 },
+    "Titlis Stand Glacier": { lat: 46.7981, lon: 8.4282 },
+    "Brunni Sunny Slopes": { lat: 46.8375, lon: 8.4111 },
+    "Les Chaux Cableway": { lat: 46.2821, lon: 7.1042 },
+    "Frience Family Play-Zone": { lat: 46.2755, lon: 7.0864 },
+    "Roc d'Orsay Gondola": { lat: 46.3055, lon: 7.1022 },
+    "Bretaye Rail Terminal": { lat: 46.3211, lon: 7.1182 },
+    "Glacier 3000 Col du Pillon": { lat: 46.3532, lon: 7.2064 },
+    "Isenau Traditional Sector": { lat: 46.3644, lon: 7.1432 }
+};
+
 const stationMappers = {
     "Geneva": "Genève", "Lausanne": "Lausanne", "Zurich": "Zürich HB", "Bern": "Bern", "Basel": "Basel SBB",
     "Zermatt": "Zermatt", "Andermatt": "Andermatt", "Verbier": "Verbier, station", "Grindelwald": "Grindelwald",
@@ -44,7 +68,6 @@ const stationMappers = {
     "Gryon": "Gryon", "Villars-sur-Ollon": "Villars-sur-Ollon", "Les Diablerets": "Les Diablerets"
 };
 
-// TRADITIONAL EUROPEAN & SWISS ALPINE LODGING REGISTRY
 const baseLodgingRegistry = {
     "Zermatt": [
         { id: "z1", name: "Gandegghütte Alpine Outpost", feature: "SAC-style glacier hut at 3,030m. Bunk platform & hearty mountain stew.", price: 55, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
@@ -98,8 +121,10 @@ function generateSbbItineraryLegs(from, to, timeVal) {
 
 app.post('/api/compute-expedition', async (req, res) => {
     try {
-        const { originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, daysCount } = req.body;
-        const coords = destinationCoordinates[destKey] || destinationCoordinates["Andermatt"];
+        const { originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, daysCount, targetSectorName } = req.body;
+        
+        // OVERRIDE: Check if specific chairlift sector coordinate rules apply smoothly
+        const coords = sectorCoordinates[targetSectorName] || destinationCoordinates[destKey] || destinationCoordinates["Andermatt"];
         const startCoords = originCoordinates[originKey] || originCoordinates["Geneva"];
         const durationNights = parseInt(daysCount) || 1;
         
@@ -111,7 +136,7 @@ app.post('/api/compute-expedition', async (req, res) => {
                 temp = meteoData.current.temperature_2m;
                 wind = meteoData.current.wind_speed_10m;
             }
-        } catch (e) { console.log("Meteo telemetry loop active"); }
+        } catch (e) { console.log("Meteo fallback router triggered"); }
 
         let routeLegs = [];
         try {
@@ -134,7 +159,7 @@ app.post('/api/compute-expedition', async (req, res) => {
                     }
                 });
             }
-        } catch(e) { console.log("SBB Timeout Fallback active"); }
+        } catch(e) { console.log("SBB OpenData trace error"); }
 
         if (routeLegs.length === 0) {
             routeLegs = generateSbbItineraryLegs(stationMappers[originKey], stationMappers[destKey], timeVal);
@@ -193,4 +218,4 @@ app.post('/api/compute-expedition', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`AlpenSync Traditional Infra Active on port ${PORT}`));
+app.listen(PORT, () => console.log(`AlpenSync Multi-Lift Engine Active on port ${PORT}`));
