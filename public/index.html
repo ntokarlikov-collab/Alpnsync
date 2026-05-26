@@ -6,15 +6,25 @@
     <title>AlpenSync OS — Year-Round Production Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    
     <style>
         html { scroll-behavior: smooth; }
         .swiss-glow-frame { box-shadow: 0 15px 50px rgba(227, 28, 37, 0.18); }
         .scrollbar-stark::-webkit-scrollbar { width: 5px; }
         .scrollbar-stark::-webkit-scrollbar-track { background: #f4f5f7; }
         .scrollbar-stark::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 2px; }
-        #alpineMap { height: 280px; width: 100%; border-radius: 24px; z-index: 10; border: 2px solid #e2e8f0; }
+        
+        /* Optimized Map Container dimensions and visual parameters */
+        #alpineMap { height: 260px; width: 100%; border-radius: 24px; z-index: 10; border: 2px solid #e2e8f0; }
+        
+        /* STRICTLY FORCE-HIDE THE ROUTING MACHINE DIRECTIONS TEXT CONTAINER PANEL */
+        .leaflet-routing-container { display: none !important; }
     </style>
 </head>
 <body class="bg-[#f8f9fa] text-slate-900 font-sans antialiased min-h-screen flex flex-col">
@@ -163,18 +173,6 @@
                 > System operational. Select metrics and click Compute Search to query full-stack backend routers...
             </div>
 
-            <div class="grid grid-cols-1 gap-4">
-                <div id="alpineMap" class="shadow-sm"></div>
-            </div>
-
-            <div id="activityRadarSection" class="hidden border border-stone-200 rounded-2xl p-5 bg-gradient-to-br from-stone-900 to-stone-950 text-white space-y-3 shadow-md">
-                <h4 class="text-xs font-black tracking-widest text-red-500 uppercase flex items-center gap-1.5">
-                    <i class="fa-solid fa-map-pin animate-pulse"></i> AlpenSync Recommended Local Activity Guide
-                </h4>
-                <div id="activityDisplayGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
-                    </div>
-            </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <div class="lg:col-span-3 bg-[#f4f5f6] border border-stone-200 rounded-2xl p-4 sm:p-6 space-y-4">
                     <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase border-b border-stone-200 pb-2 flex justify-between items-center">
@@ -202,6 +200,18 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div id="activityRadarSection" class="hidden border border-stone-200 rounded-2xl p-5 bg-gradient-to-br from-stone-900 to-stone-950 text-white space-y-3 shadow-md">
+                <h4 class="text-xs font-black tracking-widest text-red-500 uppercase flex items-center gap-1.5">
+                    <i class="fa-solid fa-map-pin animate-pulse"></i> AlpenSync Recommended Local Activity Guide
+                </h4>
+                <div id="activityDisplayGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
+                    </div>
+            </div>
+
+            <div id="mapWrapperFrame" class="hidden grid grid-cols-1 gap-4">
+                <div id="alpineMap" class="shadow-sm"></div>
             </div>
 
             <div id="expenseLedgerSection" class="hidden border border-stone-200 rounded-2xl p-5 bg-gradient-to-br from-stone-50 to-stone-100/50 space-y-4">
@@ -266,6 +276,7 @@
         let globalCalculatedCache = null;
         let activeSelectedHotelObj = null;
         let mapInstance = null;
+        let activeRoutingEngineInstance = null; // Tracking control pointer to reset routes cleanly
 
         const destinationSectorRegistry = {
             "Zermatt": [{ name: "Gornergrat Crest System", summer: "Trekking", winter: "Skiing" }],
@@ -280,59 +291,15 @@
             "Les Diablerets": [{ name: "Isenau Basin", summer: "Alpine Pastures", winter: "Glacier 3000 Access" }]
         };
 
-        // 10-HUB DYNAMIC LOCAL RECOMMENDED ACTIVITY GUIDE DIRECTORY REGISTRY
-        const resortActivityRegistry = {
-            "Zermatt": {
-                winter: ["Ski the legendary 25km Matterhorn glacier run", "Visit the underground Glacier Ice Palace", "Après-ski at Hennu Stall"],
-                summer: ["Hike the iconic 5-Lakes trail array", "Ride the Gornergrat open-air cog railway", "Summer ski on the Plateau Rosa"]
-            },
-            "Andermatt": {
-                winter: ["Powder freeriding on Gemsstock North Face", "Cross-country skiing in Urseren valley", "Night sledding at Nätschen"],
-                summer: ["Hike the historic Schöllenen Gorge trail", "Play 18 holes at Andermatt Swiss Alps Golf", "Cycle the classic Gotthard Pass curves"]
-            },
-            "Verbier": {
-                winter: ["Conquer the extreme Tortin mogul run", "Off-piste heli-skiing itineraries", "Socialize at the vibrant Farinet Lounge"],
-                summer: ["Mountain biking at Verbier Bike Park", "Paragliding over the Bagnes valley", "Hike the panoramic Pierre Avoi peak ridge"]
-            },
-            "Grindelwald": {
-                winter: ["Sled the 15km 'Big Pintenfritz' run", "Ski the official Lauberhorn World Cup track", "Walk the snowy First Cliff Walk grid"],
-                summer: ["Fly on the First Flyer zip-line line", "Hike to the pristine Bachalpsee lake", "Explore the deep Glacier Canyon chasm"]
-            },
-            "St. Moritz": {
-                winter: ["Watch polo or horse racing on the frozen lake", "Bobsleigh on the historic Olympia Bob Run", "Night ski at Corvatsch"],
-                summer: ["Windsurf or kitesurf on Lake Silvaplana", "Hike the scenic Muottas Muragl panorama paths", "Ride the scenic Bernina Express pass link"]
-            },
-            "Davos": {
-                winter: ["Ski the massive 12km Parsenn classic run", "Ice skate on the giant outdoor natural rink", "Après-ski at Bolgen Plaza"],
-                summer: ["Sail or wakeboard on pristine Lake Davos", "Ride the extreme freeride trails down Gotschna", "Hike the high alpine paths of Jakobshorn"]
-            },
-            "Engelberg": {
-                winter: ["Freeride the famous 2000m vertical 'Laub' drop", "Snowshoe around frozen Lake Trübsee", "Visit the historic Engelberg Monastery"],
-                summer: ["Traverse the thrilling Titlis Cliff Walk bridge", "Climb the Fürenwand technical Via Ferrata", "Row boats on the scenic Trübsee basin"]
-            },
-            "Gryon": {
-                winter: ["Enjoy budget family skiing at Les Chaux", "Sled down the scenic Cergnement valley", "Snowshoe through the historic Taveyanne hamlet"],
-                summer: ["Swim at the free Frience eco-lake refuge park", "Mountain karting down from Les Chaux ridges", "Barbecue in the designated Taveyanne reserve huts"]
-            },
-            "Villars-sur-Ollon": {
-                winter: ["Ski the wide sunny Bretaye snow bowls", "Thermal spa relaxation at Les Bains de Villars", "Ride the vintage mountain cog wheel rail line"],
-                summer: ["Golf on the spectacular 18-hole mountain plateau", "Hike to the scenic Lac des Chavonnes chalet", "Downhill grass scooter tracking runs"]
-            },
-            "Les Diablerets": {
-                winter: ["Walk the Peak Walk suspension bridge at Glacier 3000", "Conquer the historic 7km night sledding run", "Ice climbing clinics at Creux de Champ"],
-                summer: ["Ride the high-speed Alpine Coaster at Glacier 3000", "Hike the dramatic Creux de Champ nature basin amphitheater", "Via Ferrata climbing up the massive Cascade du Dar walls"]
-            }
-        };
-
         const seasonObjectivesRegistry = {
             "winter": ["Ski Touring", "Alpinism", "Ice Climbing", "Glacier Mountaineering"],
             "summer": ["High-Altitude Trekking", "Technical Rock Climbing", "Downhill Mountain Biking", "Glacier Via Ferrata"]
         };
 
         const technicalApparelRegistry = {
-            "Ski Touring": "Breathable touring shells, avalanche beacons, probes.",
+            "Ski Touring": "Breathable touring softshells, avalanche beacon sets, snow probes.",
             "Alpinism": "Heavy weather jackets, crampons, technical ice axes.",
-            "Ice Climbing": "Waterproof outer coats, rigid insulated boots, ice tools.",
+            "Ice Climbing": "Waterproof shells, rigid insulated boots, ice tools.",
             "Glacier Mountaineering": "UV Cat 4 glacier eyewear, harness systems, dynamic ropes.",
             "High-Altitude Trekking": "Moisture-wicking base lines, stretch canvas trousers, shell pack.",
             "Technical Rock Climbing": "Durable stretch climbing segments, chalk buckets, harness.",
@@ -340,15 +307,29 @@
             "Glacier Via Ferrata": "Softshell tracking coat, via ferrata lanyard absorber, high-traction boots."
         };
 
+        const resortActivityRegistry = {
+            "Zermatt": { winter: ["Ski the legendary 25km Matterhorn glacier run", "Visit the underground Glacier Ice Palace"], summer: ["Hike the iconic 5-Lakes trail array", "Ride the Gornergrat cog railway"] },
+            "Andermatt": { winter: ["Powder freeriding on Gemsstock North Face", "Night sledding at Nätschen"], summer: ["Hike the historic Schöllenen Gorge", "Cycle the classic Gotthard Pass curves"] },
+            "Verbier": { winter: ["Conquer the extreme Tortin mogul run", "Off-piste heli-skiing itineraries"], summer: ["Mountain biking at Verbier Bike Park", "Hike the panoramic Pierre Avoi ridge"] },
+            "Grindelwald": { winter: ["Sled the 15km 'Big Pintenfritz' run", "Walk the snowy First Cliff Walk"], summer: ["Fly on the First Flyer zip-line", "Hike to pristine Bachalpsee lake"] },
+            "St. Moritz": { winter: ["Watch polo on the frozen lake", "Bobsleigh on the Olympia Bob Run"], summer: ["Windsurf on Lake Silvaplana", "Ride the Bernina Express pass link"] },
+            "Davos": { winter: ["Ski the massive 12km Parsenn classic run", "Ice skate on the giant outdoor rink"], summer: ["Sail or wakeboard on Lake Davos", "Hike the paths of Jakobshorn"] },
+            "Engelberg": { winter: ["Freeride the famous vertical 'Laub' drop", "Snowshoe around frozen Lake Trübsee"], summer: ["Traverse the Titlis Cliff Walk bridge", "Climb the Fürenwand Via Ferrata"] },
+            "Gryon": { winter: ["Enjoy family skiing at Les Chaux", "Snowshoe through Taveyanne hamlet"], summer: ["Swim at Frience eco-lake park", "Mountain karting down from Les Chaux"] },
+            "Villars-sur-Ollon": { winter: ["Ski sunny Bretaye snow bowls", "Ride the vintage mountain cog wheel line"], summer: ["Golf on the spectacular plateau course", "Hike to Lac des Chavonnes chalet"] },
+            "Les Diablerets": { winter: ["Walk the Peak Walk at Glacier 3000", "Conquer the 7km night sledding run"], summer: ["Ride Alpine Coaster at Glacier 3000", "Hike Creux de Champ nature basin"] }
+        };
+
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
             updateMountainSectors();
             populateObjectives();
             
+            // Generate standard background topology map cache frame
             mapInstance = L.map('alpineMap').setView([46.8182, 8.2275], 8);
             L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
                 maxZoom: 17,
-                attribution: 'Map data: &copy; OpenTopoMap contributors'
+                attribution: '&copy; OpenTopoMap contributors'
             }).addTo(mapInstance);
         });
 
@@ -456,7 +437,7 @@
             const perPerson = document.getElementById('tableGrandEach').innerText;
             const grossTotal = document.getElementById('tableGrandTotal').innerText;
 
-            const chatTemplateString = `🇨🇭 *ALPENYNC RESORT EXCURSION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Base Lodge Stay:* ${activeSelectedHotelObj.name}\n\n📊 *GROUP BUDGET BREAKDOWN*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Book your travel assets directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
+            const chatTemplateString = `🇨🇭 *ALPENYSNC RESORT EXCURSION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Base Lodge Stay:* ${activeSelectedHotelObj.name}\n\n📊 *GROUP BUDGET BREAKDOWN*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
 
             navigator.clipboard.writeText(chatTemplateString);
             document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chat invite string copied to clipboard smoothly! Paste into WhatsApp to sync your team.</span>`;
@@ -499,27 +480,40 @@
                 if(data.success) {
                     consoleBox.innerHTML = `> Core metrics synchronised. Live SBB Route Connection: ${data.liveRouteConfirmed}`;
                     
+                    // --- HIGH FIDELITY TOPOLOGICAL ROUTING ENGINE (TASK OVERLAY) ---
                     if (mapInstance && data.geoCoordinates) {
+                        // Wipe old routing controls or markers off the layout viewport canvas cleanly
+                        if (activeRoutingEngineInstance) {
+                            mapInstance.removeControl(activeRoutingEngineInstance);
+                        }
                         mapInstance.eachLayer((layer) => {
-                            if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-                                mapInstance.removeLayer(layer);
-                            }
+                            if (layer instanceof L.Marker) mapInstance.removeLayer(layer);
                         });
 
                         const startPoint = [data.geoCoordinates.origin.lat, data.geoCoordinates.origin.lon];
                         const stopPoint = [data.geoCoordinates.dest.lat, data.geoCoordinates.dest.lon];
 
-                        L.marker(startPoint).addTo(mapInstance).bindPopup(`<b>Origin Hub:</b> ${payload.originKey}`).openPopup();
-                        L.marker(stopPoint).addTo(mapInstance).bindPopup(`<b>Destination Node:</b> ${payload.destKey}`);
+                        // Drop high-fidelity pinpoint markers at the start/end terminal points
+                        L.marker(startPoint).addTo(mapInstance).bindPopup(`<b>Start Hub:</b> ${payload.originKey}`).openPopup();
+                        L.marker(stopPoint).addTo(mapInstance).bindPopup(`<b>Alpine Base Node:</b> ${payload.destKey}`);
 
-                        const routeVectorLine = L.polyline([startPoint, stopPoint], { color: '#E31C25', weight: 4, opacity: 0.85, dashArray: '6, 8' }).addTo(mapInstance);
-                        mapInstance.fitBounds(routeVectorLine.getBounds(), { padding: [50, 50] });
+                        // Inject the actual topological terrain router machine control block
+                        activeRoutingEngineInstance = L.Routing.control({
+                            waypoints: [L.latLng(startPoint[0], startPoint[1]), L.latLng(stopPoint[0], stopPoint[1])],
+                            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
+                            lineOptions: { styles: [{ color: '#E31C25', opacity: 0.85, weight: 5 }] },
+                            addWaypoints: false,
+                            draggableWaypoints: false,
+                            fitSelectedRoutes: true,
+                            show: false
+                        }).addTo(mapInstance);
+
+                        // Slide open the hidden map wrapper framework card lower on layout stack
+                        document.getElementById('mapWrapperFrame').classList.remove('hidden');
                     }
 
-                    // --- STEP A: GENERATE TAILORED ACTIVITIES DISPLAY CARDS ---
                     const activitySection = document.getElementById('activityRadarSection');
                     const activityGrid = document.getElementById('activityDisplayGrid');
-                    
                     const resortData = resortActivityRegistry[destKey] || { winter: [], summer: [] };
                     const activeActivitiesList = currentSeasonMode === "winter" ? resortData.winter : resortData.summer;
                     
