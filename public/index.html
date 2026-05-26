@@ -19,10 +19,7 @@
         .scrollbar-stark::-webkit-scrollbar { width: 5px; }
         .scrollbar-stark::-webkit-scrollbar-track { background: #f4f5f7; }
         .scrollbar-stark::-webkit-scrollbar-thumb { background: #1c1917; border-radius: 2px; }
-        
-        #alpineMap { height: 280px; width: 100%; border-radius: 24px; z-index: 10; border: 2px solid #e2e8f0; }
-        
-        /* Hides the text direction summary panel overlay */
+        #alpineMap { height: 260px; width: 100%; border-radius: 24px; z-index: 10; border: 2px solid #e2e8f0; }
         .leaflet-routing-container { display: none !important; }
     </style>
 </head>
@@ -172,7 +169,7 @@
                 > System operational. Select metrics and click Compute Search to query full-stack backend routers...
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div class="grid grid-cols-1 grid-cols-5 gap-6">
                 <div class="lg:col-span-3 bg-[#f4f5f6] border border-stone-200 rounded-2xl p-4 sm:p-6 space-y-4">
                     <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase border-b border-stone-200 pb-2 flex justify-between items-center">
                         <span>SBB Timetable Card Breakdown</span>
@@ -191,11 +188,11 @@
 
                     <div class="bg-stone-50 border border-stone-200 rounded-2xl p-5">
                         <h4 class="text-xs font-black tracking-widest text-stone-950 uppercase mb-3 flex justify-between items-center">
-                            <span>Available Accommodations</span>
+                            <span>Traditional Chalets & Alpine Huts</span>
                             <span class="text-[10px] text-stone-400 font-mono" id="selectedHotelTally">None Chosen</span>
                         </h4>
                         <div id="accommodationContainer" class="space-y-3 text-xs text-stone-400">
-                            No rooms loaded yet. Click Compute Search to view baseline local options.
+                            No cabins loaded yet. Click Compute Search to unlock local staging options.
                         </div>
                     </div>
                 </div>
@@ -249,7 +246,7 @@
                                 <td class="p-3 font-mono font-bold text-right" id="tableCostLiftTotal">CHF 0.00</td>
                             </tr>
                             <tr>
-                                <td class="p-3 font-medium">Active Selection Alpine Staging Stays (Lodging Tally)</td>
+                                <td class="p-3 font-medium">Active Selection Alpine Staging Stays (Chalet Tally)</td>
                                 <td class="p-3 font-mono" id="tableCostHotelEach">CHF 0.00</td>
                                 <td class="p-3 font-mono font-bold text-right" id="tableCostHotelTotal">CHF 0.00</td>
                             </tr>
@@ -324,7 +321,6 @@
             updateMountainSectors();
             populateObjectives();
             
-            // Replaced tile mapping route nodes with ultra-stable standard OpenStreetMap CDN
             mapInstance = L.map('alpineMap').setView([46.8182, 8.2275], 8);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
@@ -436,10 +432,10 @@
             const perPerson = document.getElementById('tableGrandEach').innerText;
             const grossTotal = document.getElementById('tableGrandTotal').innerText;
 
-            const chatTemplateString = `🇨🇭 *ALPENSYNC RESORT EXCURSION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Traveller(s)\n• *Base Lodge Stay:* ${activeSelectedHotelObj.name}\n\n📊 *GROUP BUDGET BREAKDOWN*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
+            const chatTemplateString = `🇨🇭 *ALPENYSNC EXPEDITION COALITION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Mountain Crew Members\n• *Locked Alpine Cabin:* ${activeSelectedHotelObj.name}\n\n📊 *FINANCIAL SPLIT MATRIX*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n_Secure transit seating directly via SBB Checkouts:_ \n${globalCalculatedCache.sbbBookingUrl}`;
 
             navigator.clipboard.writeText(chatTemplateString);
-            document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chat invite string copied to clipboard smoothly! Paste into WhatsApp to sync your team.</span>`;
+            document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chalet layout copied! Paste directly into your crew group chat.</span>`;
         }
 
         function triggerPrintInvoiceWindow() {
@@ -479,7 +475,6 @@
                 if(data.success) {
                     consoleBox.innerHTML = `> Core metrics synchronised. Live SBB Route Connection: ${data.liveRouteConfirmed}`;
                     
-                    // --- HIGH FIDELITY TOPOLOGICAL ROUTING ENGINE & VISUAL SIZE INVALIDATOR ---
                     if (mapInstance && data.geoCoordinates) {
                         if (activeRoutingEngineInstance) {
                             mapInstance.removeControl(activeRoutingEngineInstance);
@@ -494,10 +489,8 @@
                         L.marker(startPoint).addTo(mapInstance).bindPopup(`<b>Start Hub:</b> ${payload.originKey}`).openPopup();
                         L.marker(stopPoint).addTo(mapInstance).bindPopup(`<b>Alpine Base Node:</b> ${payload.destKey}`);
 
-                        // Open the wrapper div container first
                         document.getElementById('mapWrapperFrame').classList.remove('hidden');
 
-                        // EXPLICIT VIEWPORT CORRECTION: Force map to recognize size changes instantly
                         setTimeout(() => {
                             mapInstance.invalidateSize();
                             
@@ -628,7 +621,7 @@
                         </div>`;
                 }
             } catch (err) {
-                consoleBox.innerHTML = `<span class='text-red-600'>✕ UI Render Error.</span>`;
+                document.getElementById('logConsole').innerHTML = `<span class='text-red-600'>✕ UI Render Error.</span>`;
             }
 
             btn.removeAttribute('disabled');
