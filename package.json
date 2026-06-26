@@ -1,7 +1,7 @@
 {
   "name": "alpensync",
-  "version": "1.0.0",
-  "description": "Swiss Alpine Expedition Hub Under FADP Compliance Rules",
+  "version": "1.1.0",
+  "description": "Swiss Alpine Expedition Hub — AI Cognitive Solutions Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
