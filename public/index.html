@@ -1,1260 +1,346 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpenSync OS — Alpine Expedition Gateway</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --swiss-red: #EB0000;
-            --swiss-red-hover: #C60018;
-            --ink: #14202B;
-            --ink-2: #46586A;
-            --ink-3: #6B7E92;
-            --snow: #F8FAFC;
-            --line: #E2E8F0;
-            --sky-high: #7FB2DC;
-            --sky-mid: #A9CDE9;
-            --sky-low: #D8E8F5;
-            --valley: #EAF2F9;
-            --ridge-faint: #D9E7F2;
-            --glass: rgba(255, 255, 255, 0.72);
-            --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        body.summer {
-            --sky-high: #6FB3E8;
-            --sky-mid: #B5D9EC;
-            --sky-low: #E4F1E6;
-            --valley: #ECF4EB;
-            --ridge-faint: #D8E8D8;
-        }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: var(--font-body);
-            background-color: var(--snow);
-            color: var(--ink);
-            margin: 0;
-            transition: background-color 0.6s ease;
-        }
-        h1, h2, .display { font-family: var(--font-display); }
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const cors = require('cors');
+const pkg = require('./package.json');
 
-        /* ============================================================
-           STICKY NAV — frosted, appears after the hero
-           ============================================================ */
-        #topNav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 10px 22px;
-            background: rgba(248, 250, 252, 0.72);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            transform: translateY(-110%);
-            transition: transform 0.4s ease;
-        }
-        #topNav.visible { transform: translateY(0); }
-        .nav-brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
-        .nav-spacer { flex: 1; }
-        .mini-flag {
-            position: relative; width: 20px; height: 20px;
-            background: var(--swiss-red); border-radius: 4px; flex: none;
-        }
-        .mini-flag::before, .mini-flag::after {
-            content: ''; position: absolute; background: #fff;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-        }
-        .mini-flag::before { width: 12px; height: 3.5px; }
-        .mini-flag::after  { width: 3.5px; height: 12px; }
-        .engine-status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--ink-3); }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #94A3B8; flex: none; }
-        .status-dot.online { background: #16A34A; }
-        .status-dot.offline { background: var(--swiss-red); }
-        .season-toggle {
-            display: flex; align-items: center; gap: 7px;
-            padding: 6px 14px;
-            border-radius: 999px;
-            border: 1px solid var(--line);
-            background: #fff;
-            font-size: 12px; font-weight: 700;
-            color: var(--ink);
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-        .season-toggle svg { width: 14px; height: 14px; }
-        body.summer .season-toggle { background: #EAF6EC; border-color: #CBE5CF; color: #1F6B3A; }
+const app = express();
+const PORT = process.env.PORT || 3000;
+const STARTED_AT = Date.now();
+const INDEX_HTML = path.join(__dirname, 'index.html');
 
-        /* ============================================================
-           HERO — Matterhorn panorama, Swiss travel-poster style
-           ============================================================ */
-        #hero {
-            position: relative;
-            height: 100vh;
-            min-height: 620px;
-            overflow: hidden;
-            background: linear-gradient(180deg,
-                var(--sky-high) 0%, var(--sky-mid) 38%,
-                var(--sky-low) 70%, var(--snow) 100%);
-            transition: background 0.6s ease;
-        }
-        .hero-video {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            object-fit: cover; opacity: 0; transition: opacity 1.2s ease;
-        }
-        #hero.video-mode .hero-video { opacity: 1; }
-        #hero.video-mode .mtn-layer, #hero.video-mode .cloud, #hero.video-mode .hero-sun { opacity: 0; }
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname)));
 
-        .hero-sun {
-            position: absolute; top: 12%; right: 16%;
-            width: 84px; height: 84px; border-radius: 50%;
-            background: #FFFFFF; opacity: 0.92;
-            box-shadow: 0 0 70px 34px rgba(255, 255, 255, 0.55);
-            pointer-events: none;
-        }
-        .cloud {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.78);
-            border-radius: 999px; filter: blur(7px);
-            animation: cloud-drift linear infinite;
-            pointer-events: none;
-        }
-        @keyframes cloud-drift { from { transform: translateX(-35vw); } to { transform: translateX(135vw); } }
+// Local Databases / Registries
+const DESTINATIONS = {
+    'zermatt': {
+        name: 'Zermatt', lat: 46.0207, lon: 7.7491, baseTariff: 45, region: 'Valais',
+        facts: { village: 1620, topLift: 3883, pistesKm: 360, signature: 'Matterhorn Glacier Paradise' }
+    },
+    'verbier': {
+        name: 'Verbier', lat: 46.0961, lon: 7.2286, baseTariff: 42, region: 'Valais',
+        facts: { village: 1500, topLift: 3330, pistesKm: 410, signature: 'Mont Fort · 4 Vallées' }
+    },
+    'grindelwald': {
+        name: 'Grindelwald', lat: 46.6242, lon: 8.0414, baseTariff: 48, region: 'Bernese Oberland',
+        facts: { village: 1034, topLift: 2500, pistesKm: 211, signature: 'Eiger North Face views' }
+    },
+    'stmoritz': {
+        name: 'St. Moritz', lat: 46.4908, lon: 9.8355, baseTariff: 52, region: 'Graubünden',
+        facts: { village: 1822, topLift: 3303, pistesKm: 350, signature: 'Corvatsch · Engadin valley' }
+    },
+    'chamonix': {
+        name: 'Chamonix (Cross-Border)', lat: 45.9227, lon: 6.8685, baseTariff: 55, region: 'Haute-Savoie',
+        facts: { village: 1035, topLift: 3842, pistesKm: 155, signature: 'Aiguille du Midi · Mont Blanc' }
+    }
+};
 
-        .mtn-layer {
-            position: absolute; bottom: 0; left: 0;
-            width: 100%; height: 82%;
-            pointer-events: none; will-change: transform;
-        }
-        .mtn-layer svg { width: 100%; height: 100%; display: block; }
-        body.summer .snowpatch { opacity: 0.18; }
-        body.summer .meadow-a { fill: #DCEAD1; }
-        body.summer .meadow-b { fill: #EAF4E2; }
+const ORIGINS = {
+    'geneva': { name: 'Geneva Airport / Cornavin', baseRailPrice: 40 },
+    'zurich': { name: 'Zürich HB', baseRailPrice: 50 },
+    'lausanne': { name: 'Lausanne', baseRailPrice: 28 },
+    'basel': { name: 'Basel SBB', baseRailPrice: 45 }
+};
 
-        .hero-snow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-        body.summer .hero-snow { display: none; }
-        .flake { position: absolute; top: -12px; background: #fff; border-radius: 50%; animation: flake-fall linear infinite; }
-        @keyframes flake-fall { to { transform: translateY(112vh); } }
+// SwissPass Matrix: fraction of the standard fare actually paid
+const PASS_PROFILES = {
+    'none': { label: 'Standard Fare', modifier: 1.0 },
+    'halbtax': { label: 'Half-Fare Card (Halbtax)', modifier: 0.5 },
+    'generalabonnement': { label: 'GA Travelcard', modifier: 0.0 },
+    'swiss-travel-pass': { label: 'Swiss Travel Pass', modifier: 0.15 }
+};
 
-        #hero::after {
-            content: ''; position: absolute; left: 0; right: 0; bottom: 0;
-            height: 22vh;
-            background: linear-gradient(180deg, transparent 0%, var(--snow) 94%);
-            pointer-events: none;
-        }
+// WMO weather interpretation codes (Open-Meteo `weathercode`)
+const WMO_CONDITIONS = {
+    0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+    45: 'Fog', 48: 'Depositing rime fog',
+    51: 'Light drizzle', 53: 'Drizzle', 55: 'Dense drizzle',
+    56: 'Freezing drizzle', 57: 'Dense freezing drizzle',
+    61: 'Light rain', 63: 'Rain', 65: 'Heavy rain',
+    66: 'Freezing rain', 67: 'Heavy freezing rain',
+    71: 'Light snowfall', 73: 'Snowfall', 75: 'Heavy snowfall', 77: 'Snow grains',
+    80: 'Light rain showers', 81: 'Rain showers', 82: 'Violent rain showers',
+    85: 'Light snow showers', 86: 'Heavy snow showers',
+    95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Thunderstorm with heavy hail'
+};
 
-        .hero-content {
-            position: relative; z-index: 3; height: 100%;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: flex-start;
-            padding-top: 13vh; text-align: center;
-            color: var(--ink); will-change: transform, opacity;
-        }
-        .swiss-flag {
-            position: relative; width: 34px; height: 34px;
-            background: var(--swiss-red); border-radius: 6px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 18px rgba(235, 0, 0, 0.3);
-            animation: rise-in 1.1s ease both;
-        }
-        .swiss-flag::before, .swiss-flag::after {
-            content: ''; position: absolute; background: #fff;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-        }
-        .swiss-flag::before { width: 20px; height: 6px; }
-        .swiss-flag::after  { width: 6px; height: 20px; }
-        .hero-content h1 {
-            margin: 0;
-            font-size: clamp(40px, 6.5vw, 72px);
-            letter-spacing: -2.5px; font-weight: 700;
-            animation: rise-in 1.1s ease 0.15s both;
-        }
-        .hero-content .tagline {
-            margin: 12px 0 0;
-            font-size: clamp(14px, 1.9vw, 18px);
-            font-weight: 500; color: var(--ink-2);
-            animation: rise-in 1.1s ease 0.3s both;
-        }
-        .hero-content .sectors {
-            margin: 10px 0 0;
-            font-size: 11.5px; font-weight: 700;
-            letter-spacing: 2.8px; text-transform: uppercase;
-            color: var(--ink-3);
-            animation: rise-in 1.1s ease 0.45s both;
-        }
-        .hero-cta {
-            width: auto; margin-top: 30px; padding: 15px 44px;
-            font-family: var(--font-display);
-            font-size: 15px; font-weight: 700; color: #fff;
-            background: var(--swiss-red);
-            border: none; border-radius: 3px; cursor: pointer;
-            box-shadow: 0 8px 26px rgba(235, 0, 0, 0.28);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-            animation: rise-in 1.1s ease 0.6s both;
-        }
-        .hero-cta:hover {
-            background: var(--swiss-red-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(235, 0, 0, 0.36);
-        }
-        .scroll-indicator {
-            position: absolute; bottom: 26px; left: 50%;
-            transform: translateX(-50%); z-index: 3;
-            color: var(--swiss-red); font-size: 22px;
-            animation: bob 2.2s ease-in-out infinite;
-            cursor: pointer; user-select: none;
-        }
-        @keyframes rise-in { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
-        @keyframes bob { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
+const roundCHF = (value) => Math.round(value * 100) / 100;
 
-        /* ============================================================
-           DASHBOARD — the valley continues behind frosted panels
-           ============================================================ */
-        #dashboard {
-            position: relative;
-            padding: 30px 20px 0;
+// Balances within half a rappen of zero are considered settled — strict
+// equality misses them after repeated float arithmetic.
+const SETTLED_EPSILON = 0.005;
+
+// Open-Meteo responses are cached per destination so rapid sector-switching
+// in the UI doesn't hammer the upstream API.
+const WEATHER_TTL_MS = 5 * 60 * 1000;
+const weatherCache = new Map();
+
+const sumRange = (values, start, count) =>
+    (values || []).slice(start, start + count).reduce((sum, v) => sum + (v || 0), 0);
+
+// Pick the most promising day in the outlook window: clearest skies first,
+// warmth as the tiebreaker.
+function pickBestDay(outlook) {
+    if (!outlook.length) return null;
+    let bestIndex = 0;
+    let bestScore = -Infinity;
+    outlook.forEach((day, i) => {
+        const score = -(day.precipitationMm || 0) * 2 + (day.tempMax || 0) * 0.3;
+        if (score > bestScore) {
+            bestScore = score;
+            bestIndex = i;
         }
-        .valley-backdrop {
-            position: absolute; inset: 0;
-            overflow: hidden; pointer-events: none; z-index: 0;
-        }
-        .valley-backdrop svg { width: 100%; height: 100%; display: block; }
-        .container { position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: clamp(22px, 3vw, 30px);
-            font-weight: 700; letter-spacing: -1px;
-            margin: 46px 0 6px;
-        }
-        .section-sub { font-size: 14px; color: var(--ink-3); margin: 0 0 18px; }
-
-        .panel {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.85);
-            border-radius: 18px;
-            box-shadow: 0 10px 34px rgba(20, 45, 70, 0.08);
-            padding: 24px;
-            transition: box-shadow 0.35s ease, transform 0.35s ease;
-        }
-        .panel:hover { box-shadow: 0 16px 44px rgba(20, 45, 70, 0.12); }
-
-        .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s ease, transform 0.8s ease; }
-        .reveal.visible { opacity: 1; transform: none; }
-
-        /* --- Resort cards --- */
-        .resort-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 14px;
-        }
-        .resort-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 2px solid transparent;
-            outline: 1px solid rgba(255, 255, 255, 0.85);
-            border-radius: 16px;
-            box-shadow: 0 8px 26px rgba(20, 45, 70, 0.07);
-            padding: 14px 14px 12px;
-            cursor: pointer;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-        }
-        .resort-card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(20, 45, 70, 0.12); }
-        .resort-card.selected { border-color: var(--swiss-red); }
-        .resort-card svg { width: 100%; height: 44px; display: block; }
-        .resort-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; margin: 8px 0 2px; }
-        .resort-meta { font-size: 12px; color: var(--ink-3); }
-        .resort-badge {
-            display: inline-block; margin-top: 8px;
-            font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px;
-            text-transform: uppercase; color: var(--swiss-red);
-            opacity: 0; transition: opacity 0.25s ease;
-        }
-        .resort-card.selected .resort-badge { opacity: 1; }
-
-        /* --- Weather panel --- */
-        .weather-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; align-items: center; }
-        @media (max-width: 820px) { .weather-grid { grid-template-columns: 1fr; } }
-        .weather-now { display: flex; align-items: center; gap: 18px; }
-        .w-icon { width: 74px; height: 74px; color: var(--ink-2); flex: none; }
-        .w-icon svg { width: 100%; height: 100%; }
-        .w-temp { font-family: var(--font-display); font-size: 54px; font-weight: 700; letter-spacing: -3px; line-height: 1; }
-        .w-cond { font-size: 15px; font-weight: 600; }
-        .w-place { font-size: 12.5px; color: var(--ink-3); font-weight: 500; margin-top: 3px; }
-        .stat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-        .chip {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 6px 13px;
-            font-size: 12px; font-weight: 600; color: var(--ink-2);
-        }
-        .chip svg { width: 13px; height: 13px; }
-        .outlook-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .outlook-card {
-            background: rgba(255, 255, 255, 0.75);
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 12px 10px;
-            text-align: center;
-        }
-        .outlook-card.best { border-color: #7BC894; background: #EFF9F1; }
-        .o-day { font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 1px; }
-        .o-icon { width: 30px; height: 30px; margin: 6px auto; color: var(--ink-2); }
-        .o-icon svg { width: 100%; height: 100%; }
-        .o-temp { font-family: var(--font-display); font-size: 15px; font-weight: 700; }
-        .o-precip { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; }
-        .o-best-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #1F6B3A; margin-top: 6px; }
-        .freshness { font-size: 11px; color: var(--ink-3); font-weight: 600; }
-
-        /* --- Planner + ticket --- */
-        .planner-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 22px; align-items: start; }
-        @media (max-width: 820px) { .planner-grid { grid-template-columns: 1fr; } }
-        label { display: block; margin: 14px 0 6px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.3px; }
-        select, input[type="text"], input[type="number"] {
-            width: 100%; padding: 11px 13px;
-            border: 1px solid var(--line); border-radius: 10px;
-            box-sizing: border-box; font-size: 14px;
-            font-family: var(--font-body); color: var(--ink);
-            background: rgba(255, 255, 255, 0.9);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        select:focus, input:focus { outline: none; border-color: var(--sky-high); box-shadow: 0 0 0 3px rgba(127, 178, 220, 0.25); }
-        select {
-            appearance: none; -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B7E92' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 13px center;
-        }
-        .stepper { display: flex; align-items: center; gap: 10px; }
-        .stepper button {
-            width: 38px; height: 38px; border-radius: 10px;
-            border: 1px solid var(--line); background: rgba(255, 255, 255, 0.9);
-            font-size: 18px; font-weight: 700; color: var(--ink-2);
-            cursor: pointer; transition: border-color 0.2s ease, color 0.2s ease;
-        }
-        .stepper button:hover { border-color: var(--ink-3); color: var(--ink); }
-        .stepper input { width: 70px; text-align: center; }
-        .btn-primary {
-            width: 100%; margin-top: 20px; padding: 13px;
-            font-family: var(--font-display);
-            font-size: 14px; font-weight: 700; color: #fff;
-            background: var(--swiss-red);
-            border: none; border-radius: 10px; cursor: pointer;
-            transition: background 0.25s ease, transform 0.2s ease, opacity 0.2s;
-        }
-        .btn-primary:hover { background: var(--swiss-red-hover); transform: translateY(-1px); }
-        .btn-primary:disabled { opacity: 0.5; cursor: wait; transform: none; }
-        .btn-secondary {
-            width: 100%; margin-top: 10px; padding: 11px;
-            font-size: 13px; font-weight: 700; color: var(--ink-2);
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid var(--line); border-radius: 10px; cursor: pointer;
-            transition: border-color 0.2s ease, color 0.2s ease;
-        }
-        .btn-secondary:hover { border-color: var(--ink-3); color: var(--ink); }
-
-        .ticket {
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid var(--line);
-            box-shadow: 0 10px 30px rgba(20, 45, 70, 0.1);
-            overflow: hidden;
-        }
-        .ticket-head {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 20px;
-            background: var(--ink); color: #fff;
-        }
-        .ticket-head .t-brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 0.5px; }
-        .ticket-head .t-class { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.7); }
-        .ticket-route {
-            display: flex; align-items: center; gap: 12px;
-            padding: 22px 20px 16px;
-        }
-        .t-stop { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1.2; }
-        .t-stop small { display: block; font-family: var(--font-body); font-weight: 600; font-size: 11px; color: var(--ink-3); letter-spacing: 0.5px; }
-        .t-line { flex: 1; position: relative; height: 2px; background: repeating-linear-gradient(90deg, var(--ink-3) 0 6px, transparent 6px 12px); }
-        .t-line::before, .t-line::after {
-            content: ''; position: absolute; top: 50%; transform: translateY(-50%);
-            width: 9px; height: 9px; border-radius: 50%;
-            background: var(--swiss-red);
-        }
-        .t-line::before { left: -4px; }
-        .t-line::after { right: -4px; }
-        .t-train {
-            position: absolute; left: 50%; top: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff; padding: 0 8px;
-            color: var(--ink-2); width: 22px; height: 22px;
-        }
-        .t-train svg { width: 22px; height: 22px; }
-        .ticket-perf {
-            position: relative; margin: 4px 0;
-            border-top: 2px dashed var(--line);
-        }
-        .ticket-perf::before, .ticket-perf::after {
-            content: ''; position: absolute; top: -9px;
-            width: 16px; height: 16px; border-radius: 50%;
-            background: var(--valley);
-        }
-        .ticket-perf::before { left: -9px; }
-        .ticket-perf::after { right: -9px; }
-        .ticket-body { padding: 14px 20px 18px; }
-        .t-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: var(--ink-2); }
-        .t-row.strong { color: var(--ink); font-weight: 700; }
-        .t-row .pos { color: #1F6B3A; font-weight: 600; }
-        .t-total {
-            display: flex; justify-content: space-between; align-items: baseline;
-            margin-top: 10px; padding-top: 12px;
-            border-top: 1px solid var(--line);
-        }
-        .t-total .lbl { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); }
-        .t-total .amt { font-family: var(--font-display); font-size: 30px; font-weight: 700; letter-spacing: -1px; }
-        .savings-badge {
-            display: inline-block; margin-top: 12px;
-            background: #FDECEC; color: var(--swiss-red);
-            font-size: 11.5px; font-weight: 700;
-            padding: 5px 13px; border-radius: 999px;
-        }
-        .empty-hint {
-            border: 2px dashed var(--line); border-radius: 16px;
-            padding: 40px 20px; text-align: center;
-            color: var(--ink-3); font-size: 13.5px; font-weight: 500;
-        }
-
-        /* --- Ledger --- */
-        .ledger-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 22px; align-items: start; }
-        @media (max-width: 820px) { .ledger-grid { grid-template-columns: 1fr; } }
-        .avatar-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .avatar {
-            display: inline-flex; align-items: center; gap: 7px;
-            border-radius: 999px; padding: 5px 13px 5px 5px;
-            font-size: 12.5px; font-weight: 700;
-        }
-        .avatar .dot {
-            width: 26px; height: 26px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10.5px; font-weight: 700; flex: none;
-            background: rgba(255, 255, 255, 0.6);
-        }
-        .expense-item {
-            display: grid; grid-template-columns: 2fr 1fr 1fr 36px;
-            gap: 8px; margin-bottom: 8px; align-items: center;
-        }
-        .remove-row {
-            width: 36px; height: 38px;
-            background: none; border: 1px solid var(--line); border-radius: 10px;
-            color: #94A3B8; font-weight: 700; font-size: 15px;
-            cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease;
-        }
-        .remove-row:hover { color: var(--swiss-red); border-color: var(--swiss-red); }
-        .net-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
-        .net-name { width: 84px; font-size: 13px; font-weight: 700; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .net-bar-track { flex: 1; height: 8px; border-radius: 999px; background: rgba(226, 232, 240, 0.7); overflow: hidden; position: relative; }
-        .net-bar { height: 100%; border-radius: 999px; transition: width 0.7s ease; }
-        .net-bar.pos { background: #57B879; }
-        .net-bar.neg { background: #E8756B; }
-        .net-amt { width: 92px; text-align: right; font-size: 13px; font-weight: 700; flex: none; }
-        .net-amt.pos { color: #1F6B3A; }
-        .net-amt.neg { color: #B3261E; }
-        .settle-row {
-            display: flex; align-items: center; gap: 10px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid var(--line); border-radius: 13px;
-            padding: 10px 13px; margin-top: 8px;
-        }
-        .settle-flow { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; min-width: 0; }
-        .settle-flow svg { width: 15px; height: 15px; color: var(--ink-3); flex: none; }
-        .settle-amt { font-family: var(--font-display); font-weight: 700; font-size: 14.5px; white-space: nowrap; }
-        .twint-btn {
-            flex: none; text-decoration: none;
-            background: var(--ink); color: #fff;
-            font-size: 11.5px; font-weight: 700;
-            padding: 7px 14px; border-radius: 999px;
-            transition: background 0.2s ease;
-        }
-        .twint-btn:hover { background: #2B3D4D; }
-        .ledger-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-        .metric {
-            background: rgba(255, 255, 255, 0.75);
-            border: 1px solid var(--line); border-radius: 13px;
-            padding: 12px 15px;
-        }
-        .metric .m-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-3); }
-        .metric .m-val { font-family: var(--font-display); font-size: 21px; font-weight: 700; margin-top: 3px; }
-        .group-lbl { font-size: 12px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 4px; }
-
-        /* --- Skeletons & errors --- */
-        .skeleton {
-            border-radius: 10px;
-            background: linear-gradient(90deg, #E8EEF4 25%, #F5F8FB 50%, #E8EEF4 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.2s infinite;
-        }
-        @keyframes shimmer { to { background-position: -200% 0; } }
-        .error-banner {
-            background: #FDECEC; color: #9B1C1C;
-            border: 1px solid #F5C6C6; border-radius: 12px;
-            padding: 12px 15px; font-size: 13px; font-weight: 600;
-        }
-
-        /* --- Footer --- */
-        footer { margin-top: 70px; position: relative; z-index: 1; }
-        footer .ridge { display: block; width: 100%; height: 70px; }
-        .footer-inner {
-            background: var(--ink); color: rgba(255, 255, 255, 0.75);
-            padding: 26px 20px 34px;
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            text-align: center; font-size: 12.5px;
-        }
-        .footer-brand { display: flex; align-items: center; gap: 9px; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 15px; }
-
-        @media (prefers-reduced-motion: reduce) {
-            html { scroll-behavior: auto; }
-            .flake, .cloud, .scroll-indicator, .swiss-flag,
-            .hero-content h1, .hero-content .tagline,
-            .hero-content .sectors, .hero-cta, .skeleton { animation: none !important; }
-            .reveal { opacity: 1; transform: none; transition: none; }
-        }
-    </style>
-</head>
-<body>
-
-<nav id="topNav">
-    <div class="nav-brand"><span class="mini-flag"></span>AlpenSync OS</div>
-    <div class="nav-spacer"></div>
-    <div class="engine-status"><span class="status-dot" id="engineDot"></span><span id="engineLabel">ENGINE: LINKING...</span></div>
-    <div class="season-toggle" id="seasonToggle" onclick="toggleSeason()"></div>
-</nav>
-
-<!-- ================= MATTERHORN LANDING ================= -->
-<section id="hero">
-    <video id="heroVideo" class="hero-video" autoplay muted loop playsinline></video>
-    <div class="hero-sun"></div>
-
-    <div class="cloud" style="top: 14%; left: 2%;  width: 240px; height: 42px; animation-duration: 110s; opacity: 0.75;"></div>
-    <div class="cloud" style="top: 30%; left: 40%; width: 320px; height: 50px; animation-duration: 150s; animation-delay: -55s; opacity: 0.6;"></div>
-    <div class="cloud" style="top: 8%;  left: 64%; width: 180px; height: 34px; animation-duration: 90s;  animation-delay: -25s; opacity: 0.7;"></div>
-    <div class="cloud" style="top: 40%; left: 12%; width: 280px; height: 44px; animation-duration: 170s; animation-delay: -80s; opacity: 0.45;"></div>
-
-    <div class="mtn-layer" id="mtnFar">
-        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-            <polygon fill="#C9DCEC" points="0,640 0,430 90,368 168,412 262,338 348,398 442,346 528,392 610,352 700,640"/>
-            <polygon fill="#C9DCEC" points="748,640 828,346 902,398 992,344 1082,400 1168,352 1262,406 1352,362 1440,412 1440,640"/>
-        </svg>
-    </div>
-
-    <div class="mtn-layer" id="mtnMid">
-        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-            <polygon fill="#8FADC8" points="0,640 0,500 130,388 218,458 328,368 424,442 520,392 610,470 700,640"/>
-            <polygon fill="#8FADC8" points="752,640 860,388 948,452 1052,372 1148,448 1250,396 1342,462 1440,414 1440,640"/>
-            <polygon class="snowpatch" fill="#EFF5FA" points="112,402 130,388 150,402 142,418 124,412"/>
-            <polygon class="snowpatch" fill="#EFF5FA" points="310,382 328,368 348,383 338,398 320,394"/>
-            <polygon class="snowpatch" fill="#EFF5FA" points="842,402 860,388 880,403 870,418 852,413"/>
-            <polygon class="snowpatch" fill="#EFF5FA" points="1034,386 1052,372 1072,387 1062,402 1044,398"/>
-            <polygon class="snowpatch" fill="#EFF5FA" points="1232,410 1250,396 1270,411 1260,426 1242,421"/>
-        </svg>
-    </div>
-
-    <div class="mtn-layer" id="mtnMain">
-        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-            <defs>
-                <linearGradient id="haze" x1="0" y1="1" x2="0" y2="0">
-                    <stop offset="0" stop-color="#F8FAFC"/>
-                    <stop offset="1" stop-color="#F8FAFC" stop-opacity="0"/>
-                </linearGradient>
-            </defs>
-            <polygon fill="#3A536C" points="
-                280,640 318,590 354,542 390,496 422,458 452,424 480,394 506,366
-                530,340 552,316 570,294 584,278 598,264 612,256 622,248 632,242
-                648,224 664,206 680,188 696,170 710,156 722,144 734,133 746,125
-                753,119 759,116 766,123 771,134 775,150 777,166
-                790,188 804,212 820,240 838,270 858,304 880,342 904,384 930,430
-                958,480 988,534 1018,588 1046,630 1056,640"/>
-            <polygon fill="#7A93AC" points="
-                759,116 766,123 771,134 775,150 777,166 790,188 804,212 820,240
-                838,270 858,304 880,342 904,384 930,430 958,480 988,534 1018,588
-                1046,630 1056,640 732,640 734,520 736,430 738,340 741,262 745,205 750,155 754,130"/>
-            <polygon class="snowpatch" fill="#FFFFFF" points="
-                648,224 664,206 680,188 696,170 710,156 722,144 734,133 746,125
-                753,119 759,116 766,123 771,134 775,150 777,166 786,182 794,196
-                786,208 776,204 780,226 768,234 772,252 758,244 752,264 742,250
-                734,268 726,252 716,262 712,244 700,252 696,232 684,238 682,220
-                668,230 660,242 652,236"/>
-            <polygon class="snowpatch" fill="#DEE9F2" opacity="0.85" points="
-                648,224 664,206 680,188 696,170 710,156 722,144 734,133 746,125
-                753,119 750,155 745,205 741,240 734,268 726,252 716,262 712,244
-                700,252 696,232 684,238 682,220 668,230 660,242 652,236"/>
-            <polygon class="snowpatch" fill="#EAF2F8" opacity="0.9" points="
-                584,278 598,264 612,256 622,248 632,242 640,252 628,262 616,268 604,276 594,286"/>
-            <polygon class="snowpatch" fill="#DCE8F2" opacity="0.55" points="660,242 672,248 655,330 640,372 636,330"/>
-            <polygon class="snowpatch" fill="#DCE8F2" opacity="0.35" points="600,320 612,326 588,430 574,470 574,404"/>
-            <polygon class="snowpatch" fill="#DCE8F2" opacity="0.22" points="540,404 552,410 528,506 514,540 516,470"/>
-            <polygon class="snowpatch" fill="#FFFFFF" opacity="0.7"  points="752,264 764,258 770,330 760,410 748,352"/>
-            <polygon class="snowpatch" fill="#FFFFFF" opacity="0.5"  points="796,300 810,306 828,390 818,450 800,372"/>
-            <polygon class="snowpatch" fill="#FFFFFF" opacity="0.35" points="852,400 866,406 892,480 884,540 862,470"/>
-            <polygon class="snowpatch" fill="#FFFFFF" opacity="0.25" points="912,490 926,496 954,564 946,610 922,542"/>
-            <polygon fill="#2F4459" opacity="0.35" points="748,240 828,320 824,334 746,254"/>
-            <polygon fill="#2F4459" opacity="0.3"  points="742,330 884,470 880,484 740,344"/>
-            <polygon fill="#2F4459" opacity="0.25" points="736,440 946,616 940,628 735,455"/>
-            <polygon fill="#2F4459" opacity="0.3"  points="620,300 660,340 656,352 616,312"/>
-            <polygon fill="#2F4459" opacity="0.22" points="560,392 606,438 602,450 556,404"/>
-            <rect x="0" y="400" width="1440" height="240" fill="url(#haze)"/>
-            <path class="meadow-a" fill="#EDF4FA" d="M0,640 L0,540 Q160,492 340,528 T700,522 T1060,530 T1440,516 L1440,640 Z"/>
-            <path class="meadow-b" fill="#FFFFFF" d="M0,640 L0,576 Q200,538 400,566 T780,560 T1140,568 T1440,552 L1440,640 Z"/>
-        </svg>
-    </div>
-
-    <div class="hero-snow" id="heroSnow"></div>
-
-    <div class="hero-content" id="heroContent">
-        <div class="swiss-flag" aria-hidden="true"></div>
-        <h1>AlpenSync OS</h1>
-        <p class="tagline">Alpine Expedition Gateway — live telemetry, SBB tariffs & group settlement in one flow</p>
-        <p class="sectors">Zermatt · Verbier · Grindelwald · St. Moritz · Chamonix</p>
-        <button class="hero-cta" onclick="enterDashboard()">Begin Expedition</button>
-    </div>
-
-    <div class="scroll-indicator" onclick="enterDashboard()" title="Scroll to dashboard">▾</div>
-</section>
-
-<!-- ================= WORKING DASHBOARD ================= -->
-<main id="dashboard">
-    <div class="valley-backdrop" aria-hidden="true">
-        <svg viewBox="0 0 1440 2400" preserveAspectRatio="xMidYMin slice">
-            <polygon fill="var(--ridge-faint)" opacity="0.55" points="0,340 190,230 360,320 560,210 760,330 980,240 1180,330 1440,250 1440,460 0,460"/>
-            <polygon fill="var(--ridge-faint)" opacity="0.35" points="0,900 240,790 460,880 700,770 940,890 1180,800 1440,880 1440,1100 0,1100"/>
-            <polygon fill="var(--ridge-faint)" opacity="0.45" points="0,1560 200,1450 420,1545 660,1435 900,1555 1140,1465 1440,1545 1440,1780 0,1780"/>
-            <polygon fill="var(--ridge-faint)" opacity="0.3" points="0,2150 260,2050 520,2130 780,2030 1040,2140 1300,2060 1440,2120 1440,2400 0,2400"/>
-        </svg>
-    </div>
-
-    <div class="container">
-
-        <h2 class="section-title reveal">Choose your sector</h2>
-        <p class="section-sub reveal">Five alpine destinations, live-linked to Open-Meteo telemetry.</p>
-        <div class="resort-grid reveal" id="resortGrid"></div>
-
-        <h2 class="section-title reveal">Mountain telemetry</h2>
-        <p class="section-sub reveal">Current conditions, 12-hour accumulation and the 3-day window.</p>
-        <section class="panel reveal" id="weatherPanel">
-            <div id="weatherBody"></div>
-        </section>
-
-        <h2 class="section-title reveal">Plan the journey</h2>
-        <p class="section-sub reveal">SBB fare matrix with SwissPass and group-rate mechanics.</p>
-        <section class="panel reveal">
-            <div class="planner-grid">
-                <div>
-                    <label for="originHub">Departure hub</label>
-                    <select id="originHub">
-                        <option value="geneva">Geneva Airport / Cornavin</option>
-                        <option value="zurich">Zürich HB</option>
-                        <option value="lausanne">Lausanne</option>
-                        <option value="basel">Basel SBB</option>
-                    </select>
-
-                    <label for="swissPass">SwissPass profile</label>
-                    <select id="swissPass">
-                        <option value="none">Standard fare (no subscription)</option>
-                        <option value="halbtax">Half-Fare Card (Halbtax)</option>
-                        <option value="generalabonnement">GA Travelcard (Generalabonnement)</option>
-                        <option value="swiss-travel-pass">Swiss Travel Pass</option>
-                    </select>
-
-                    <label for="groupSize">Expedition size</label>
-                    <div class="stepper">
-                        <button type="button" onclick="stepGroup(-1)" aria-label="Fewer travellers">−</button>
-                        <input type="number" id="groupSize" value="1" min="1">
-                        <button type="button" onclick="stepGroup(1)" aria-label="More travellers">+</button>
-                        <span style="font-size:12px; color:var(--ink-3); font-weight:600;">10+ unlocks the −30% group rate</span>
-                    </div>
-
-                    <button class="btn-primary" id="tariffButton" onclick="calculateTariff()">Calculate fare</button>
-                </div>
-                <div id="ticketWrap">
-                    <div class="empty-hint">Your SBB-style ticket renders here once the fare engine runs.</div>
-                </div>
-            </div>
-        </section>
-
-        <h2 class="section-title reveal">Settle the ledger</h2>
-        <p class="section-sub reveal">Split shared costs and clear the group with the fewest possible TWINT transfers.</p>
-        <section class="panel reveal">
-            <div class="ledger-grid">
-                <div>
-                    <label for="groupRoster">Group roster (comma-separated)</label>
-                    <input type="text" id="groupRoster" value="Nikita, Anna, Marc, Sofia" oninput="renderRoster()">
-                    <div class="avatar-row" id="avatarRow"></div>
-
-                    <div class="group-lbl">Shared costs</div>
-                    <div id="expenseContainer"></div>
-                    <button class="btn-secondary" onclick="addExpenseRow()">+ Add line item</button>
-                    <button class="btn-primary" id="settleButton" onclick="settleGroupLedger()">Settle the group</button>
-                </div>
-                <div id="ledgerResults">
-                    <div class="empty-hint">Member balances and the settlement plan appear here.</div>
-                </div>
-            </div>
-        </section>
-
-    </div>
-
-    <footer>
-        <svg class="ridge" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true">
-            <polygon fill="#14202B" points="0,70 0,52 120,26 250,48 390,18 520,44 660,12 800,40 930,20 1080,46 1220,24 1340,44 1440,30 1440,70"/>
-        </svg>
-        <div class="footer-inner">
-            <div class="footer-brand"><span class="mini-flag"></span>AlpenSync OS</div>
-            <div>Alpine Expedition Gateway · Zermatt — Verbier — Grindelwald — St. Moritz — Chamonix</div>
-            <div style="opacity:0.55;">Weather: Open-Meteo · Fares: demo SBB matrix · TWINT links are mock deep links</div>
-        </div>
-    </footer>
-</main>
-
-<script>
-    const STORAGE_KEY = 'alpensync-state-v1';
-    const DEFAULT_EXPENSES = [
-        { description: 'Chalet Lodging', amount: '600', payer: 'Nikita' },
-        { description: 'Resort Mountain Passes', amount: '240', payer: 'Anna' }
-    ];
-
-    const RESORTS = [
-        { id: 'zermatt', name: 'Zermatt', region: 'Valais', elev: 1620,
-          art: '<polygon points="8,44 30,16 36,7 39,4 42,10 45,15 60,44" fill="#6E8AA5"/><polygon class="snowpatch" points="33,11 36,7 39,4 42,10 40,16 35,17" fill="#FFFFFF"/>' },
-        { id: 'verbier', name: 'Verbier', region: 'Valais', elev: 1500,
-          art: '<polygon points="4,44 20,14 30,26 42,10 58,44" fill="#6E8AA5"/><polygon class="snowpatch" points="17,19 20,14 24,20 21,25" fill="#FFFFFF"/><polygon class="snowpatch" points="39,15 42,10 46,17 42,21" fill="#FFFFFF"/>' },
-        { id: 'grindelwald', name: 'Grindelwald', region: 'Bernese Oberland', elev: 1034,
-          art: '<polygon points="6,44 24,8 34,20 40,14 62,44" fill="#6E8AA5"/><polygon class="snowpatch" points="21,14 24,8 28,15 24,19" fill="#FFFFFF"/>' },
-        { id: 'stmoritz', name: 'St. Moritz', region: 'Graubünden', elev: 1822,
-          art: '<polygon points="4,44 18,18 28,28 40,12 50,24 62,44" fill="#6E8AA5"/><polygon class="snowpatch" points="37,17 40,12 44,19 40,23" fill="#FFFFFF"/><polygon class="snowpatch" points="15,23 18,18 22,24 18,28" fill="#FFFFFF"/>' },
-        { id: 'chamonix', name: 'Chamonix', region: 'Cross-Border', elev: 1035,
-          art: '<polygon points="10,44 28,20 34,4 38,20 56,44" fill="#6E8AA5"/><polygon class="snowpatch" points="31,12 34,4 37,13 34,18" fill="#FFFFFF"/>' }
-    ];
-
-    const AVATAR_PALETTES = [
-        ['#E6F1FB', '#185FA5'], ['#E1F5EE', '#0F6E56'], ['#FAEEDA', '#854F0B'],
-        ['#FBEAF0', '#993556'], ['#EEEDFE', '#534AB7'], ['#FAECE7', '#993C1D']
-    ];
-
-    const ICONS = {
-        sun:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>',
-        partly:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.4"/><path d="M9 3.2v1.4M3.2 9h1.4M4.9 4.9l1 1"/><path d="M11 19h7.4a3 3 0 0 0 .4-6 4.6 4.6 0 0 0-8.8-1.4A3.6 3.6 0 0 0 11 19z"/></svg>',
-        cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18.5h10.5a3.5 3.5 0 0 0 .5-7 5.4 5.4 0 0 0-10.4-1.6A4.2 4.2 0 0 0 7 18.5z"/></svg>',
-        fog:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13h10.5a3.5 3.5 0 0 0 .5-7 5.4 5.4 0 0 0-10.4-1.6A4.2 4.2 0 0 0 7 13z"/><path d="M5 17h14M7.5 20.5h9"/></svg>',
-        rain:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14.5h10.5a3.5 3.5 0 0 0 .5-7 5.4 5.4 0 0 0-10.4-1.6A4.2 4.2 0 0 0 7 14.5z"/><path d="M8.5 17.5l-1 3M12.5 17.5l-1 3M16.5 17.5l-1 3"/></svg>',
-        snow:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14h10.5a3.5 3.5 0 0 0 .5-7 5.4 5.4 0 0 0-10.4-1.6A4.2 4.2 0 0 0 7 14z"/><path d="M8.5 17.2v.01M12 19.4v.01M15.5 17.2v.01M10.2 20.8v.01M13.8 20.8v.01"/></svg>',
-        storm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13.5h10.5a3.5 3.5 0 0 0 .5-7 5.4 5.4 0 0 0-10.4-1.6A4.2 4.2 0 0 0 7 13.5z"/><path d="M12.5 15l-2.5 4h3l-2 4"/></svg>',
-        wind:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3 8.5h11a2.6 2.6 0 1 0-2.6-2.6M3 13h15.5a2.6 2.6 0 1 1-2.6 2.6M3 17.5h8a2.3 2.3 0 1 1-2.3 2.3"/></svg>',
-        flake: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M12 3l-2.2 2.2M12 3l2.2 2.2M12 21l-2.2-2.2M12 21l2.2-2.2"/></svg>',
-        lift:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7l19-3.5M12 5.2V10"/><path d="M8.5 10h7l-1.2 6.5h-4.6L8.5 10z"/></svg>',
-        piste: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c5-1 7-3 9-7s4-6 7-7"/><path d="M16.5 3.5L20 6l-2.5 3.5"/></svg>',
-        train: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="3.5" width="13" height="13" rx="2.5"/><path d="M5.5 11h13M9 20l-1.5 1.5M15 20l1.5 1.5M8.5 20h7"/><circle cx="9.3" cy="13.8" r="0.4"/><circle cx="14.7" cy="13.8" r="0.4"/></svg>',
-        arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>',
-        sunSmall:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2"/></svg>'
+    });
+    return {
+        date: outlook[bestIndex].date,
+        reason: (outlook[bestIndex].precipitationMm || 0) < 1
+            ? 'clearest skies in the window'
+            : 'driest day in the window'
     };
+}
 
-    function iconForCode(code) {
-        if (code === 0) return ICONS.sun;
-        if (code === 1 || code === 2) return ICONS.partly;
-        if (code === 3) return ICONS.cloud;
-        if (code === 45 || code === 48) return ICONS.fog;
-        if (code >= 71 && code <= 77) return ICONS.snow;
-        if (code === 85 || code === 86) return ICONS.snow;
-        if (code >= 95) return ICONS.storm;
-        if (code >= 51) return ICONS.rain;
-        return ICONS.cloud;
+// --- API ROUTES ---
+
+// 0. Engine Health Probe
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'operational',
+        engine: 'AlpenSync OS',
+        version: pkg.version,
+        uptimeSeconds: Math.round((Date.now() - STARTED_AT) / 1000)
+    });
+});
+
+// 1. Weather Telemetry Endpoint (Open-Meteo Integration)
+app.get('/api/weather', async (req, res) => {
+    const { destination } = req.query;
+    const key = destination?.toLowerCase();
+    const loc = DESTINATIONS[key];
+
+    if (!loc) {
+        return res.status(404).json({ error: 'Destination not supported in AlpenSync registries.' });
     }
 
-    let currentSeason = 'WINTER';
-    let currentDestination = 'zermatt';
-    let lastWeatherData = null;
-
-    const chf = (value) => Number(value).toFixed(2);
-    const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-    // --- Hero & chrome ---
-
-    function enterDashboard() {
-        document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function initHero() {
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        if (!reducedMotion) {
-            const snow = document.getElementById('heroSnow');
-            for (let i = 0; i < 36; i++) {
-                const flake = document.createElement('span');
-                flake.className = 'flake';
-                const size = (Math.random() * 3 + 1.5).toFixed(1);
-                flake.style.cssText =
-                    `left:${(Math.random() * 100).toFixed(1)}%;width:${size}px;height:${size}px;` +
-                    `animation-duration:${(Math.random() * 10 + 9).toFixed(1)}s;` +
-                    `animation-delay:-${(Math.random() * 19).toFixed(1)}s;` +
-                    `opacity:${(Math.random() * 0.45 + 0.3).toFixed(2)}`;
-                snow.appendChild(flake);
-            }
-        }
-
-        // Optional video upgrade: drop `matterhorn.mp4` beside index.html
-        const video = document.getElementById('heroVideo');
-        video.addEventListener('canplay', () => document.getElementById('hero').classList.add('video-mode'));
-        video.src = 'matterhorn.mp4';
-
-        const hero = document.getElementById('hero');
-        const nav = document.getElementById('topNav');
-        const far = document.getElementById('mtnFar');
-        const mid = document.getElementById('mtnMid');
-        const main = document.getElementById('mtnMain');
-        const content = document.getElementById('heroContent');
-        let ticking = false;
-        window.addEventListener('scroll', () => {
-            if (ticking) return;
-            ticking = true;
-            requestAnimationFrame(() => {
-                const y = window.scrollY;
-                nav.classList.toggle('visible', y > hero.offsetHeight * 0.72);
-                if (!reducedMotion) {
-                    far.style.transform = `translateY(${y * 0.06}px)`;
-                    mid.style.transform = `translateY(${y * 0.14}px)`;
-                    main.style.transform = `translateY(${y * 0.24}px)`;
-                    content.style.transform = `translateY(${y * 0.4}px)`;
-                    content.style.opacity = Math.max(0, 1 - y / 420);
-                }
-                ticking = false;
-            });
-        }, { passive: true });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    }
-
-    // --- Season ---
-
-    function toggleSeason() {
-        currentSeason = currentSeason === 'WINTER' ? 'SUMMER' : 'WINTER';
-        applySeason();
-        if (lastWeatherData) renderWeather(lastWeatherData);
-        saveState();
-    }
-
-    function applySeason() {
-        document.body.classList.toggle('summer', currentSeason === 'SUMMER');
-        const toggle = document.getElementById('seasonToggle');
-        toggle.innerHTML = currentSeason === 'WINTER'
-            ? `${ICONS.flake}<span>WINTER</span>`
-            : `${ICONS.sunSmall}<span>SUMMER</span>`;
-    }
-
-    // --- Engine health ---
-
-    async function pingEngine() {
-        const dot = document.getElementById('engineDot');
-        const label = document.getElementById('engineLabel');
-        try {
-            const res = await fetch('/api/health');
-            const data = await res.json();
-            dot.className = 'status-dot online';
-            label.innerText = `ENGINE: ONLINE v${data.version}`;
-        } catch (e) {
-            dot.className = 'status-dot offline';
-            label.innerText = 'ENGINE: OFFLINE';
-        }
-    }
-
-    // --- Resort cards ---
-
-    function renderResorts() {
-        const grid = document.getElementById('resortGrid');
-        grid.innerHTML = RESORTS.map(r => `
-            <div class="resort-card ${r.id === currentDestination ? 'selected' : ''}" data-id="${r.id}"
-                 role="button" tabindex="0" aria-label="Select ${r.name}">
-                <svg viewBox="0 0 66 44" preserveAspectRatio="xMidYMax meet" aria-hidden="true">${r.art}</svg>
-                <div class="resort-name">${r.name}</div>
-                <div class="resort-meta">${r.elev} m · ${r.region}</div>
-                <span class="resort-badge">● selected sector</span>
-            </div>`).join('');
-        grid.querySelectorAll('.resort-card').forEach(card => {
-            const pick = () => selectResort(card.dataset.id);
-            card.addEventListener('click', pick);
-            card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    const cached = weatherCache.get(key);
+    if (cached && Date.now() - cached.fetchedAt < WEATHER_TTL_MS) {
+        return res.json({
+            ...cached.payload,
+            cacheAgeSeconds: Math.round((Date.now() - cached.fetchedAt) / 1000)
         });
     }
 
-    function selectResort(id) {
-        currentDestination = id;
-        document.querySelectorAll('.resort-card').forEach(c => c.classList.toggle('selected', c.dataset.id === id));
-        fetchTelemetry();
-        saveState();
-    }
-
-    // --- Weather ---
-
-    function weatherSkeleton() {
-        return `<div class="weather-grid">
-            <div>
-                <div class="skeleton" style="height:74px; width:75%;"></div>
-                <div class="stat-chips">
-                    <div class="skeleton" style="height:30px; width:110px; border-radius:999px;"></div>
-                    <div class="skeleton" style="height:30px; width:130px; border-radius:999px;"></div>
-                    <div class="skeleton" style="height:30px; width:100px; border-radius:999px;"></div>
-                </div>
-            </div>
-            <div class="outlook-row">
-                <div class="skeleton" style="height:118px;"></div>
-                <div class="skeleton" style="height:118px;"></div>
-                <div class="skeleton" style="height:118px;"></div>
-            </div>
-        </div>`;
-    }
-
-    function outlookCard(day, best) {
-        const date = new Date(`${day.date}T12:00:00`);
-        const label = date.toLocaleDateString('en-CH', { weekday: 'short' });
-        const isBest = best && best.date === day.date;
-        const precip = currentSeason === 'WINTER'
-            ? `${chf(day.snowfallCm || 0)} cm snow`
-            : `${chf(day.precipitationMm || 0)} mm rain`;
-        return `<div class="outlook-card ${isBest ? 'best' : ''}">
-            <div class="o-day">${label}</div>
-            <div class="o-icon">${iconForCode(day.weathercode)}</div>
-            <div class="o-temp">${Math.round(day.tempMax)}° / ${Math.round(day.tempMin)}°</div>
-            <div class="o-precip">${precip}</div>
-            ${isBest ? '<div class="o-best-tag">★ best day</div>' : ''}
-        </div>`;
-    }
-
-    function renderWeather(data) {
-        const accum = currentSeason === 'WINTER'
-            ? `${ICONS.flake}<span>${data.snowfallNext12h ?? 0} cm / 12 h</span>`
-            : `${ICONS.rain}<span>${data.precipitationNext12h ?? 0} mm / 12 h</span>`;
-        const facts = data.facts || {};
-        const freshness = data.cacheAgeSeconds > 0 ? `cached ${data.cacheAgeSeconds}s ago` : 'live feed';
-
-        document.getElementById('weatherBody').innerHTML = `
-            <div class="weather-grid">
-                <div>
-                    <div class="weather-now">
-                        <div class="w-icon">${iconForCode(data.current.weathercode)}</div>
-                        <div>
-                            <div class="w-temp">${Math.round(data.current.temperature)}°</div>
-                            <div class="w-cond">${esc(data.current.condition)}</div>
-                            <div class="w-place">${esc(data.destination)} · ${esc(data.region)} · station ${data.stationElevation} m</div>
-                        </div>
-                    </div>
-                    <div class="stat-chips">
-                        <span class="chip">${ICONS.wind}<span>${data.current.windspeed} km/h</span></span>
-                        <span class="chip">${accum}</span>
-                        ${facts.topLift ? `<span class="chip">${ICONS.lift}<span>top lift ${facts.topLift} m</span></span>` : ''}
-                        ${facts.pistesKm ? `<span class="chip">${ICONS.piste}<span>${facts.pistesKm} km pistes</span></span>` : ''}
-                    </div>
-                    <p style="font-size:12px; color:var(--ink-3); margin:14px 0 0; font-weight:500;">
-                        ${facts.signature ? esc(facts.signature) + ' · ' : ''}<span class="freshness">${freshness}</span>
-                        ${data.bestDay ? ` · best day: ${esc(data.bestDay.reason)}` : ''}
-                    </p>
-                </div>
-                <div class="outlook-row">
-                    ${(data.outlook || []).map(d => outlookCard(d, data.bestDay)).join('')}
-                </div>
-            </div>`;
-    }
-
-    async function fetchTelemetry() {
-        const body = document.getElementById('weatherBody');
-        body.innerHTML = weatherSkeleton();
-        try {
-            const res = await fetch(`/api/weather?destination=${encodeURIComponent(currentDestination)}`);
-            const data = await res.json();
-            if (data.error) {
-                body.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
-                return;
-            }
-            lastWeatherData = data;
-            renderWeather(data);
-        } catch (e) {
-            body.innerHTML = `<div class="error-banner">Telemetry stream unavailable — is the AlpenSync engine running?</div>`;
+    try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}` +
+            `&current_weather=true` +
+            `&hourly=temperature_2m,snowfall,precipitation,weathercode` +
+            `&daily=temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,weathercode` +
+            `&forecast_days=3&timezone=Europe/Berlin`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Open-Meteo responded with ${response.status}`);
         }
-    }
+        const data = await response.json();
 
-    // --- Fare / ticket ---
-
-    function stepGroup(delta) {
-        const input = document.getElementById('groupSize');
-        input.value = Math.max(1, (parseInt(input.value, 10) || 1) + delta);
-        saveState();
-    }
-
-    function countUp(el, target, prefix) {
-        const start = performance.now();
-        const dur = 750;
-        const ease = (p) => 1 - Math.pow(1 - p, 3);
-        function frame(t) {
-            const p = Math.min(1, (t - start) / dur);
-            el.textContent = `${prefix}${(target * ease(p)).toFixed(2)}`;
-            if (p < 1) requestAnimationFrame(frame);
+        if (!data.current_weather) {
+            throw new Error('Telemetry payload missing current_weather block');
         }
-        requestAnimationFrame(frame);
-    }
 
-    async function calculateTariff() {
-        const groupSize = Math.max(1, parseInt(document.getElementById('groupSize').value, 10) || 1);
-        const payload = {
-            origin: document.getElementById('originHub').value,
-            destination: currentDestination,
-            passType: document.getElementById('swissPass').value,
-            groupSize: groupSize
-        };
-        const button = document.getElementById('tariffButton');
-        const wrap = document.getElementById('ticketWrap');
-        button.disabled = true;
+        // Forecast accumulations for the 12 hours following the current reading
+        const nowIndex = data.hourly?.time
+            ? data.hourly.time.findIndex(t => t >= data.current_weather.time)
+            : -1;
+        const snowfallNext12h = nowIndex === -1 ? null : roundCHF(sumRange(data.hourly.snowfall, nowIndex, 12));
+        const precipitationNext12h = nowIndex === -1 ? null : roundCHF(sumRange(data.hourly.precipitation, nowIndex, 12));
 
-        try {
-            const res = await fetch('/api/tariff/calculate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.error) {
-                wrap.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
-                return;
-            }
-            const b = data.breakdown;
-            const p = data.pricing;
-            const groupLine = b.groupDiscountApplied
-                ? `<div class="t-row"><span>Group rate (10+)</span><span class="pos">−30% applied</span></div>` : '';
-            const savings = p.savingsPerPerson > 0
-                ? `<span class="savings-badge">Group saves CHF ${chf(p.savingsPerPerson * p.groupSize)} vs standard fare</span>` : '';
-
-            wrap.innerHTML = `
-            <div class="ticket">
-                <div class="ticket-head">
-                    <span class="t-brand"><span class="mini-flag" style="width:16px;height:16px;border-radius:3px;"></span>ALPENSYNC RAIL</span>
-                    <span class="t-class">2ND CLASS · ${p.groupSize} PAX</span>
-                </div>
-                <div class="ticket-route">
-                    <div class="t-stop">${esc(data.origin)}<small>DEPARTURE HUB</small></div>
-                    <div class="t-line"><span class="t-train">${ICONS.train}</span></div>
-                    <div class="t-stop" style="text-align:right;">${esc(data.destinationName)}<small>ALPINE SECTOR</small></div>
-                </div>
-                <div class="ticket-perf"></div>
-                <div class="ticket-body">
-                    <div class="t-row"><span>Rail leg</span><span>CHF ${chf(b.railLeg)}</span></div>
-                    <div class="t-row"><span>Alpine sector supplement</span><span>CHF ${chf(b.alpineSupplement)}</span></div>
-                    <div class="t-row"><span>${esc(b.passLabel)}</span><span class="pos">−${b.passDiscountPct}%</span></div>
-                    ${groupLine}
-                    <div class="t-row strong"><span>Per passenger</span><span>CHF ${chf(p.finalPricePerPerson)}</span></div>
-                    <div class="t-total">
-                        <span class="lbl">Total group cost</span>
-                        <span class="amt" id="ticketTotal">CHF 0.00</span>
-                    </div>
-                    ${savings}
-                </div>
-            </div>`;
-            countUp(document.getElementById('ticketTotal'), p.totalGroupCost, 'CHF ');
-        } catch (e) {
-            wrap.innerHTML = `<div class="error-banner">Fare engine unreachable — is the AlpenSync engine running?</div>`;
-        } finally {
-            button.disabled = false;
-        }
-    }
-
-    // --- Ledger ---
-
-    function rosterMembers() {
-        return document.getElementById('groupRoster').value
-            .split(',').map(s => s.trim()).filter(Boolean);
-    }
-
-    function paletteFor(name, members) {
-        const i = Math.max(0, members.indexOf(name));
-        return AVATAR_PALETTES[i % AVATAR_PALETTES.length];
-    }
-
-    function initials(name) {
-        return name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    }
-
-    function renderRoster() {
-        const members = rosterMembers();
-        document.getElementById('avatarRow').innerHTML = members.map(m => {
-            const [bg, fg] = paletteFor(m, members);
-            return `<span class="avatar" style="background:${bg}; color:${fg};">
-                <span class="dot" style="color:${fg};">${esc(initials(m))}</span>${esc(m)}</span>`;
-        }).join('');
-        saveState();
-    }
-
-    function addExpenseRow(item = {}) {
-        const container = document.getElementById('expenseContainer');
-        const div = document.createElement('div');
-        div.className = 'expense-item';
-
-        const desc = document.createElement('input');
-        desc.type = 'text'; desc.placeholder = 'Item'; desc.className = 'exp-desc';
-        desc.value = item.description || '';
-
-        const amount = document.createElement('input');
-        amount.type = 'number'; amount.placeholder = 'CHF'; amount.className = 'exp-amount';
-        amount.min = '0'; amount.step = '0.05';
-        amount.value = item.amount || '';
-
-        const payer = document.createElement('input');
-        payer.type = 'text'; payer.placeholder = 'Payer'; payer.className = 'exp-payer';
-        payer.value = item.payer || '';
-
-        const remove = document.createElement('button');
-        remove.type = 'button'; remove.className = 'remove-row';
-        remove.innerText = '×'; remove.title = 'Remove line item';
-        remove.onclick = () => { div.remove(); saveState(); };
-
-        div.append(desc, amount, payer, remove);
-        container.appendChild(div);
-    }
-
-    function collectExpenses() {
-        return [...document.querySelectorAll('.expense-item')].map(row => ({
-            description: row.querySelector('.exp-desc').value.trim(),
-            amount: row.querySelector('.exp-amount').value,
-            payer: row.querySelector('.exp-payer').value.trim()
+        const outlook = (data.daily?.time || []).map((date, i) => ({
+            date,
+            condition: WMO_CONDITIONS[data.daily.weathercode?.[i]] || 'Unknown',
+            weathercode: data.daily.weathercode?.[i],
+            tempMax: data.daily.temperature_2m_max?.[i],
+            tempMin: data.daily.temperature_2m_min?.[i],
+            snowfallCm: data.daily.snowfall_sum?.[i],
+            precipitationMm: data.daily.precipitation_sum?.[i]
         }));
+
+        const payload = {
+            destination: loc.name,
+            region: loc.region,
+            facts: loc.facts,
+            current: {
+                ...data.current_weather,
+                condition: WMO_CONDITIONS[data.current_weather.weathercode] || 'Unknown'
+            },
+            snowfallNext12h,
+            precipitationNext12h,
+            outlook,
+            bestDay: pickBestDay(outlook),
+            stationElevation: Math.round(data.elevation),
+            elevation_telemetry: `Station grid at ${Math.round(data.elevation)}m a.s.l. — FADP Compliant Data`
+        };
+
+        weatherCache.set(key, { fetchedAt: Date.now(), payload });
+        res.json({ ...payload, cacheAgeSeconds: 0 });
+    } catch (error) {
+        res.status(502).json({ error: 'Failed to stream alpine telemetry.' });
+    }
+});
+
+// 2. SBB Rail & Tariff Matrix Engine
+app.post('/api/tariff/calculate', (req, res) => {
+    const { origin, destination, passType, groupSize } = req.body;
+
+    const fromLoc = ORIGINS[origin?.toLowerCase()];
+    const toLoc = DESTINATIONS[destination?.toLowerCase()];
+    const size = Math.max(1, parseInt(groupSize) || 1);
+
+    if (!fromLoc || !toLoc) {
+        return res.status(400).json({ error: 'Invalid departure hub or mountain sector.' });
     }
 
-    async function settleGroupLedger() {
-        const members = rosterMembers();
-        const results = document.getElementById('ledgerResults');
-        if (members.length === 0) {
-            results.innerHTML = `<div class="error-banner">The roster is empty — add at least one member.</div>`;
-            return;
+    const pass = PASS_PROFILES[passType] || PASS_PROFILES['none'];
+
+    // Base calculation
+    const standardTicket = fromLoc.baseRailPrice + toLoc.baseTariff;
+    let discountModifier = pass.modifier;
+
+    // Group discounts (SBB corporate / Youth group mechanics)
+    const groupDiscountApplied = size >= 10;
+    if (groupDiscountApplied) {
+        discountModifier *= 0.70; // 30% group rate deduction
+    }
+
+    const pricePerPerson = roundCHF(standardTicket * discountModifier);
+    const totalGroupCost = roundCHF(pricePerPerson * size);
+
+    res.json({
+        route: `${fromLoc.name} ➔ ${toLoc.name}`,
+        origin: fromLoc.name,
+        destinationName: toLoc.name,
+        breakdown: {
+            railLeg: fromLoc.baseRailPrice,
+            alpineSupplement: toLoc.baseTariff,
+            standardTicket: standardTicket,
+            passLabel: pass.label,
+            passDiscountPct: Math.round((1 - pass.modifier) * 100),
+            groupDiscountApplied: groupDiscountApplied
+        },
+        pricing: {
+            basePricePerPerson: standardTicket,
+            appliedModifier: discountModifier,
+            finalPricePerPerson: pricePerPerson,
+            savingsPerPerson: roundCHF(standardTicket - pricePerPerson),
+            totalGroupCost: totalGroupCost,
+            groupSize: size
         }
-        const expenses = collectExpenses()
-            .filter(e => e.amount !== '')
-            .map(e => ({ ...e, amount: parseFloat(e.amount) }));
-
-        const button = document.getElementById('settleButton');
-        button.disabled = true;
-
-        try {
-            const res = await fetch('/api/ledger/settle', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ expenses, groupMembers: members })
-            });
-            const data = await res.json();
-            if (data.error) {
-                results.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
-                return;
-            }
-
-            const maxNet = Math.max(...data.memberBalances.map(m => Math.abs(m.net)), 1);
-            const netRows = data.memberBalances.map(m => {
-                const pct = Math.round(Math.abs(m.net) / maxNet * 100);
-                const cls = m.net >= 0 ? 'pos' : 'neg';
-                const sign = m.net > 0 ? '+' : m.net < 0 ? '−' : '';
-                return `<div class="net-row">
-                    <span class="net-name">${esc(m.name)}</span>
-                    <span class="net-bar-track"><span class="net-bar ${cls}" style="width:${pct}%;"></span></span>
-                    <span class="net-amt ${cls}">${sign}${chf(Math.abs(m.net))}</span>
-                </div>`;
-            }).join('');
-
-            const settleRows = data.settlements.length === 0
-                ? `<div class="empty-hint" style="padding:22px;">All balances are equalized — no transfers needed.</div>`
-                : data.settlements.map(s => {
-                    const [fromBg, fromFg] = paletteFor(s.from, members);
-                    const [toBg, toFg] = paletteFor(s.to, members);
-                    return `<div class="settle-row">
-                        <span class="settle-flow">
-                            <span class="avatar dot" style="width:26px;height:26px;border-radius:50%;background:${fromBg};color:${fromFg};display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;padding:0;">${esc(initials(s.from))}</span>
-                            ${ICONS.arrow}
-                            <span class="avatar dot" style="width:26px;height:26px;border-radius:50%;background:${toBg};color:${toFg};display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;padding:0;">${esc(initials(s.to))}</span>
-                            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(s.from)} pays ${esc(s.to)}</span>
-                        </span>
-                        <span class="settle-amt">CHF ${chf(s.amount)}</span>
-                        <a class="twint-btn" href="${esc(s.twintMockString)}">TWINT</a>
-                    </div>`;
-                }).join('');
-
-            results.innerHTML = `
-                <div class="ledger-summary">
-                    <div class="metric"><div class="m-lbl">Total spent</div><div class="m-val">CHF ${chf(data.totalSpent)}</div></div>
-                    <div class="metric"><div class="m-lbl">Share per person</div><div class="m-val">CHF ${chf(data.perPersonShare)}</div></div>
-                </div>
-                <div class="group-lbl">Net positions</div>
-                ${netRows}
-                <div class="group-lbl">Settlement plan · ${data.settlements.length} transfer${data.settlements.length === 1 ? '' : 's'}</div>
-                ${settleRows}`;
-            saveState();
-        } catch (e) {
-            results.innerHTML = `<div class="error-banner">Ledger engine unreachable — is the AlpenSync engine running?</div>`;
-        } finally {
-            button.disabled = false;
-        }
-    }
-
-    // --- Persistence ---
-
-    function saveState() {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                season: currentSeason,
-                origin: document.getElementById('originHub').value,
-                destination: currentDestination,
-                passType: document.getElementById('swissPass').value,
-                groupSize: document.getElementById('groupSize').value,
-                roster: document.getElementById('groupRoster').value,
-                expenses: collectExpenses()
-            }));
-        } catch (e) { /* storage unavailable — run stateless */ }
-    }
-
-    function loadState() {
-        let state = null;
-        try {
-            state = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        } catch (e) { /* corrupted or unavailable — use defaults */ }
-
-        if (state) {
-            currentSeason = state.season === 'SUMMER' ? 'SUMMER' : 'WINTER';
-            if (state.destination && RESORTS.some(r => r.id === state.destination)) currentDestination = state.destination;
-            if (state.origin) document.getElementById('originHub').value = state.origin;
-            if (state.passType) document.getElementById('swissPass').value = state.passType;
-            if (state.groupSize) document.getElementById('groupSize').value = state.groupSize;
-            if (state.roster != null) document.getElementById('groupRoster').value = state.roster;
-        }
-        const expenses = (state?.expenses?.length) ? state.expenses : DEFAULT_EXPENSES;
-        expenses.forEach(addExpenseRow);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        loadState();
-        applySeason();
-        renderResorts();
-        renderRoster();
-        initHero();
-        pingEngine();
-        fetchTelemetry();
     });
-    document.addEventListener('change', saveState);
-</script>
-</body>
-</html>
+});
+
+// 3. TWINT Mock Settlement Ledger Gateway
+app.post('/api/ledger/settle', (req, res) => {
+    const { expenses, groupMembers } = req.body;
+
+    if (!Array.isArray(expenses) || !Array.isArray(groupMembers) || groupMembers.length === 0) {
+        return res.status(400).json({ error: 'Missing ledger properties or member roster.' });
+    }
+
+    const invalidItems = expenses.filter(exp => !(parseFloat(exp.amount) > 0));
+    if (invalidItems.length > 0) {
+        return res.status(400).json({
+            error: `Invalid amount on line item(s): ${invalidItems.map(e => e.description || '(unnamed)').join(', ')}. Amounts must be positive numbers.`
+        });
+    }
+
+    const unknownPayers = [...new Set(
+        expenses.map(exp => exp.payer).filter(p => !groupMembers.includes(p))
+    )];
+    if (unknownPayers.length > 0) {
+        return res.status(400).json({
+            error: `Payer(s) not on the group roster: ${unknownPayers.join(', ')}. Add them to the roster or correct the payer name.`
+        });
+    }
+
+    const totalSpent = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    const perPersonShare = totalSpent / groupMembers.length;
+
+    // Calculate balances
+    const paidBy = {};
+    groupMembers.forEach(m => { paidBy[m] = 0; });
+    expenses.forEach(exp => { paidBy[exp.payer] += parseFloat(exp.amount); });
+
+    const memberBalances = groupMembers.map(member => ({
+        name: member,
+        paid: roundCHF(paidBy[member]),
+        share: roundCHF(perPersonShare),
+        net: roundCHF(paidBy[member] - perPersonShare)
+    }));
+
+    // Split logic: pair largest debtor with largest creditor until settled
+    const working = groupMembers.map(member => ({
+        name: member,
+        balance: paidBy[member] - perPersonShare
+    }));
+    const debtors = working.filter(m => m.balance < -SETTLED_EPSILON).sort((a, b) => a.balance - b.balance);
+    const creditors = working.filter(m => m.balance > SETTLED_EPSILON).sort((a, b) => b.balance - a.balance);
+
+    const settlements = [];
+    debtors.forEach(d => {
+        creditors.forEach(c => {
+            if (Math.abs(d.balance) < SETTLED_EPSILON || c.balance < SETTLED_EPSILON) return;
+
+            const payment = Math.min(Math.abs(d.balance), c.balance);
+            d.balance += payment;
+            c.balance -= payment;
+
+            const paymentCHF = roundCHF(payment);
+            settlements.push({
+                from: d.name,
+                to: c.name,
+                amount: paymentCHF,
+                twintMockString: `twint://pay?to=${encodeURIComponent(c.name)}&amount=${paymentCHF.toFixed(2)}&ref=AlpenSync-${Math.random().toString(36).substring(7).toUpperCase()}`
+            });
+        });
+    });
+
+    res.json({
+        totalSpent: roundCHF(totalSpent),
+        perPersonShare: roundCHF(perPersonShare),
+        memberBalances: memberBalances,
+        settlements: settlements
+    });
+});
+
+// Unknown API routes get a JSON 404 instead of the HTML fallback
+app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'Unknown AlpenSync API route.' });
+});
+
+// Serve frontend routing fallback
+app.get('*', (req, res) => {
+    if (!fs.existsSync(INDEX_HTML)) {
+        console.error(`[AlpenSync] index.html not found at ${INDEX_HTML}. Directory contains: ${fs.readdirSync(__dirname).join(', ')}`);
+        return res.status(500).json({
+            error: 'Frontend asset index.html is missing from the deployment.',
+            expectedPath: INDEX_HTML
+        });
+    }
+    res.sendFile(INDEX_HTML);
+});
+
+// JSON error handler — malformed request bodies should not yield HTML stack traces
+app.use((err, req, res, next) => {
+    if (err.type === 'entity.parse.failed') {
+        return res.status(400).json({ error: 'Malformed JSON payload.' });
+    }
+    console.error('[AlpenSync] Unhandled engine fault:', err);
+    res.status(500).json({ error: 'Internal AlpenSync engine fault.' });
+});
+
+app.listen(PORT, () => {
+    console.log(`[AlpenSync OS Engine v${pkg.version} running smoothly on port ${PORT}]`);
+    console.log(`[AlpenSync] Serving from ${__dirname}`);
+    console.log(`[AlpenSync] index.html present: ${fs.existsSync(INDEX_HTML)}`);
+    console.log(`[AlpenSync] Directory contents: ${fs.readdirSync(__dirname).join(', ')}`);
+});
