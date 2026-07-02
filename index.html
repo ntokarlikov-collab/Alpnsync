@@ -731,69 +731,17 @@
     ];
 
     const RESORTS = [
-        { id: 'zermatt', name: 'Zermatt', region: 'Valais', elev: 1620, lat: 46.0207, lon: 7.7491, baseTariff: 45,
-          facts: { topLift: 3883, pistesKm: 360, signature: 'Matterhorn Glacier Paradise' },
+        { id: 'zermatt', name: 'Zermatt', region: 'Valais', elev: 1620,
           art: '<polygon points="8,44 30,16 36,7 39,4 42,10 45,15 60,44" fill="#6E8AA5"/><polygon class="snowpatch" points="33,11 36,7 39,4 42,10 40,16 35,17" fill="#FFFFFF"/>' },
-        { id: 'verbier', name: 'Verbier', region: 'Valais', elev: 1500, lat: 46.0961, lon: 7.2286, baseTariff: 42,
-          facts: { topLift: 3330, pistesKm: 410, signature: 'Mont Fort · 4 Vallées' },
+        { id: 'verbier', name: 'Verbier', region: 'Valais', elev: 1500,
           art: '<polygon points="4,44 20,14 30,26 42,10 58,44" fill="#6E8AA5"/><polygon class="snowpatch" points="17,19 20,14 24,20 21,25" fill="#FFFFFF"/><polygon class="snowpatch" points="39,15 42,10 46,17 42,21" fill="#FFFFFF"/>' },
-        { id: 'grindelwald', name: 'Grindelwald', region: 'Bernese Oberland', elev: 1034, lat: 46.6242, lon: 8.0414, baseTariff: 48,
-          facts: { topLift: 2500, pistesKm: 211, signature: 'Eiger North Face views' },
+        { id: 'grindelwald', name: 'Grindelwald', region: 'Bernese Oberland', elev: 1034,
           art: '<polygon points="6,44 24,8 34,20 40,14 62,44" fill="#6E8AA5"/><polygon class="snowpatch" points="21,14 24,8 28,15 24,19" fill="#FFFFFF"/>' },
-        { id: 'stmoritz', name: 'St. Moritz', region: 'Graubünden', elev: 1822, lat: 46.4908, lon: 9.8355, baseTariff: 52,
-          facts: { topLift: 3303, pistesKm: 350, signature: 'Corvatsch · Engadin valley' },
+        { id: 'stmoritz', name: 'St. Moritz', region: 'Graubünden', elev: 1822,
           art: '<polygon points="4,44 18,18 28,28 40,12 50,24 62,44" fill="#6E8AA5"/><polygon class="snowpatch" points="37,17 40,12 44,19 40,23" fill="#FFFFFF"/><polygon class="snowpatch" points="15,23 18,18 22,24 18,28" fill="#FFFFFF"/>' },
-        { id: 'chamonix', name: 'Chamonix', region: 'Cross-Border', elev: 1035, lat: 45.9227, lon: 6.8685, baseTariff: 55,
-          facts: { topLift: 3842, pistesKm: 155, signature: 'Aiguille du Midi · Mont Blanc' },
+        { id: 'chamonix', name: 'Chamonix', region: 'Cross-Border', elev: 1035,
           art: '<polygon points="10,44 28,20 34,4 38,20 56,44" fill="#6E8AA5"/><polygon class="snowpatch" points="31,12 34,4 37,13 34,18" fill="#FFFFFF"/>' }
     ];
-
-    // --- Client-side registries (everything runs in the browser — no server) ---
-    const ORIGINS = {
-        geneva:   { name: 'Geneva Airport / Cornavin', baseRailPrice: 40 },
-        zurich:   { name: 'Zürich HB', baseRailPrice: 50 },
-        lausanne: { name: 'Lausanne', baseRailPrice: 28 },
-        basel:    { name: 'Basel SBB', baseRailPrice: 45 }
-    };
-    const PASS_PROFILES = {
-        'none':              { label: 'Standard Fare', modifier: 1.0 },
-        'halbtax':           { label: 'Half-Fare Card (Halbtax)', modifier: 0.5 },
-        'generalabonnement': { label: 'GA Travelcard', modifier: 0.0 },
-        'swiss-travel-pass': { label: 'Swiss Travel Pass', modifier: 0.15 }
-    };
-    const WMO_CONDITIONS = {
-        0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
-        45: 'Fog', 48: 'Depositing rime fog',
-        51: 'Light drizzle', 53: 'Drizzle', 55: 'Dense drizzle',
-        56: 'Freezing drizzle', 57: 'Dense freezing drizzle',
-        61: 'Light rain', 63: 'Rain', 65: 'Heavy rain',
-        66: 'Freezing rain', 67: 'Heavy freezing rain',
-        71: 'Light snowfall', 73: 'Snowfall', 75: 'Heavy snowfall', 77: 'Snow grains',
-        80: 'Light rain showers', 81: 'Rain showers', 82: 'Violent rain showers',
-        85: 'Light snow showers', 86: 'Heavy snow showers',
-        95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Thunderstorm with heavy hail'
-    };
-    const RESORT_BY_ID = Object.fromEntries(RESORTS.map(r => [r.id, r]));
-
-    const roundCHF = (v) => Math.round(v * 100) / 100;
-    const SETTLED_EPSILON = 0.005;
-    const WEATHER_TTL_MS = 5 * 60 * 1000;
-    const weatherCache = new Map();
-    const sumRange = (values, start, count) =>
-        (values || []).slice(start, start + count).reduce((s, v) => s + (v || 0), 0);
-
-    function pickBestDay(outlook) {
-        if (!outlook.length) return null;
-        let bestIndex = 0, bestScore = -Infinity;
-        outlook.forEach((day, i) => {
-            const score = -(day.precipitationMm || 0) * 2 + (day.tempMax || 0) * 0.3;
-            if (score > bestScore) { bestScore = score; bestIndex = i; }
-        });
-        return {
-            date: outlook[bestIndex].date,
-            reason: (outlook[bestIndex].precipitationMm || 0) < 1 ? 'clearest skies in the window' : 'driest day in the window'
-        };
-    }
 
     const AVATAR_PALETTES = [
         ['#E6F1FB', '#185FA5'], ['#E1F5EE', '#0F6E56'], ['#FAEEDA', '#854F0B'],
@@ -917,11 +865,20 @@
             : `${ICONS.sunSmall}<span>SUMMER</span>`;
     }
 
-    // --- Engine status (self-contained build) ---
+    // --- Engine health ---
 
-    function markReady() {
-        document.getElementById('engineDot').className = 'status-dot online';
-        document.getElementById('engineLabel').innerText = 'READY';
+    async function pingEngine() {
+        const dot = document.getElementById('engineDot');
+        const label = document.getElementById('engineLabel');
+        try {
+            const res = await fetch('/api/health');
+            const data = await res.json();
+            dot.className = 'status-dot online';
+            label.innerText = `ENGINE: ONLINE v${data.version}`;
+        } catch (e) {
+            dot.className = 'status-dot offline';
+            label.innerText = 'ENGINE: OFFLINE';
+        }
     }
 
     // --- Resort cards ---
@@ -1021,67 +978,20 @@
             </div>`;
     }
 
-    function buildWeatherPayload(loc, data) {
-        const nowIndex = data.hourly?.time
-            ? data.hourly.time.findIndex(t => t >= data.current_weather.time)
-            : -1;
-        const snowfallNext12h = nowIndex === -1 ? null : roundCHF(sumRange(data.hourly.snowfall, nowIndex, 12));
-        const precipitationNext12h = nowIndex === -1 ? null : roundCHF(sumRange(data.hourly.precipitation, nowIndex, 12));
-        const outlook = (data.daily?.time || []).map((date, i) => ({
-            date,
-            condition: WMO_CONDITIONS[data.daily.weathercode?.[i]] || 'Unknown',
-            weathercode: data.daily.weathercode?.[i],
-            tempMax: data.daily.temperature_2m_max?.[i],
-            tempMin: data.daily.temperature_2m_min?.[i],
-            snowfallCm: data.daily.snowfall_sum?.[i],
-            precipitationMm: data.daily.precipitation_sum?.[i]
-        }));
-        return {
-            destination: loc.name,
-            region: loc.region,
-            facts: loc.facts,
-            current: {
-                ...data.current_weather,
-                condition: WMO_CONDITIONS[data.current_weather.weathercode] || 'Unknown'
-            },
-            snowfallNext12h,
-            precipitationNext12h,
-            outlook,
-            bestDay: pickBestDay(outlook),
-            stationElevation: Math.round(data.elevation),
-            cacheAgeSeconds: 0
-        };
-    }
-
     async function fetchTelemetry() {
         const body = document.getElementById('weatherBody');
         body.innerHTML = weatherSkeleton();
-        const loc = RESORT_BY_ID[currentDestination];
-
-        const cached = weatherCache.get(currentDestination);
-        if (cached && Date.now() - cached.fetchedAt < WEATHER_TTL_MS) {
-            lastWeatherData = { ...cached.payload, cacheAgeSeconds: Math.round((Date.now() - cached.fetchedAt) / 1000) };
-            renderWeather(lastWeatherData);
-            return;
-        }
-
         try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}` +
-                `&current_weather=true` +
-                `&hourly=temperature_2m,snowfall,precipitation,weathercode` +
-                `&daily=temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,weathercode` +
-                `&forecast_days=3&timezone=Europe/Berlin`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`Open-Meteo responded with ${res.status}`);
+            const res = await fetch(`/api/weather?destination=${encodeURIComponent(currentDestination)}`);
             const data = await res.json();
-            if (!data.current_weather) throw new Error('Missing current_weather block');
-
-            const payload = buildWeatherPayload(loc, data);
-            weatherCache.set(currentDestination, { fetchedAt: Date.now(), payload });
-            lastWeatherData = payload;
-            renderWeather(payload);
+            if (data.error) {
+                body.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
+                return;
+            }
+            lastWeatherData = data;
+            renderWeather(data);
         } catch (e) {
-            body.innerHTML = `<div class="error-banner">Couldn't reach the Open-Meteo weather service. Check your connection and try again.</div>`;
+            body.innerHTML = `<div class="error-banner">Telemetry stream unavailable — is the AlpenSync engine running?</div>`;
         }
     }
 
@@ -1094,68 +1004,40 @@
     }
 
     function countUp(el, target, prefix) {
-        const final = `${prefix}${target.toFixed(2)}`;
-        // If motion is off or the tab isn't visible (rAF paused), show the value directly.
-        if (document.visibilityState !== 'visible' ||
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            el.textContent = final;
-            return;
-        }
         const start = performance.now();
         const dur = 750;
         const ease = (p) => 1 - Math.pow(1 - p, 3);
         function frame(t) {
             const p = Math.min(1, (t - start) / dur);
-            el.textContent = p < 1 ? `${prefix}${(target * ease(p)).toFixed(2)}` : final;
+            el.textContent = `${prefix}${(target * ease(p)).toFixed(2)}`;
             if (p < 1) requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);
     }
 
-    function computeTariff(originKey, destKey, passType, size) {
-        const fromLoc = ORIGINS[originKey];
-        const toLoc = RESORT_BY_ID[destKey];
-        size = Math.max(1, parseInt(size, 10) || 1);
-        const pass = PASS_PROFILES[passType] || PASS_PROFILES['none'];
-
-        const standardTicket = fromLoc.baseRailPrice + toLoc.baseTariff;
-        let modifier = pass.modifier;
-        const groupDiscountApplied = size >= 10;
-        if (groupDiscountApplied) modifier *= 0.70; // 30% group rate
-
-        const pricePerPerson = roundCHF(standardTicket * modifier);
-        return {
-            route: `${fromLoc.name} ➔ ${toLoc.name}`,
-            origin: fromLoc.name,
-            destinationName: toLoc.name,
-            breakdown: {
-                railLeg: fromLoc.baseRailPrice,
-                alpineSupplement: toLoc.baseTariff,
-                standardTicket: standardTicket,
-                passLabel: pass.label,
-                passDiscountPct: Math.round((1 - pass.modifier) * 100),
-                groupDiscountApplied: groupDiscountApplied
-            },
-            pricing: {
-                finalPricePerPerson: pricePerPerson,
-                savingsPerPerson: roundCHF(standardTicket - pricePerPerson),
-                totalGroupCost: roundCHF(pricePerPerson * size),
-                groupSize: size
-            }
-        };
-    }
-
-    function calculateTariff() {
+    async function calculateTariff() {
         const groupSize = Math.max(1, parseInt(document.getElementById('groupSize').value, 10) || 1);
+        const payload = {
+            origin: document.getElementById('originHub').value,
+            destination: currentDestination,
+            passType: document.getElementById('swissPass').value,
+            groupSize: groupSize
+        };
+        const button = document.getElementById('tariffButton');
         const wrap = document.getElementById('ticketWrap');
+        button.disabled = true;
 
-        {
-            const data = computeTariff(
-                document.getElementById('originHub').value,
-                currentDestination,
-                document.getElementById('swissPass').value,
-                groupSize
-            );
+        try {
+            const res = await fetch('/api/tariff/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.error) {
+                wrap.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
+                return;
+            }
             const b = data.breakdown;
             const p = data.pricing;
             const groupLine = b.groupDiscountApplied
@@ -1189,6 +1071,10 @@
                 </div>
             </div>`;
             countUp(document.getElementById('ticketTotal'), p.totalGroupCost, 'CHF ');
+        } catch (e) {
+            wrap.innerHTML = `<div class="error-banner">Fare engine unreachable — is the AlpenSync engine running?</div>`;
+        } finally {
+            button.disabled = false;
         }
     }
 
@@ -1253,50 +1139,7 @@
         }));
     }
 
-    function computeSettlement(expenses, members) {
-        const invalid = expenses.filter(e => !(parseFloat(e.amount) > 0));
-        if (invalid.length > 0) {
-            return { error: `Invalid amount on line item(s): ${invalid.map(e => e.description || '(unnamed)').join(', ')}. Amounts must be positive numbers.` };
-        }
-        const unknown = [...new Set(expenses.map(e => e.payer).filter(p => !members.includes(p)))];
-        if (unknown.length > 0) {
-            return { error: `Payer(s) not on the roster: ${unknown.join(', ')}. Add them to the roster or correct the payer name.` };
-        }
-
-        const totalSpent = expenses.reduce((s, e) => s + parseFloat(e.amount), 0);
-        const perPersonShare = totalSpent / members.length;
-
-        const paidBy = {};
-        members.forEach(m => { paidBy[m] = 0; });
-        expenses.forEach(e => { paidBy[e.payer] += parseFloat(e.amount); });
-
-        const memberBalances = members.map(m => ({
-            name: m, paid: roundCHF(paidBy[m]), net: roundCHF(paidBy[m] - perPersonShare)
-        }));
-
-        const working = members.map(m => ({ name: m, balance: paidBy[m] - perPersonShare }));
-        const debtors = working.filter(m => m.balance < -SETTLED_EPSILON).sort((a, b) => a.balance - b.balance);
-        const creditors = working.filter(m => m.balance > SETTLED_EPSILON).sort((a, b) => b.balance - a.balance);
-
-        const settlements = [];
-        debtors.forEach(d => {
-            creditors.forEach(c => {
-                if (Math.abs(d.balance) < SETTLED_EPSILON || c.balance < SETTLED_EPSILON) return;
-                const payment = Math.min(Math.abs(d.balance), c.balance);
-                d.balance += payment;
-                c.balance -= payment;
-                const amt = roundCHF(payment);
-                settlements.push({
-                    from: d.name, to: c.name, amount: amt,
-                    twintMockString: `twint://pay?to=${encodeURIComponent(c.name)}&amount=${amt.toFixed(2)}&ref=AlpenSync-${Math.random().toString(36).substring(7).toUpperCase()}`
-                });
-            });
-        });
-
-        return { totalSpent: roundCHF(totalSpent), perPersonShare: roundCHF(perPersonShare), memberBalances, settlements };
-    }
-
-    function settleGroupLedger() {
+    async function settleGroupLedger() {
         const members = rosterMembers();
         const results = document.getElementById('ledgerResults');
         if (members.length === 0) {
@@ -1307,8 +1150,16 @@
             .filter(e => e.amount !== '')
             .map(e => ({ ...e, amount: parseFloat(e.amount) }));
 
-        {
-            const data = computeSettlement(expenses, members);
+        const button = document.getElementById('settleButton');
+        button.disabled = true;
+
+        try {
+            const res = await fetch('/api/ledger/settle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ expenses, groupMembers: members })
+            });
+            const data = await res.json();
             if (data.error) {
                 results.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
                 return;
@@ -1353,6 +1204,10 @@
                 <div class="group-lbl">Settlement plan · ${data.settlements.length} transfer${data.settlements.length === 1 ? '' : 's'}</div>
                 ${settleRows}`;
             saveState();
+        } catch (e) {
+            results.innerHTML = `<div class="error-banner">Ledger engine unreachable — is the AlpenSync engine running?</div>`;
+        } finally {
+            button.disabled = false;
         }
     }
 
@@ -1396,7 +1251,7 @@
         renderResorts();
         renderRoster();
         initHero();
-        markReady();
+        pingEngine();
         fetchTelemetry();
     });
     document.addEventListener('change', saveState);
