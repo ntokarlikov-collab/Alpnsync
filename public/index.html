@@ -3,115 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpenSync OS — Year-Round Production Hub</title>
+    <title>AlpenSync OS — Premium Swiss Expedition Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- LEAFLET CORE MAP ASSETS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- LEAFLET ROUTING MACHINE ENGINE ASSETS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     
     <style>
-        html { scroll-behavior: smooth; background-color: #050608; }
+        html { scroll-behavior: smooth; background-color: #030406; }
         .scrollbar-stark::-webkit-scrollbar { width: 4px; }
         .scrollbar-stark::-webkit-scrollbar-track { background: transparent; }
-        .scrollbar-stark::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .scrollbar-stark::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
         #alpineMap { height: 260px; width: 100%; border-radius: 20px; z-index: 10; border: 1px solid rgba(255,255,255,0.08); }
         .leaflet-routing-container { display: none !important; }
         
-        /* SCROLL-DRIVEN CINEMATIC CANVAS MECHANICS */
         .cinematic-bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             background-size: cover;
             background-position: center;
-            z-index: -1;
-            transform: scale(1.05);
-            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: -2;
+            transform: scale(1.02);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: opacity, transform;
         }
         
-        /* Ultra-Clean Glass Panels */
+        .dark-vignette {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(3,4,6,0.1) 0%, rgba(3,4,6,0.5) 50%, #030406 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
         .glass-panel {
-            background: rgba(10, 11, 15, 0.35);
-            backdrop-filter: blur(30px) saturate(140%);
-            -webkit-backdrop-filter: blur(30px) saturate(140%);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: border-color 0.4s ease, background 0.4s ease;
+            background: rgba(8, 9, 12, 0.55);
+            backdrop-filter: blur(40px) saturate(130%);
+            -webkit-backdrop-filter: blur(40px) saturate(130%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: border-color 0.4s ease, background-color 0.4s ease;
         }
         .glass-panel:hover {
-            border-color: rgba(255, 255, 255, 0.12);
-            background: rgba(10, 11, 15, 0.45);
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(8, 9, 12, 0.65);
         }
 
-        /* Interactive Card Overlays */
         .twint-card-overlay { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .twint-card-overlay:hover .qr-popup-holder { opacity: 1; visibility: visible; transform: translate(-50%, -10px); }
 
-        .fade-in-up { animation: fadeInUpAction 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .fade-in-up { animation: fadeInUpAction 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeInUpAction {
-            from { opacity: 0; transform: translateY(20px); filter: blur(6px); }
+            from { opacity: 0; transform: translateY(30px); filter: blur(8px); }
             to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
     </style>
 </head>
-<body class="text-white font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden select-none">
+<body class="text-white font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden">
 
-    <!-- FIXED MULTI-TIER INTERACTIVE CANVAS STACK -->
     <div id="bgLayer1" class="cinematic-bg-layer opacity-100" style="background-image: url('https://images.unsplash.com/photo-1531315630201-bb15abeb1653?auto=format&fit=crop&w=1920&q=90');"></div>
     <div id="bgLayer2" class="cinematic-bg-layer opacity-0" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=90');"></div>
     <div id="bgLayer3" class="cinematic-bg-layer opacity-0" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=90');"></div>
     
-    <!-- Dynamic Ambient Overlay Shield -->
-    <div id="canvasVignette" class="fixed inset-0 z-0 pointer-events-none transition-all duration-1000 bg-gradient-to-b from-black/20 via-black/40 to-[#050608]"></div>
+    <div class="dark-vignette"></div>
 
-    <!-- MINIMALIST NAVIGATION DECK -->
-    <nav class="border-b border-white/5 bg-black/20 backdrop-blur-md text-white sticky top-0 z-50 transition-all duration-300">
+    <nav class="border-b border-white/5 bg-transparent text-white sticky top-0 z-50 backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center font-black tracking-tighter text-sm shadow-xl">
-                    🇨🇭
-                </div>
-                <span class="font-black text-sm tracking-widest text-white uppercase">ALPEN<span class="text-red-500">SYNC</span></span>
+            <div class="flex items-center gap-2">
+                <span class="font-black text-xs tracking-widest uppercase">ALPEN<span class="text-red-500">SYNC</span></span>
             </div>
-
-            <div class="flex items-center gap-6 text-[10px] font-mono tracking-widest uppercase text-white/40">
-                <span>[ Platform State: Active ]</span>
-                <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:inline">[ nFADP Secured ]</span>
-            </div>
-
             <div class="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5 text-[11px]">
-                <button id="seasonWinter" onclick="setSeason('winter')" class="px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md">
+                <button id="seasonWinter" onclick="setSeason('winter')" class="px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md">
                     Winter
                 </button>
-                <button id="seasonSummer" onclick="setSeason('summer')" class="px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white">
+                <button id="seasonSummer" onclick="setSeason('summer')" class="px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white">
                     Summer
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- CINEMATIC INGESTION HERO STACK -->
-    <header class="relative max-w-7xl w-full mx-auto px-6 min-h-[55vh] flex flex-col justify-center items-start z-10 pt-12 pb-24">
-        <div class="space-y-4 max-w-3xl fade-in-up">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md font-mono text-[9px] uppercase tracking-widest text-white/80">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Dynamic Expedition Hub Link
+    <header class="relative max-w-7xl w-full mx-auto px-6 min-h-[90vh] flex flex-col justify-between items-start z-10 pt-20 pb-12">
+        <div class="space-y-4 max-w-2xl mt-12 fade-in-up">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] uppercase tracking-widest font-mono text-white/70">
+                <span class="w-1 h-1 rounded-full bg-red-500"></span> Alpine Logistics Array
             </div>
-            <h1 class="text-5xl sm:text-7xl font-black tracking-tighter uppercase leading-none">
-                Conquer The <br><span id="heroSeasonTitle" class="text-transparent bg-clip-text bg-gradient-to-r from-white via-stone-300 to-stone-500">Winter Heights</span>
+            <h1 class="text-5xl sm:text-7xl font-black tracking-tighter uppercase leading-none text-transparent bg-clip-text bg-gradient-to-b from-white via-stone-200 to-stone-400">
+                The Alpine <br>Standard
             </h1>
-            <p class="text-white/60 text-xs sm:text-sm font-medium max-w-md leading-relaxed">Automated Swiss Pass pricing matrices, localized multi-lift target mapping, and prescriptive climate variables.</p>
+            <p class="text-white/50 text-xs sm:text-sm font-medium max-w-md leading-relaxed">A minimal, transient workspace designed to calculate multi-modal Swiss coordinates, mountain sector access, and real-time ledger distributions smoothly.</p>
+        </div>
+
+        <div class="w-full flex justify-center animate-bounce pt-12">
+            <a href="#configure-zone" class="text-white/30 hover:text-white text-xs font-mono tracking-widest uppercase flex flex-col items-center gap-2">
+                <span>Scroll Down to Open Terminal</span>
+                <i class="fa-solid fa-chevron-down text-sm"></i>
+            </a>
         </div>
     </header>
 
-    <!-- CONFIGURATION PARAMETERS DECK -->
-    <section id="configure-zone" class="max-w-7xl w-full mx-auto px-6 relative z-30 mb-12">
-        <div class="glass-panel rounded-[32px] p-6 shadow-2xl">
+    <section id="configure-zone" class="max-w-7xl w-full mx-auto px-6 relative z-30 mb-12 pt-12 scroll-mt-24">
+        <div class="glass-panel rounded-[28px] p-6 shadow-2xl space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans">
                 <div class="bg-white/5 p-3 rounded-xl border border-white/5">
                     <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">From (SBB Departure Hub)</label>
@@ -143,8 +138,7 @@
                 <div class="bg-white/5 p-3 rounded-xl border border-white/5">
                     <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Mountain Target Sector</label>
                     <select id="paramSector" class="w-full bg-transparent text-white focus:outline-none font-bold cursor-pointer">
-                        <!-- Populated Dynamically -->
-                    </select>
+                        </select>
                 </div>
 
                 <div class="bg-white/5 p-3 rounded-xl border border-white/5 grid grid-cols-2 gap-2">
@@ -159,40 +153,28 @@
                 </div>
             </div>
 
-            <!-- LOWER INPUT ROW -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans mt-4 pt-4 border-t border-white/5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans pt-2">
                 <div class="bg-white/5 p-3 rounded-xl border border-white/5 grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Alpine Objective</label>
                         <select id="paramObjective" onchange="runEngineGearUpdate()" class="w-full bg-transparent text-white focus:outline-none font-bold cursor-pointer">
-                            <!-- Populated Dynamically -->
-                        </select>
+                            </select>
                     </div>
                     <div>
                         <label class="text-[9px] text-emerald-400 font-black uppercase tracking-wider block mb-1">Stay Duration</label>
                         <select id="paramDays" class="w-full bg-transparent text-emerald-400 font-bold focus:outline-none cursor-pointer">
                             <option value="1" class="bg-stone-950" selected>1 Night</option>
                             <option value="2" class="bg-stone-950">2 Nights</option>
-                            <option value="3 class="bg-stone-950"">3 Nights</option>
+                            <option value="3" class="bg-stone-950">3 Nights</option>
                             <option value="5" class="bg-stone-950">5 Nights</option>
                             <option value="7" class="bg-stone-950">7 Nights</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5 grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">SwissPass Profile</label>
-                        <select id="paramSwissPass" class="w-full bg-transparent text-white focus:outline-none text-[11px] font-bold cursor-pointer">
-                            <option value="FullFare" class="bg-stone-950" selected>Full Price</option>
-                            <option value="HalfFare" class="bg-stone-950">Half-Fare</option>
-                            <option value="GA" class="bg-stone-950">GA Member</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Crew Size</label>
-                        <input type="number" id="paramGroupSize" value="1" min="1" max="25" class="w-full bg-transparent text-white font-bold focus:outline-none text-sm">
-                    </div>
+                <div class="bg-white/5 p-3 rounded-xl border border-white/5 flex flex-col justify-center">
+                    <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Total Crew Size</label>
+                    <input type="number" id="paramGroupSize" oninput="handleCrewSizeMatrixChange()" value="3" min="1" max="12" class="w-full bg-transparent text-white font-black focus:outline-none text-base">
                 </div>
 
                 <div class="bg-white/5 p-3 rounded-xl border border-white/5">
@@ -214,13 +196,14 @@
                     </button>
                 </div>
             </div>
+
+            <div id="crewPassMatrixContainer" class="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                </div>
         </div>
     </section>
 
-    <!-- MAIN CORE MATRIX OVERVIEW -->
     <main class="max-w-7xl w-full mx-auto px-6 pb-16 flex-1 z-20 space-y-6">
         
-        <!-- ⚙️ HOOK 1: HIGH FIDELITY GAME-THEORETIC GROUP SAVINGS BANNER -->
         <div id="synergySavingsBanner" class="hidden bg-gradient-to-r from-emerald-950/80 to-teal-950/80 backdrop-blur-md rounded-2xl p-4 border border-emerald-500/20 flex justify-between items-center text-white shadow-xl">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-xl bg-emerald-500 text-stone-950 flex items-center justify-center text-sm font-black shadow-inner">
@@ -228,7 +211,7 @@
                 </div>
                 <div>
                     <div class="text-[10px] text-emerald-400 font-mono uppercase font-black tracking-wider">AlpenSync Synergy Engine</div>
-                    <p class="text-xs font-medium text-white/80">Cooperative system networks bypassed retail consumer platform markups.</p>
+                    <p class="text-xs font-medium text-white/80">Cooperative system distribution successfully bypassed retail consumer platform markups.</p>
                 </div>
             </div>
             <div class="text-right shrink-0">
@@ -237,10 +220,9 @@
             </div>
         </div>
 
-        <!-- 🚨 THE TACTICAL MISSION SQUAD LOBBY COMPONENT -->
-        <div id="tacticalRaidLobby" class="hidden bg-black/40 backdrop-blur-xl p-5 rounded-[24px] border border-white/6 shadow-2xl space-y-4 fade-in-up">
+        <div id="tacticalRaidLobby" class="hidden bg-black/40 backdrop-blur-xl p-5 rounded-[24px] border border-white/5 shadow-2xl space-y-4 fade-in-up">
             <div class="border-b border-white/5 pb-2 flex justify-between items-center">
-                <h3 class="text-xs font-black tracking-widest text-red-500 uppercase flex items-center gap-2">
+                <h3 class="text-xs font-black tracking-widest text-white/40 uppercase flex items-center gap-2">
                     <i class="fa-solid fa-gamepad"></i> Technical Expedition Squad Lobby
                 </h3>
                 <div class="text-[10px] font-mono text-white/40">
@@ -248,14 +230,11 @@
                 </div>
             </div>
             <div id="lobbyRaidCardsGrid" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <!-- Populated via script stack loop -->
-            </div>
+                </div>
         </div>
 
-        <!-- TWO COLUMN CONTAINER VIEWPORT -->
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <!-- SBB SCHEDULING INTERFACE -->
-            <div class="lg:col-span-3 bg-black/40 backdrop-blur-xl rounded-[24px] p-6 space-y-4 shadow-xl border border-white/6 flex flex-col justify-between">
+            <div class="lg:col-span-3 bg-black/40 backdrop-blur-xl rounded-[24px] p-6 space-y-4 shadow-xl border border-white/5 flex flex-col justify-between">
                 <h4 class="text-xs font-black tracking-widest text-white/40 uppercase border-b border-white/5 pb-2 flex justify-between items-center">
                     <span>SBB Rail Timetable Track Logs</span>
                     <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/SBB_CFF_FFS_LOGO.svg" class="h-3 brightness-200 opacity-30" alt="SBB Logo">
@@ -265,14 +244,13 @@
                 </div>
             </div>
 
-            <!-- RIGHT CONTROL STACK PANELS -->
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-black/40 backdrop-blur-xl border border-white/6 rounded-[24px] p-5 shadow-sm text-left" id="meteoVillageContainer">
+                <div class="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[24px] p-5 shadow-sm text-left" id="meteoVillageContainer">
                     <h4 class="text-xs font-black tracking-widest text-white/40 uppercase mb-2">MeteoSuisse Environment</h4>
                     <div class="text-xs text-white/20 font-mono">Telemetry stream closed.</div>
                 </div>
 
-                <div class="bg-black/40 backdrop-blur-xl border border-white/6 rounded-[24px] p-5 shadow-sm text-left">
+                <div class="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[24px] p-5 shadow-sm text-left">
                     <h4 class="text-xs font-black tracking-widest text-white/40 uppercase mb-3 flex justify-between items-center">
                         <span>Traditional Cabins & Refuges</span>
                         <span class="text-[10px] text-white/30 font-mono" id="selectedHotelTally">None Chosen</span>
@@ -284,17 +262,14 @@
             </div>
         </div>
 
-        <!-- INTERACTIVE RECOMMENDED ACTIVITY PANEL -->
         <div id="activityRadarSection" class="hidden border border-white/5 rounded-[24px] p-5 bg-black/50 backdrop-blur-xl text-white space-y-3 shadow-2xl fade-in-up">
             <h4 class="text-xs font-black tracking-widest text-red-500 uppercase flex items-center gap-1.5">
                 <i class="fa-solid fa-map-pin animate-pulse"></i> AlpenSync Recommended Local Activity Guide
             </h4>
             <div id="activityDisplayGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
-                <!-- Loaded dynamically via script mapping -->
-            </div>
+                </div>
         </div>
 
-        <!-- 🏔️ HOOK 2: MICRO-CLIMATE SVG ALTITUDE ELEVATION PROFILE TRACK -->
         <div id="altitudeProfileSection" class="hidden border border-white/5 rounded-[24px] p-5 bg-black/60 backdrop-blur-xl text-white space-y-3 shadow-xl relative overflow-hidden fade-in-up">
             <h4 class="text-xs font-black tracking-widest text-white/40 uppercase flex justify-between items-center">
                 <span><i class="fa-solid fa-chart-area text-red-500 mr-1"></i> Mountain Traverse Vertical Elevation Profile</span>
@@ -310,12 +285,10 @@
             </div>
         </div>
 
-        <!-- LIVE ROUTE MAP CONTAINER -->
         <div id="mapWrapperFrame" class="hidden grid grid-cols-1 gap-4 fade-in-up">
             <div id="alpineMap"></div>
         </div>
 
-        <!-- FINANCIAL EXPEDITION LEDGER GRID -->
         <div id="expenseLedgerSection" class="hidden border border-white/5 rounded-[24px] p-5 bg-black/40 backdrop-blur-2xl space-y-4 fade-in-up">
             <div class="border-b border-white/5 pb-2 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                 <h4 class="text-xs font-black tracking-widest text-white/40 uppercase flex items-center">
@@ -374,12 +347,10 @@
                 </table>
             </div>
 
-            <!-- 📱 HOOK 3: DYNAMIC HOVER-TO-SCAN TWINT PROFILES -->
             <div class="pt-2">
-                <div class="text-[10px] font-black uppercase tracking-wider text-white/40 mb-2">Individual Crew Member TWINT Settlements (Hover / Tap card to scan QR):</div>
+                <div class="text-[10px] font-black uppercase tracking-wider text-white/40 mb-2">Individual Crew Member TWINT Settlements (Hover / Tap card to instantly scan QR):</div>
                 <div id="twintButtonsContainer" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                    <!-- Populated dynamically via controller scripts -->
-                </div>
+                    </div>
             </div>
         </div>
 
@@ -389,7 +360,6 @@
         </div>
     </main>
 
-    <!-- PRIVACY WINDOW -->
     <div id="privacyModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
         <div class="bg-stone-900 border border-white/10 max-w-md w-full rounded-2xl p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-white/5 pb-2">
@@ -407,7 +377,6 @@
         </div>
     </div>
 
-    <!-- MAIN APP ENGINE CONTROLLER -->
     <script>
         let currentSeasonMode = "winter";
         let globalCalculatedCache = null;
@@ -415,52 +384,11 @@
         let mapInstance = null;
         let activeRoutingEngineInstance = null;
 
-        const destinationSectorRegistry = {
-            "Zermatt": [{ name: "Gornergrat Station", summer: "Trekking", winter: "Skiing" }, { name: "Matterhorn Glacier Paradise", summer: "Glacier Paths", winter: "Glacial Arena" }],
-            "Andermatt": [{ name: "Gemsstock Peak Terminal", summer: "Climbing", winter: "Ski Touring" }, { name: "Nätschen Family Sector", summer: "Meadow Hikes", winter: "Sledding Tracks" }],
-            "Verbier": [{ name: "Mont-Fort Glacier Terminal", summer: "Ridge Treks", winter: "Couloirs" }, { name: "Savoleyres Ridgeway", summer: "Bike Trails", winter: "Cruise Belts" }],
-            "Grindelwald": [{ name: "Eiger Gletscher Terminal", summer: "Face Trails", winter: "Carver Slopes" }, { name: "First Adventure Peak", summer: "Cliff Walks", winter: "Freestyle Parks" }],
-            "St. Moritz": [{ name: "Corvatsch Glacier Station", summer: "Ice Trails", winter: "Powder Shelves" }, { name: "Corviglia Snowpark Hub", summer: "Flow Trails", winter: "Slalom Pistes" }],
-            "Davos": [{ name: "Parsenn Weissfluhjoch", summer: "Rocky Crossings", winter: "Classic Runs" }, { name: "Jakobshorn Freeride Arena", summer: "Dirt Descents", winter: "Freestyle Parks" }],
-            "Engelberg": [{ name: "Titlis Stand Glacier", summer: "Suspension Bridge", winter: "Laub vertical drop" }, { name: "Brunni Sunny Slopes", summer: "Via Ferrata", winter: "Family Ski Tracks" }],
-            "Gryon": [{ name: "Les Chaux Cableway", summer: "Valley Hikes", winter: "Powder Meadows" }, { name: "Frience Family Play-Zone", summer: "Eco-Swimming Lake", winter: "Sledding Arenas" }],
-            "Villars-sur-Ollon": [{ name: "Roc d'Orsay Gondola", summer: "Mountain Karting", winter: "Cruising Basins" }, { name: "Bretaye Rail Terminal", summer: "Dining Loops", winter: "Transit Links" }],
-            "Les Diablerets": [{ name: "Glacier 3000 Col du Pillon", summer: "Coaster Rides", winter: "Glacial Ski Pistes" }, { name: "Isenau Traditional Sector", summer: "Walking Trails", winter: "Snowshoe Trails" }]
-        };
-
-        const seasonObjectivesRegistry = {
-            "winter": ["Ski Touring", "Alpinism", "Ice Climbing", "Glacier Mountaineering"],
-            "summer": ["High-Altitude Trekking", "Technical Rock Climbing", "Downhill Mountain Biking", "Glacier Via Ferrata"]
-        };
-
-        const technicalApparelRegistry = {
-            "Ski Touring": "Breathable touring softshells, avalanche beacon sets, snow probes.",
-            "Alpinism": "Heavy weather jackets, crampons, technical ice axes.",
-            "Ice Climbing": "Waterproof shells, rigid insulated boots, ice tools.",
-            "Glacier Mountaineering": "UV Cat 4 glacier eyewear, harness systems, dynamic ropes.",
-            "High-Altitude Trekking": "Moisture-wicking base lines, stretch canvas trousers, shell pack.",
-            "Technical Rock Climbing": "Durable stretch climbing segments, chalk buckets, harness.",
-            "Downhill Mountain Biking": "Armored protection mesh layers, impact joint pads, full-face helmet.",
-            "Glacier Via Ferrata": "Softshell tracking coat, via ferrata lanyard absorber, high-traction boots."
-        };
-
-        const resortActivityRegistry = {
-            "Zermatt": { winter: ["Ski the legendary 25km Matterhorn glacier run", "Visit the underground Glacier Ice Palace"], summer: ["Hike the iconic 5-Lakes trail array", "Ride the Gornergrat cog railway"] },
-            "Andermatt": { winter: ["Powder freeriding on Gemsstock North Face", "Night sledding at Nätschen"], summer: ["Hike the historic Schöllenen Gorge", "Cycle the classic Gotthard Pass curves"] },
-            "Verbier": { winter: ["Conquer the extreme Tortin mogul run", "Off-piste heli-skiing itineraries"], summer: ["Mountain biking at Verbier Bike Park", "Hike the panoramic Pierre Avoi ridge"] },
-            "Grindelwald": { winter: ["Sled the 15km 'Big Pintenfritz' run", "Walk the snowy First Cliff Walk"], summer: ["Fly on the First Flyer zip-line", "Hike to pristine Bachalpsee lake"] },
-            "St. Moritz": { winter: ["Watch polo on the frozen lake", "Bobsleigh on the Olympia Bob Run"], summer: ["Windsurf on Lake Silvaplana", "Ride the Bernina Express pass link"] },
-            "Davos": { winter: ["Ski the massive 12km Parsenn classic run", "Ice skate on the giant outdoor rink"], summer: ["Sail or wakeboard on Lake Davos", "Hike the paths of Jakobshorn"] },
-            "Engelberg": { winter: ["Freeride the famous vertical 'Laub' drop", "Snowshoe around frozen Lake Trübsee"], summer: ["Traverse the Titlis Cliff Walk bridge", "Climb the Fürenwand Via Ferrata"] },
-            "Gryon": { winter: ["Enjoy family skiing at Les Chaux", "Snowshoe through Taveyanne hamlet"], summer: ["Swim at Frience eco-lake park", "Mountain karting down from Les Chaux"] },
-            "Villars-sur-Ollon": { winter: ["Ski sunny Bretaye snow bowls", "Ride the vintage mountain cog wheel line"], summer: ["Golf on the spectacular plateau course", "Hike to Lac des Chavonnes chalet"] },
-            "Les Diablerets": { winter: ["Walk the Peak Walk at Glacier 3000", "Conquer the 7km night sledding run"], summer: ["Ride Alpine Coaster at Glacier 3000", "Hike Creux de Champ nature basin"] }
-        };
-
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
             updateMountainSectors();
             populateObjectives();
+            handleCrewSizeMatrixChange(); // Initialize standard baseline crew toggles
             
             mapInstance = L.map('alpineMap').setView([46.8182, 8.2275], 8);
             L.tileLayer('https://{s}.tile.openstreetmap.org/dark_all/{z}/{x}/{y}.png', {
@@ -469,31 +397,50 @@
             }).addTo(mapInstance);
         });
 
-        // --- SCROLL MATRIX CANVAS REDIRECTION CONTROLLER ---
+        // --- SCROLL DRIVEN ATMOSPHERIC MORPHING SYSTEM ---
         window.addEventListener('scroll', () => {
             const scrollPos = window.scrollY;
-            const threshold1 = 250;
-            const threshold2 = 650;
+            const threshold1 = 280;
+            const threshold2 = 720;
 
             const layer1 = document.getElementById('bgLayer1');
             const layer2 = document.getElementById('bgLayer2');
             const layer3 = document.getElementById('bgLayer3');
 
             if (scrollPos < threshold1) {
-                layer1.style.opacity = "1"; layer1.style.transform = `scale(${1.05 + scrollPos * 0.0001})`;
+                layer1.style.opacity = "1"; layer1.style.transform = `scale(${1.02 + scrollPos * 0.00005})`;
                 layer2.style.opacity = "0";
                 layer3.style.opacity = "0";
             } else if (scrollPos >= threshold1 && scrollPos < threshold2) {
                 const ratio = (scrollPos - threshold1) / (threshold2 - threshold1);
                 layer1.style.opacity = (1 - ratio).toString();
-                layer2.style.opacity = ratio.toString(); layer2.style.transform = `scale(${1.05 + (scrollPos - threshold1) * 0.0001})`;
+                layer2.style.opacity = ratio.toString(); layer2.style.transform = `scale(${1.02 + (scrollPos - threshold1) * 0.00005})`;
                 layer3.style.opacity = "0";
             } else {
                 layer1.style.opacity = "0";
                 layer2.style.opacity = "0";
-                layer3.style.opacity = "1"; layer3.style.transform = `scale(${1.05 + (scrollPos - threshold2) * 0.0001})`;
+                layer3.style.opacity = "1"; layer3.style.transform = `scale(${1.02 + (scrollPos - threshold2) * 0.00005})`;
             }
         });
+
+        // --- DYNAMIC PASSENGER MATRIX ROW FACTORY ---
+        function handleCrewSizeMatrixChange() {
+            const size = parseInt(document.getElementById('paramGroupSize').value) || 1;
+            const container = document.getElementById('crewPassMatrixContainer');
+            container.innerHTML = "";
+
+            for (let i = 1; i <= size; i++) {
+                container.innerHTML += `
+                    <div class="bg-white/5 border border-white/10 p-2.5 rounded-xl flex flex-col gap-1">
+                        <span class="text-[9px] font-mono font-bold uppercase text-white/40">Operative P-${i} Pass</span>
+                        <select class="crew-pass-selector bg-stone-900 border border-white/10 text-white text-[11px] rounded px-1 py-1 focus:outline-none cursor-pointer font-bold">
+                            <option value="FullFare" ${i === 3 ? 'selected' : ''}>Full Price</option>
+                            <option value="HalfFare" ${i === 2 ? 'selected' : ''}>Half-Fare (1/2)</option>
+                            <option value="GA" ${i === 1 ? 'selected' : ''}>GA Subscription</option>
+                        </select>
+                    </div>`;
+            }
+        }
 
         function togglePrivacyModal() {
             document.getElementById('privacyModal').classList.toggle('hidden');
@@ -504,18 +451,17 @@
             const winterBtn = document.getElementById('seasonWinter');
             const summerBtn = document.getElementById('seasonSummer');
             const heroTitle = document.getElementById('heroSeasonTitle');
-            const canvasMesh = document.getElementById('dynamicCanvasMesh');
 
             if(mode === 'winter') {
-                winterBtn.className = "px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md";
-                summerBtn.className = "px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white";
+                winterBtn.className = "px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md";
+                summerBtn.className = "px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white";
                 heroTitle.innerText = "Winter Heights";
-                canvasMesh.className = "mesh-winter";
+                document.getElementById('bgLayer1').style.backgroundImage = "url('https://images.unsplash.com/photo-1531315630201-bb15abeb1653?auto=format&fit=crop&w=1920&q=90')";
             } else {
-                summerBtn.className = "px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md";
-                winterBtn.className = "px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white";
+                summerBtn.className = "px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md";
+                winterBtn.className = "px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white";
                 heroTitle.innerText = "Summer Wilderness";
-                canvasMesh.className = "mesh-summer";
+                document.getElementById('bgLayer1').style.backgroundImage = "url('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1920&q=90')";
             }
             updateMountainSectors();
             populateObjectives();
@@ -562,17 +508,6 @@
             recomputeLedgerSplitsWithTwint();
         }
 
-        function generatePreFilledTwintLink(basePaylink, splitAmount, travelerIndex) {
-            try {
-                const cleanUrl = new URL(basePaylink);
-                cleanUrl.searchParams.set('amount', parseFloat(splitAmount).toFixed(2));
-                cleanUrl.searchParams.set('trxInfo', `AlpenSync_Crew_P${travelerIndex}`);
-                return cleanUrl.toString();
-            } catch (e) {
-                return `${basePaylink}?amount=${parseFloat(splitAmount).toFixed(2)}&trxInfo=AlpenSync_Crew_P${travelerIndex}`;
-            }
-        }
-
         function renderAltitudeProfileLine(originName, originElev, destName, destElev, currentTemp) {
             const svg = document.getElementById('altitudeSVG');
             document.getElementById('profileOriginLabel').innerText = `${originName} (${originElev}m)`;
@@ -589,62 +524,56 @@
             svg.innerHTML = `
                 <defs>
                     <linearGradient id="standardGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                        <stop offset="70%" style="stop-color:#f59e0b;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#E31C25;stop-opacity:1" />
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.1" />
+                        <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.8" />
                     </linearGradient>
                     <linearGradient id="iceGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:#38bdf8;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#e0f2fe;stop-opacity:1" />
+                        <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#e0f2fe;stop-opacity:0.8" />
                     </linearGradient>
                 </defs>
-                <line x1="60" y1="30" x2="740" y2="30" stroke="#27272a" stroke-dasharray="4,4"/>
-                <line x1="60" y1="80" x2="740" y2="80" stroke="#27272a" stroke-dasharray="4,4"/>
-                <line x1="60" y1="130" x2="740" y2="130" stroke="#27272a" stroke-dasharray="4,4"/>
-                <path d="M ${startX} ${startY} C ${midX1} ${midY1}, ${midX2} ${midY2}, ${endX} ${endY}" fill="none" stroke="${profileLineGradientColor}" stroke-width="4" stroke-linecap="round" />
-                <circle cx="${startX}" cy="${startY}" r="5" fill="#10b981" />
-                <circle cx="${endX}" cy="${endY}" r="7" fill="#E31C25" class="animate-ping" style="transform-origin: ${endX}px ${endY}px;" />
-                <circle cx="${endX}" cy="${endY}" r="4" fill="#E31C25" />
+                <line x1="60" y1="30" x2="740" y2="30" stroke="#1f2937" stroke-dasharray="4,4"/>
+                <line x1="60" y1="130" x2="740" y2="130" stroke="#1f2937" stroke-dasharray="4,4"/>
+                <path d="M ${startX} ${startY} C ${midX1} ${midY1}, ${midX2} ${midY2}, ${endX} ${endY}" fill="none" stroke="${profileLineGradientColor}" stroke-width="3" stroke-linecap="round" />
+                <circle cx="${startX}" cy="${startY}" r="4" fill="#ffffff" />
+                <circle cx="${endX}" cy="${endY}" r="6" fill="#ffffff" class="animate-ping" style="transform-origin: ${endX}px ${endY}px;" />
+                <circle cx="${endX}" cy="${endY}" r="4" fill="#ffffff" />
             `;
             document.getElementById('altitudeProfileSection').classList.remove('hidden');
         }
 
-        function paintTacticalRaidLobby(crewSize, currentPassMode, currentResortCard) {
+        // --- THE STRATEGY RAID LOBBY PRINTER ENGINE ---
+        function paintTacticalRaidLobby(crewSize, passesArray) {
             const container = document.getElementById('lobbyRaidCardsGrid');
             container.innerHTML = "";
             let successModifier = 100;
 
-            for (let i = 1; i <= crewSize; i++) {
+            for (let i = 0; i < crewSize; i++) {
+                const pass = passesArray[i] || 'FullFare';
                 let roleTitle = "Full-Fare Recruit";
-                let roleIcon = "fa-user-astronaut text-stone-400";
+                let roleIcon = "fa-user-astronaut opacity-40";
                 let perkText = "Standard Consumer Footprint";
 
-                if (i === 1) {
-                    if (currentPassMode === "GA") {
-                        roleTitle = "The GA Titan"; roleIcon = "fa-shield-cat text-emerald-400"; perkText = "Infinite Rail Range Core";
-                    } else if (currentPassMode === "HalfFare") {
-                        roleTitle = "Half-Fare Vanguard"; roleIcon = "fa-user-ninja text-sky-400"; perkText = "50% Tariff Shielding";
-                    } else {
-                        roleTitle = "Expedition Commander"; roleIcon = "fa-user-shield text-white"; perkText = "Mission Strategy Core";
-                    }
-                } else {
-                    if (i % 3 === 0) { roleTitle = "Half-Fare Operative"; roleIcon = "fa-user-ninja text-sky-400"; perkText = "Optimised Transit Matrix"; }
-                    else if (i % 4 === 0) { roleTitle = "GA Core Infrastructure"; roleIcon = "fa-shield-cat text-emerald-400"; perkText = "Zero Transport Friction"; }
+                if (pass === "GA") {
+                    roleTitle = "The GA Titan"; roleIcon = "fa-shield-cat text-white"; perkText = "Infinite Range Core Active";
+                } else if (pass === "HalfFare") {
+                    roleTitle = "Half-Fare Vanguard"; roleIcon = "fa-user-ninja text-white"; perkText = "50% Tariff Shielding Block";
+                } else if (i === 0) {
+                    roleTitle = "Expedition Commander"; roleIcon = "fa-user-shield text-white"; perkText = "Mission Blueprint Lead";
                 }
 
                 if (globalCalculatedCache && globalCalculatedCache.telemetry.wind > 22) successModifier -= 6;
 
                 container.innerHTML += `
-                    <div class="bg-black/40 border border-white/5 p-4 rounded-xl relative flex flex-col justify-between overflow-hidden">
+                    <div class="bg-white/5 border border-white/5 p-4 rounded-xl relative flex flex-col justify-between overflow-hidden">
                         <div class="space-y-1">
-                            <div class="text-[9px] font-mono text-white/30 uppercase tracking-widest">Asset Active</div>
+                            <div class="text-[9px] font-mono text-white/30 uppercase tracking-widest">Squad Slot Active</div>
                             <div class="text-xs font-black text-white flex items-center gap-1.5">
-                                <i class="fa-solid ${roleIcon}"></i> ${i === 1 ? 'Organizer' : `Operative ${i}`}
+                                <i class="fa-solid ${roleIcon}"></i> ${i === 0 ? 'Commander (You)' : `Operative P-${i+1}`}
                             </div>
                             <p class="text-[10px] text-white/50">${roleTitle}</p>
                         </div>
-                        <div class="mt-4 pt-2 border-t border-white/5 text-[9px] font-mono text-white/40 flex items-center justify-between">
+                        <div class="mt-4 pt-2 border-t border-white/5 text-[9px] font-mono text-white/30 flex items-center justify-between">
                             <span>${perkText}</span>
                             <span class="text-emerald-400">Ready</span>
                         </div>
@@ -700,9 +629,9 @@
                 const qrImageAPISourceUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(computedPaylink)}&color=0c0d0f&bgcolor=ffffff`;
 
                 const cardHtml = isOrganizer ? `
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col justify-center text-center opacity-40">
+                    <div class="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col justify-center text-center opacity-30">
                         <span class="font-black text-xs text-white">Crew Member ${i}</span>
-                        <span class="text-[9px] uppercase font-bold text-white/50 tracking-wider">Group Organizer</span>
+                        <span class="text-[9px] uppercase font-bold text-white/40 tracking-wider">Group Organizer</span>
                     </div>
                 ` : `
                     <div class="bg-black/20 border border-white/5 rounded-xl p-3 flex items-center justify-between shadow-sm relative twint-card-overlay cursor-pointer group hover:border-white transition-all duration-300">
@@ -713,7 +642,6 @@
                         <span class="bg-white text-black font-black text-[9px] uppercase tracking-wider px-2 py-1.5 rounded-lg shrink-0 flex items-center gap-1 shadow-sm transition-all">
                             <i class="fa-solid fa-qrcode"></i> Scan
                         </span>
-
                         <div class="qr-popup-holder opacity-0 visibility-hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white p-3 rounded-2xl shadow-2xl z-50 pointer-events-none transform translate-y-2 transition-all duration-300 w-40 text-center flex flex-col items-center">
                             <img src="${qrImageAPISourceUrl}" class="w-28 h-24 object-contain rounded border mb-1.5" alt="TWINT QR Code">
                             <span class="text-[8px] font-black text-stone-900 uppercase tracking-widest block"><i class="fa-solid fa-mobile-screen mr-0.5"></i> Scan to TWINT</span>
@@ -724,11 +652,7 @@
                 btnContainer.innerHTML += cardHtml;
             }
             
-            const currentPassMode = document.getElementById('paramSwissPass').value;
-            const currentResortCard = document.getElementById('paramPasses').value;
-            paintTacticalRaidLobby(crewSize, currentPassMode, currentResortCard);
-            
-            document.getElementById('expenseLedgerSection').classList.remove('hidden');
+            paintTacticalRaidLobby(crewSize, globalCalculatedCache.passengerPasses);
         }
 
         function shareToWhatsAppClipboard() {
@@ -757,7 +681,7 @@
             const consoleBox = document.getElementById('logConsole');
 
             if (!consentCheck.checked) {
-                consoleBox.innerHTML = `<span class="text-red-600 font-bold">🚨 FADP Compliance Error: You must accept the transient data processing terms before executing mountain queries.</span>`;
+                consoleBox.innerHTML = `<span class="text-red-600 font-bold">🚨 FADP Compliance Error: You must accept the terms before querying mountain networks.</span>`;
                 return;
             }
 
@@ -767,12 +691,17 @@
             btn.setAttribute('disabled', 'true');
             btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Syncing...";
 
+            // HARVEST ALL GRANULAR CREW CHIP DROPDOWN OPTIONS SECURELY
+            const selectNodesList = document.querySelectorAll('.crew-pass-selector');
+            const passProfileArray = [];
+            selectNodesList.forEach(select => passProfileArray.push(select.value));
+
             const payload = {
                 originKey: document.getElementById('paramOrigin').value,
                 destKey: destKey,
                 dateVal: document.getElementById('paramDate').value,
                 timeVal: document.getElementById('paramTime').value,
-                swissPassMode: document.getElementById('paramSwissPass').value,
+                passengerPasses: passProfileArray, // Send clean array array list to backend routers
                 passSystem: document.getElementById('paramPasses').value,
                 targetSectorName: document.getElementById('paramSector').value,
                 travelers: parseInt(document.getElementById('paramGroupSize').value) || 1,
@@ -820,7 +749,7 @@
                             activeRoutingEngineInstance = L.Routing.control({
                                 waypoints: [L.latLng(startPoint[0], startPoint[1]), L.latLng(stopPoint[0], stopPoint[1])],
                                 router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
-                                lineOptions: { styles: [{ color: '#E31C25', opacity: 0.85, weight: 5 }] },
+                                lineOptions: { styles: [{ color: '#ffffff', opacity: 0.7, weight: 4 }] },
                                 addWaypoints: false,
                                 draggableWaypoints: false,
                                 fitSelectedRoutes: true,
@@ -858,7 +787,7 @@
                         matchRate.innerText = "🚨 RISK DETECTED";
                         matchRate.className = "text-red-500 font-black animate-pulse";
                         meteoContainer.className = "text-xs p-5 rounded-2xl border border-red-500/20 bg-red-950/20 text-red-200 shadow-xl animate-pulse";
-                        document.getElementById('bgLayer1').style.filter = "hue-rotate(140deg) saturate(160%) brightness(40%)";
+                        document.getElementById('bgLayer1').style.filter = "hue-rotate(130deg) saturate(140%) brightness(30%)";
                     } else {
                         matchRate.innerText = "🟢 Safe Window";
                         matchRate.className = "text-emerald-400 font-bold";
@@ -930,7 +859,7 @@
                                 <div><span class='text-white/30 text-[9px] uppercase font-black tracking-wider block mb-0.5'>1st Class Option</span><b class='text-base text-white/60 font-mono font-black'>CHF ${data.railTariffs.cost1st.toFixed(2)}</b></div>
                             </div>
                             
-                            <a href="${data.sbbBookingUrl}" target="_blank" class="w-full bg-white hover:bg-stone-200 text-black font-black py-3 rounded-xl uppercase tracking-wider text-center block transition-all shadow-md">
+                            <a href="${data.sbbBookingUrl}" target="_blank" class="w-full bg-white text-black hover:bg-stone-200 font-black py-3 rounded-xl uppercase tracking-wider text-center block transition-all shadow-md">
                                 <i class="fa-solid fa-ticket mr-2"></i> Book Live Fares on SBB.ch
                             </a>
 
@@ -942,7 +871,7 @@
                         </div>`;
                 }
             } catch (err) {
-                consoleBox.innerHTML = `<span class='text-red-600'>✕ UI Render Error.</span>`;
+                document.getElementById('logConsole').innerHTML = `<span class='text-red-600'>✕ UI Render Error.</span>`;
             }
 
             btn.removeAttribute('disabled');
