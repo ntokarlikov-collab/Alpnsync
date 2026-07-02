@@ -1,12 +1,19 @@
 {
-  "name": "alpensync",
-  "version": "1.1.0",
-  "description": "Swiss Alpine Expedition Hub — AI Cognitive Solutions Platform",
+  "name": "alpensync-os",
+  "version": "1.0.0",
+  "description": "Swiss alpine travel telemetry and mobility planning hub",
   "main": "server.js",
   "scripts": {
+    "build": "echo \"No build step required\"",
     "start": "node server.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Nikita",
+  "license": "ISC"
 }
