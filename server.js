@@ -13,7 +13,7 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 5 Departure Hub Coordinates & Baseline Base Elevations (Meters)
+// 5 Departure Hub Coordinates & Baseline Elevations (Meters)
 const originCoordinates = {
     "Geneva": { lat: 46.2044, lon: 6.1432, elev: 375 },
     "Lausanne": { lat: 46.5197, lon: 6.6323, elev: 495 },
@@ -53,7 +53,7 @@ const sectorCoordinates = {
     "Titlis Stand Glacier": { lat: 46.7981, lon: 8.4282, elev: 2428 },
     "Brunni Sunny Slopes": { lat: 46.8375, lon: 8.4111, elev: 1860 },
     "Les Chaux Cableway": { lat: 46.2821, lon: 7.1042, elev: 1773 },
-    "Frience Family Play-Zone": { lat: 46.2755, lon: 7.0864, elev: 1558 },
+    "Frience Family Play-Zone": { lat: 46.2755, fontColor: "text-red-500", lon: 7.0864, elev: 1558 },
     "Roc d'Orsay Gondola": { lat: 46.3055, lon: 7.1022, elev: 2002 },
     "Bretaye Rail Terminal": { lat: 46.3211, lon: 7.1182, elev: 1808 },
     "Glacier 3000 Col du Pillon": { lat: 46.3532, lon: 7.2064, elev: 2971 },
@@ -70,57 +70,65 @@ const stationMappers = {
 const baseLodgingRegistry = {
     "Zermatt": [
         { id: "z1", name: "Gandegghütte Alpine Outpost", feature: "SAC hut at 3,030m. Bunk platforms & warm stews.", price: 55, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "z2", name: "Chalet Findeln Timber Mazot", feature: "19th-century timber barn. Soapstone hearth wood stoves.", price: 210, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
+        { id: "z2", name: "Chalet Findeln Timber Mazot", feature: "19th-century private timber barn. Soapstone hearth wood stoves.", price: 210, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
     ],
     "Andermatt": [
-        { id: "a1", name: "Albert-Heim Refuge (SAC)", feature: "Granite high refuge. Traditional long-table assemblies.", price: 46, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "a2", name: "Walser Chalet Urserntal", feature: "Historic exposed-beam family shelter in deep valleys.", price: 125, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
+        { id: "a1", name: "Albert-Heim Refuge (SAC)", feature: "Granite high refuge. Traditional long-table family dining.", price: 46, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "a2", name: "Walser Chalet Urserntal", feature: "Historic exposed-beam cottage situated inside a silent snow meadow.", price: 125, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
     ],
     "Verbier": [
         { id: "v1", name: "Cabane du Mont-Fort", feature: "Stone refuge tracking along glacier routing trails.", price: 58, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" },
-        { id: "v2", name: "Chalet Les Attelas Premium", feature: "Hand-crafted design framework. Vaulted outdoor clear spas.", price: 290, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
+        { id: "v2", name: "Chalet Les Attelas Premium", feature: "Hand-crafted design framework. Vaulted cedar hot tubs.", price: 290, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
     ],
     "Grindelwald": [
         { id: "g1", name: "Berghaus Alpiglen Station", feature: "Rustic wooden lodge sitting below the Eiger North Face wall.", price: 52, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "g2", name: "Oberland Heritage Log Chalet", feature: "Private 3-floor luxury chalet layout with deep view balconies.", price: 185, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
+        { id: "g2", name: "Oberland Heritage Log Chalet", feature: "Private multi-level luxury chalet layout with deep view balconies.", price: 185, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
     ],
     "St. Moritz": [
-        { id: "sm1", name: "Chamanna Coaz Alpine Shelter", feature: "Remote mountaineering base wrapped by ice parameters.", price: 48, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "sm2", name: "Channa Engadina Private Barn", feature: "Restored stone sheep barn with signature open stone hearths.", price: 260, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
+        { id: "sm1", name: "Chamanna Coaz Alpine Shelter", feature: "Isolated mountaineering base grid wrapped by active ice fields.", price: 48, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "sm2", name: "Channa Engadina Private Barn", feature: "Beautifully restored traditional Engadin sheep barn with signature open stone hearths.", price: 260, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80" }
     ],
     "Davos": [
         { id: "d1", name: "Clavadeler Alp Berghaus", feature: "Working dairy farm chalet. Fresh cheese arrays included.", price: 50, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "d2", name: "Sertig Valley Walser Cabin", feature: "Isolated log framework down deep glacial terminal basins.", price: 165, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
+        { id: "d2", name: "Sertig Valley Walser Cabin", feature: "Quiet single log structure situated deep down an off-piste run corridor.", price: 165, img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80" }
     ],
     "Engelberg": [
-        { id: "e1", name: "Brunnihütte Mountain Hut", feature: "High-perch active refuge with panoramic terrace beds.", price: 44, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "e2", name: "Grafenort Valley Forester House", feature: "Charming isolated wood lodge with custom pine saunas.", price: 155, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
+        { id: "e1", name: "Brunnihütte Mountain Hut", feature: "High-altitude perching station with massive panoramic sundeck beds.", price: 44, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "e2", name: "Grafenort Valley Forester House", feature: "Charming timber house with private built-in outdoor finish saunas.", price: 155, img: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=300&q=80" }
     ],
     "Gryon": [
-        { id: "gr1", name: "Cergnement Valley Outpost", feature: "Ultra-budget community stone cottage with roaring hearths.", price: 34, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
-        { id: "gr2", name: "Chalet de Frience Eco-Cabin", feature: "Solar-powered tracking base sitting beside biological lakes.", price: 88, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
+        { id: "gr1", name: "Cergnement Valley Outpost", feature: "Ultra-budget stone cottage outpost equipped with an open wood fire hearth.", price: 34, img: "https://images.unsplash.com/photo-1506059612708-99d6c258160e?auto=format&fit=crop&w=300&q=80" },
+        { id: "gr2", name: "Chalet de Frience Eco-Cabin", feature: "Solar-powered tracking cabin sitting right beside the biological swimming lake.", price: 88, img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80" }
     ],
     "Villars-sur-Ollon": [
-        { id: "vi1", name: "Col de Soud Forest Hideaway", feature: "Traditional restaurant attic bunks. Fresh regional fondues.", price: 38, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
-        { id: "vi2", name: "Chalet Bretaye Ridge Cabin", feature: "Ski-in/ski-out timber chalet located on high mountain passes.", price: 110, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }
+        { id: "vi1", name: "Col de Soud Forest Hideaway", feature: "Traditional restaurant attic berths. Fresh regional fondues.", price: 38, img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80" },
+        { id: "vi2", name: "Chalet Bretaye Ridge Cabin", feature: "Ski-in/ski-out timber structure located directly on the mountain pass line.", price: 110, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" }
     ],
     "Les Diablerets": [
-        { id: "ld1", name: "Cabane des Diablerets (SAC)", feature: "High limestone cliff shelter. Built for technical crews.", price: 42, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" },
-        { id: "ld2", name: "Refuge de l'Espace Overlook", feature: "Boutique timber frames hanging off vertical rock faces.", price: 140, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" }
+        { id: "ld1", name: "Cabane des Diablerets (SAC)", feature: "High limestone cliff bunker at 2,485m built specifically for technical mountain crews.", price: 42, img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=300&q=80" },
+        { id: "ld2", name: "Refuge de l'Espace Glacier Overlook", feature: "Boutique timber structural grid hanging right off a vertical mountain face drop.", price: 140, img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80" }
     ]
 };
 
+function generateSbbItineraryLegs(from, to, timeVal) {
+    return [
+        { type: "IR", num: "90", info: `Direction ${to} Corridor`, dep: timeVal, station: from, arr: "10:15", dest: "Aigle Train Station", platform: "2" },
+        { type: "walk", walkLabel: "Regional Mountain Train Connection", duration: "5 min" },
+        { type: "REGIO", num: "ALC/TPC", info: "Alpine Narrow-Gauge Track Line", dep: "10:20", station: "Aigle Train Station", arr: "11:05", dest: to, platform: "Track 11" }
+    ];
+}
+
 app.post('/api/compute-expedition', async (req, res) => {
     try {
-        const { originKey, destKey, dateVal, timeVal, swissPassMode, passSystem, travelers, daysCount, targetSectorName } = req.body;
+        const { originKey, destKey, dateVal, timeVal, passengerPasses, passSystem, travelers, daysCount, targetSectorName } = req.body;
         
         const originObj = originCoordinates[originKey] || originCoordinates["Geneva"];
         const coords = sectorCoordinates[targetSectorName] || destinationCoordinates[destKey] || destinationCoordinates["Andermatt"];
         const durationNights = parseInt(daysCount) || 1;
+        const crewSize = parseInt(travelers) || 1;
         
         let temp = 11.5, wind = 12.0;
         try {
-            // Built-in Native Fetch Interface Implementation Protocol
             const meteoRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,wind_speed_10m&wind_speed_unit=kmh`);
             const meteoData = await meteoRes.json();
             if(meteoData?.current) {
@@ -153,10 +161,7 @@ app.post('/api/compute-expedition', async (req, res) => {
         } catch(e) { console.log("SBB OpenData baseline active"); }
 
         if (routeLegs.length === 0) {
-            routeLegs = [
-                { type: "IR", num: "90", info: `Direction ${destKey} Line`, dep: timeVal, station: stationMappers[originKey], arr: "10:15", dest: "Interchange Hub", platform: "2" },
-                { type: "walk", walkLabel: "Narrow-Gauge Cog Track Handoff", duration: "5 min" }
-            ];
+            routeLegs = generateSbbItineraryLegs(stationMappers[originKey], stationMappers[destKey], timeVal);
         }
 
         const sbbBaseTariffs = {
@@ -172,17 +177,26 @@ app.post('/api/compute-expedition', async (req, res) => {
             baseFareUnit = sbbBaseTariffs[originKey][destKey];
         }
 
-        let discountModifier = swissPassMode === "HalfFare" ? 0.5 : (swissPassMode === "GA" ? 0.0 : 1.0);
-        let totalRail2nd = baseFareUnit * discountModifier * travelers;
-        let totalRail1st = (baseFareUnit * 1.65) * discountModifier * travelers;
+        // --- GRANULAR COMPUTATION MATRIX LOOP ---
+        let totalRail2nd = 0;
+        let totalRail1st = 0;
+        
+        // Loop through explicit individual crew passenger tokens securely
+        const passesArray = Array.isArray(passengerPasses) ? passengerPasses : [passengerPasses || 'FullFare'];
+        
+        passesArray.forEach(pass => {
+            let discountModifier = pass === "HalfFare" ? 0.5 : (pass === "GA" ? 0.0 : 1.0);
+            totalRail2nd += baseFareUnit * discountModifier;
+            totalRail1st += (baseFareUnit * 1.65) * discountModifier;
+        });
 
         let localLiftPricePerDay = ["Gryon", "Villars-sur-Ollon", "Les Diablerets"].includes(destKey) ? 54.00 : 82.00;
         let liftBaseEach = localLiftPricePerDay * durationNights;
-        let liftTicketStatusText = passSystem !== "None" ? `${passSystem} Card Active` : `CHF ${(liftBaseEach * travelers).toFixed(2)} Fee`;
+        let liftTicketStatusText = passSystem !== "None" ? `${passSystem} Card Active` : `CHF ${(liftBaseEach * crewSize).toFixed(2)} Fee`;
 
         let hotels = baseLodgingRegistry[destKey] || baseLodgingRegistry["Andermatt"];
         let calculatedHotels = hotels.map(h => {
-            let totalVolumeSum = h.price * durationNights * travelers;
+            let totalVolumeSum = h.price * durationNights * crewSize;
             return {
                 id: h.id, name: h.name, feature: h.feature, img: h.img, 
                 price: totalVolumeSum.toFixed(2),
@@ -205,7 +219,8 @@ app.post('/api/compute-expedition', async (req, res) => {
             liveRouteConfirmed: true,
             sbbBookingUrl,
             geoCoordinates: { origin: originObj, dest: coords },
-            durationNights
+            durationNights,
+            passengerPasses: passesArray
         });
     } catch (err) {
         res.status(500).json({ success: false });
