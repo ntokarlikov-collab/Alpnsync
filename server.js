@@ -1,5 +1,4 @@
 const express = require('express');
-const fetch = require('node-fetch');
 const path = require('path');
 const cors = require('cors');
 const pkg = require('./package.json');
