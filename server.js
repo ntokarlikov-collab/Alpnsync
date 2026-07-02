@@ -1,11 +1,13 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 const pkg = require('./package.json');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const STARTED_AT = Date.now();
+const INDEX_HTML = path.join(__dirname, 'index.html');
 
 // Middleware
 app.use(cors());
@@ -317,7 +319,14 @@ app.use('/api', (req, res) => {
 
 // Serve frontend routing fallback
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    if (!fs.existsSync(INDEX_HTML)) {
+        console.error(`[AlpenSync] index.html not found at ${INDEX_HTML}. Directory contains: ${fs.readdirSync(__dirname).join(', ')}`);
+        return res.status(500).json({
+            error: 'Frontend asset index.html is missing from the deployment.',
+            expectedPath: INDEX_HTML
+        });
+    }
+    res.sendFile(INDEX_HTML);
 });
 
 // JSON error handler — malformed request bodies should not yield HTML stack traces
@@ -331,4 +340,7 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
     console.log(`[AlpenSync OS Engine v${pkg.version} running smoothly on port ${PORT}]`);
+    console.log(`[AlpenSync] Serving from ${__dirname}`);
+    console.log(`[AlpenSync] index.html present: ${fs.existsSync(INDEX_HTML)}`);
+    console.log(`[AlpenSync] Directory contents: ${fs.readdirSync(__dirname).join(', ')}`);
 });
