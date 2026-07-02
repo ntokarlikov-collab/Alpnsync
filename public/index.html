@@ -3,880 +3,903 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpenSync OS — Premium Swiss Expedition Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-    
+    <title>AlpenSync OS — Alpine Expedition Gateway</title>
     <style>
-        html { scroll-behavior: smooth; background-color: #030406; }
-        .scrollbar-stark::-webkit-scrollbar { width: 4px; }
-        .scrollbar-stark::-webkit-scrollbar-track { background: transparent; }
-        .scrollbar-stark::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
-        #alpineMap { height: 260px; width: 100%; border-radius: 20px; z-index: 10; border: 1px solid rgba(255,255,255,0.08); }
-        .leaflet-routing-container { display: none !important; }
-        
-        .cinematic-bg-layer {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-size: cover;
-            background-position: center;
-            z-index: -2;
-            transform: scale(1.02);
-            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: opacity, transform;
+        :root {
+            --swiss-red: #EB0000;       /* SBB brand red */
+            --dark-slate: #1A252C;
+            --snow-white: #F8FAFC;
+            --border-gray: #E2E8F0;
+            --summer-green: #047857;
+            --sky-high: #7FB2DC;
+            --sky-mid: #A9CDE9;
+            --sky-low: #D8E8F5;
         }
-        
-        .dark-vignette {
-            position: fixed;
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--snow-white);
+            color: var(--dark-slate);
+            margin: 0;
+        }
+
+        /* ============================================================
+           HERO — Matterhorn landing scene, Swiss travel-poster style
+           Flat graphic panorama in the SBB design language. If a
+           `matterhorn.mp4` exists next to index.html it upgrades to
+           real footage automatically.
+           ============================================================ */
+        #hero {
+            position: relative;
+            height: 100vh;
+            min-height: 600px;
+            overflow: hidden;
+            background: linear-gradient(180deg,
+                var(--sky-high) 0%,
+                var(--sky-mid) 38%,
+                var(--sky-low) 70%,
+                var(--snow-white) 100%);
+        }
+        .hero-video {
+            position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(3,4,6,0.1) 0%, rgba(3,4,6,0.5) 50%, #030406 100%);
-            z-index: -1;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+        #hero.video-mode .hero-video { opacity: 1; }
+        #hero.video-mode .mtn-layer,
+        #hero.video-mode .cloud,
+        #hero.video-mode .hero-sun { opacity: 0; }
+
+        .hero-sun {
+            position: absolute;
+            top: 12%;
+            right: 16%;
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            opacity: 0.92;
+            box-shadow: 0 0 70px 34px rgba(255, 255, 255, 0.55);
             pointer-events: none;
         }
-        
-        .glass-panel {
-            background: rgba(8, 9, 12, 0.55);
-            backdrop-filter: blur(40px) saturate(130%);
-            -webkit-backdrop-filter: blur(40px) saturate(130%);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: border-color 0.4s ease, background-color 0.4s ease;
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.78);
+            border-radius: 999px;
+            filter: blur(7px);
+            animation: cloud-drift linear infinite;
+            pointer-events: none;
         }
-        .glass-panel:hover {
-            border-color: rgba(255, 255, 255, 0.1);
-            background: rgba(8, 9, 12, 0.65);
+        @keyframes cloud-drift {
+            from { transform: translateX(-35vw); }
+            to   { transform: translateX(135vw); }
         }
 
-        .twint-card-overlay { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .twint-card-overlay:hover .qr-popup-holder { opacity: 1; visibility: visible; transform: translate(-50%, -10px); }
+        .mtn-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 82%;
+            pointer-events: none;
+            will-change: transform;
+        }
+        .mtn-layer svg { width: 100%; height: 100%; display: block; }
 
-        .fade-in-up { animation: fadeInUpAction 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes fadeInUpAction {
-            from { opacity: 0; transform: translateY(30px); filter: blur(8px); }
-            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        .hero-snow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+        .flake {
+            position: absolute;
+            top: -12px;
+            background: #fff;
+            border-radius: 50%;
+            animation: flake-fall linear infinite;
+        }
+        @keyframes flake-fall {
+            to { transform: translateY(112vh); }
+        }
+
+        /* The flowing seam: hero dissolves into the snow-white page */
+        #hero::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 22vh;
+            background: linear-gradient(180deg, transparent 0%, var(--snow-white) 94%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 13vh;
+            text-align: center;
+            color: var(--dark-slate);
+            will-change: transform, opacity;
+        }
+        .swiss-flag {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            background: var(--swiss-red);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 18px rgba(235, 0, 0, 0.3);
+            animation: rise-in 1.1s ease both;
+        }
+        .swiss-flag::before, .swiss-flag::after {
+            content: '';
+            position: absolute;
+            background: #fff;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .swiss-flag::before { width: 19px; height: 6px; }
+        .swiss-flag::after  { width: 6px;  height: 19px; }
+
+        .hero-content h1 {
+            margin: 0;
+            font-size: clamp(38px, 6.5vw, 70px);
+            letter-spacing: -2.5px;
+            font-weight: 800;
+            color: var(--dark-slate);
+            animation: rise-in 1.1s ease 0.15s both;
+        }
+        .hero-content .tagline {
+            margin: 12px 0 0;
+            font-size: clamp(14px, 1.9vw, 18px);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            color: #46586A;
+            animation: rise-in 1.1s ease 0.3s both;
+        }
+        .hero-content .sectors {
+            margin: 10px 0 0;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 2.8px;
+            text-transform: uppercase;
+            color: #6B7E92;
+            animation: rise-in 1.1s ease 0.45s both;
+        }
+        .hero-cta {
+            width: auto;
+            margin-top: 30px;
+            padding: 14px 42px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--swiss-red);
+            border: none;
+            border-radius: 2px;   /* SBB buttons are near-square */
+            cursor: pointer;
+            box-shadow: 0 8px 26px rgba(235, 0, 0, 0.28);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+            animation: rise-in 1.1s ease 0.6s both;
+        }
+        .hero-cta:hover {
+            background: #C60018;   /* SBB red hover */
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(235, 0, 0, 0.36);
+            opacity: 1;
+        }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 26px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: var(--swiss-red);
+            font-size: 22px;
+            animation: bob 2.2s ease-in-out infinite;
+            cursor: pointer;
+            user-select: none;
+        }
+        @keyframes rise-in {
+            from { opacity: 0; transform: translateY(26px); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes bob {
+            0%, 100% { transform: translate(-50%, 0); }
+            50%      { transform: translate(-50%, 10px); }
+        }
+
+        /* ============================================================
+           DASHBOARD — the working page
+           ============================================================ */
+        #dashboard { padding: 40px 20px 60px; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--swiss-red);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .dash-header h1 { margin: 0; font-size: 24px; letter-spacing: -0.5px; }
+        .header-controls { display: flex; align-items: center; gap: 10px; }
+        .engine-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748B;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #94A3B8;
+        }
+        .status-dot.online { background-color: #16A34A; }
+        .status-dot.offline { background-color: var(--swiss-red); }
+        .season-badge {
+            background-color: var(--dark-slate);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media(max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .card {
+            background: white;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        /* Fluid reveal as the dashboard scrolls into view */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible { opacity: 1; transform: none; }
+        .card.reveal:nth-child(2) { transition-delay: 0.15s; }
+
+        h2 { font-size: 18px; margin-top: 0; border-bottom: 1px solid var(--border-gray); padding-bottom: 8px; }
+        h3 { font-size: 14px; }
+        label { display: block; margin: 10px 0 5px; font-size: 13px; font-weight: 600; }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            background-color: var(--swiss-red);
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: wait; }
+        .output-box {
+            background-color: #F1F5F9;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 12px;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+        .output-box.error { background-color: #FEF2F2; color: #991B1B; }
+        .expense-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 34px;
+            gap: 10px;
+            margin-bottom: 5px;
+            align-items: start;
+        }
+        .remove-row {
+            background: none;
+            border: 1px solid var(--border-gray);
+            color: #94A3B8;
+            font-weight: bold;
+            padding: 10px 0;
+            line-height: 1;
+        }
+        .remove-row:hover { color: var(--swiss-red); border-color: var(--swiss-red); opacity: 1; }
+        .hint { font-size: 12px; color: #64748B; margin: 4px 0 10px; }
+
+        /* Respect users who prefer reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .flake, .cloud, .scroll-indicator,
+            .swiss-flag, .hero-content h1, .hero-content .tagline,
+            .hero-content .sectors, .hero-cta { animation: none !important; }
+            .reveal { opacity: 1; transform: none; transition: none; }
         }
     </style>
 </head>
-<body class="text-white font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+<body>
 
-    <div id="bgLayer1" class="cinematic-bg-layer opacity-100" style="background-image: url('https://images.unsplash.com/photo-1531315630201-bb15abeb1653?auto=format&fit=crop&w=1920&q=90');"></div>
-    <div id="bgLayer2" class="cinematic-bg-layer opacity-0" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=90');"></div>
-    <div id="bgLayer3" class="cinematic-bg-layer opacity-0" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=90');"></div>
-    
-    <div class="dark-vignette"></div>
+<!-- ================= MATTERHORN LANDING ================= -->
+<section id="hero">
+    <video id="heroVideo" class="hero-video" autoplay muted loop playsinline></video>
 
-    <nav class="border-b border-white/5 bg-transparent text-white sticky top-0 z-50 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="font-black text-xs tracking-widest uppercase">ALPEN<span class="text-red-500">SYNC</span></span>
-            </div>
-            <div class="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5 text-[11px]">
-                <button id="seasonWinter" onclick="setSeason('winter')" class="px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md">
-                    Winter
-                </button>
-                <button id="seasonSummer" onclick="setSeason('summer')" class="px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white">
-                    Summer
-                </button>
-            </div>
-        </div>
-    </nav>
+    <div class="hero-sun"></div>
 
-    <header class="relative max-w-7xl w-full mx-auto px-6 min-h-[90vh] flex flex-col justify-between items-start z-10 pt-20 pb-12">
-        <div class="space-y-4 max-w-2xl mt-12 fade-in-up">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] uppercase tracking-widest font-mono text-white/70">
-                <span class="w-1 h-1 rounded-full bg-red-500"></span> Alpine Logistics Array
-            </div>
-            <h1 class="text-5xl sm:text-7xl font-black tracking-tighter uppercase leading-none text-transparent bg-clip-text bg-gradient-to-b from-white via-stone-200 to-stone-400">
-                The Alpine <br>Standard
-            </h1>
-            <p class="text-white/50 text-xs sm:text-sm font-medium max-w-md leading-relaxed">A minimal, transient workspace designed to calculate multi-modal Swiss coordinates, mountain sector access, and real-time ledger distributions smoothly.</p>
-        </div>
+    <div class="cloud" style="top: 14%; left: 2%;  width: 240px; height: 42px; animation-duration: 110s; opacity: 0.75;"></div>
+    <div class="cloud" style="top: 30%; left: 40%; width: 320px; height: 50px; animation-duration: 150s; animation-delay: -55s; opacity: 0.6;"></div>
+    <div class="cloud" style="top: 8%;  left: 64%; width: 180px; height: 34px; animation-duration: 90s;  animation-delay: -25s; opacity: 0.7;"></div>
+    <div class="cloud" style="top: 40%; left: 12%; width: 280px; height: 44px; animation-duration: 170s; animation-delay: -80s; opacity: 0.45;"></div>
 
-        <div class="w-full flex justify-center animate-bounce pt-12">
-            <a href="#configure-zone" class="text-white/30 hover:text-white text-xs font-mono tracking-widest uppercase flex flex-col items-center gap-2">
-                <span>Scroll Down to Open Terminal</span>
-                <i class="fa-solid fa-chevron-down text-sm"></i>
-            </a>
-        </div>
-    </header>
-
-    <section id="configure-zone" class="max-w-7xl w-full mx-auto px-6 relative z-30 mb-12 pt-12 scroll-mt-24">
-        <div class="glass-panel rounded-[28px] p-6 shadow-2xl space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans">
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                    <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">From (SBB Departure Hub)</label>
-                    <select id="paramOrigin" class="w-full bg-transparent text-white focus:outline-none font-bold cursor-pointer">
-                        <option value="Geneva" class="bg-stone-950" selected>Geneva Cornavin</option>
-                        <option value="Lausanne" class="bg-stone-950">Lausanne Central</option>
-                        <option value="Zurich" class="bg-stone-950">Zürich HB</option>
-                        <option value="Bern" class="bg-stone-950">Bern Hauptbahnhof</option>
-                        <option value="Basel" class="bg-stone-950">Basel SBB</option>
-                    </select>
-                </div>
-
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                    <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">To (Target Alpine Resort)</label>
-                    <select id="paramDestination" onchange="updateMountainSectors()" class="w-full bg-transparent text-white focus:outline-none font-bold cursor-pointer">
-                        <option value="Zermatt" class="bg-stone-950" selected>Zermatt (Matterhorn)</option>
-                        <option value="Andermatt" class="bg-stone-950">Andermatt Sedrun</option>
-                        <option value="Verbier" class="bg-stone-950">Verbier (4 Vallées)</option>
-                        <option value="Grindelwald" class="bg-stone-950">Grindelwald Terminal</option>
-                        <option value="St. Moritz" class="bg-stone-950">St. Moritz Engadin</option>
-                        <option value="Davos" class="bg-stone-950">Davos Platz</option>
-                        <option value="Engelberg" class="bg-stone-950">Engelberg Titlis</option>
-                        <option value="Gryon" class="bg-stone-950">Gryon (Alpes Vaudoises)</option>
-                        <option value="Villars-sur-Ollon" class="bg-stone-950">Villars-sur-Ollon</option>
-                        <option value="Les Diablerets" class="bg-stone-950">Les Diablerets</option>
-                    </select>
-                </div>
-
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                    <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Mountain Target Sector</label>
-                    <select id="paramSector" class="w-full bg-transparent text-white focus:outline-none font-bold cursor-pointer">
-                        </select>
-                </div>
-
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5 grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Departure Date</label>
-                        <input type="date" id="paramDate" class="w-full bg-transparent text-white text-[11px] font-mono focus:outline-none font-bold">
-                    </div>
-                    <div>
-                        <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Time Window</label>
-                        <input type="time" id="paramTime" value="08:14" class="w-full bg-transparent text-white text-[11px] font-mono focus:outline-none font-bold">
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans pt-2">
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5 grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Alpine Objective</label>
-                        <select id="paramObjective" onchange="runEngineGearUpdate()" class="w-full bg-transparent text-white focus:outline-none font-bold cursor-pointer">
-                            </select>
-                    </div>
-                    <div>
-                        <label class="text-[9px] text-emerald-400 font-black uppercase tracking-wider block mb-1">Stay Duration</label>
-                        <select id="paramDays" class="w-full bg-transparent text-emerald-400 font-bold focus:outline-none cursor-pointer">
-                            <option value="1" class="bg-stone-950" selected>1 Night</option>
-                            <option value="2" class="bg-stone-950">2 Nights</option>
-                            <option value="3" class="bg-stone-950">3 Nights</option>
-                            <option value="5" class="bg-stone-950">5 Nights</option>
-                            <option value="7" class="bg-stone-950">7 Nights</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5 flex flex-col justify-center">
-                    <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Total Crew Size</label>
-                    <input type="number" id="paramGroupSize" oninput="handleCrewSizeMatrixChange()" value="3" min="1" max="12" class="w-full bg-transparent text-white font-black focus:outline-none text-base">
-                </div>
-
-                <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                    <label class="text-[9px] text-white/40 font-black uppercase tracking-wider block mb-1">Resort Passes</label>
-                    <select id="paramPasses" class="w-full bg-transparent text-stone-300 focus:outline-none font-bold cursor-pointer">
-                        <option value="None" class="bg-stone-950" selected>Purchase Day Pass</option>
-                        <option value="MagicPass" class="bg-stone-950">Magic Pass Active</option>
-                        <option value="Top4" class="bg-stone-950">Top4 Season Card</option>
-                    </select>
-                </div>
-
-                <div class="flex flex-col gap-2 justify-end">
-                    <label class="flex items-center gap-2 text-[10px] text-white/40 select-none cursor-pointer pb-1">
-                        <input type="checkbox" id="privacyConsent" checked class="accent-white rounded bg-transparent border-white/20">
-                        <span>Acknowledge transient <b class="text-white hover:underline" onclick="togglePrivacyModal()">nFADP processing</b></span>
-                    </label>
-                    <button onclick="executeClusterCalculation()" id="engineBtn" class="w-full bg-white text-black hover:bg-stone-200 font-black py-3 rounded-xl uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2 text-[11px]">
-                        <i class="fa-solid fa-circle-nodes"></i> Compute Search
-                    </button>
-                </div>
-            </div>
-
-            <div id="crewPassMatrixContainer" class="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                </div>
-        </div>
-    </section>
-
-    <main class="max-w-7xl w-full mx-auto px-6 pb-16 flex-1 z-20 space-y-6">
-        
-        <div id="synergySavingsBanner" class="hidden bg-gradient-to-r from-emerald-950/80 to-teal-950/80 backdrop-blur-md rounded-2xl p-4 border border-emerald-500/20 flex justify-between items-center text-white shadow-xl">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl bg-emerald-500 text-stone-950 flex items-center justify-center text-sm font-black shadow-inner">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
-                <div>
-                    <div class="text-[10px] text-emerald-400 font-mono uppercase font-black tracking-wider">AlpenSync Synergy Engine</div>
-                    <p class="text-xs font-medium text-white/80">Cooperative system distribution successfully bypassed retail consumer platform markups.</p>
-                </div>
-            </div>
-            <div class="text-right shrink-0">
-                <span class="text-[9px] text-emerald-400 font-mono block uppercase font-bold tracking-wider">Crew Net Saved</span>
-                <span id="savingsTallyCounter" class="text-xl font-mono font-black text-emerald-400">CHF 0.00</span>
-            </div>
-        </div>
-
-        <div id="tacticalRaidLobby" class="hidden bg-black/40 backdrop-blur-xl p-5 rounded-[24px] border border-white/5 shadow-2xl space-y-4 fade-in-up">
-            <div class="border-b border-white/5 pb-2 flex justify-between items-center">
-                <h3 class="text-xs font-black tracking-widest text-white/40 uppercase flex items-center gap-2">
-                    <i class="fa-solid fa-gamepad"></i> Technical Expedition Squad Lobby
-                </h3>
-                <div class="text-[10px] font-mono text-white/40">
-                    Squad Success Index: <span id="lobbyReadinessScore" class="text-emerald-400 font-bold">100%</span>
-                </div>
-            </div>
-            <div id="lobbyRaidCardsGrid" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div class="lg:col-span-3 bg-black/40 backdrop-blur-xl rounded-[24px] p-6 space-y-4 shadow-xl border border-white/5 flex flex-col justify-between">
-                <h4 class="text-xs font-black tracking-widest text-white/40 uppercase border-b border-white/5 pb-2 flex justify-between items-center">
-                    <span>SBB Rail Timetable Track Logs</span>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/SBB_CFF_FFS_LOGO.svg" class="h-3 brightness-200 opacity-30" alt="SBB Logo">
-                </h4>
-                <div id="itineraryContainer" class="space-y-4 text-center py-16 text-white/30 text-xs font-mono">
-                    Awaiting target log vector initialization arrays...
-                </div>
-            </div>
-
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[24px] p-5 shadow-sm text-left" id="meteoVillageContainer">
-                    <h4 class="text-xs font-black tracking-widest text-white/40 uppercase mb-2">MeteoSuisse Environment</h4>
-                    <div class="text-xs text-white/20 font-mono">Telemetry stream closed.</div>
-                </div>
-
-                <div class="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[24px] p-5 shadow-sm text-left">
-                    <h4 class="text-xs font-black tracking-widest text-white/40 uppercase mb-3 flex justify-between items-center">
-                        <span>Traditional Cabins & Refuges</span>
-                        <span class="text-[10px] text-white/30 font-mono" id="selectedHotelTally">None Chosen</span>
-                    </h4>
-                    <div id="accommodationContainer" class="space-y-3 text-xs text-white/20">
-                        Select metrics to resolve target staging points.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="activityRadarSection" class="hidden border border-white/5 rounded-[24px] p-5 bg-black/50 backdrop-blur-xl text-white space-y-3 shadow-2xl fade-in-up">
-            <h4 class="text-xs font-black tracking-widest text-red-500 uppercase flex items-center gap-1.5">
-                <i class="fa-solid fa-map-pin animate-pulse"></i> AlpenSync Recommended Local Activity Guide
-            </h4>
-            <div id="activityDisplayGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
-                </div>
-        </div>
-
-        <div id="altitudeProfileSection" class="hidden border border-white/5 rounded-[24px] p-5 bg-black/60 backdrop-blur-xl text-white space-y-3 shadow-xl relative overflow-hidden fade-in-up">
-            <h4 class="text-xs font-black tracking-widest text-white/40 uppercase flex justify-between items-center">
-                <span><i class="fa-solid fa-chart-area text-red-500 mr-1"></i> Mountain Traverse Vertical Elevation Profile</span>
-                <span id="altitudeProfileHUD" class="text-[10px] font-mono text-red-500">Vector Dynamic</span>
-            </h4>
-            <div class="w-full relative pt-2">
-                <svg id="altitudeSVG" viewBox="0 0 800 160" class="w-full h-32 overflow-visible"></svg>
-                <div class="flex justify-between font-mono text-[9px] text-stone-500 px-1 pt-1 border-t border-white/5">
-                    <span id="profileOriginLabel">Base Hub</span>
-                    <span class="text-center text-stone-600">Topological Incline Profile Velocity</span>
-                    <span id="profileDestLabel">Sector Terminal</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="mapWrapperFrame" class="hidden grid grid-cols-1 gap-4 fade-in-up">
-            <div id="alpineMap"></div>
-        </div>
-
-        <div id="expenseLedgerSection" class="hidden border border-white/5 rounded-[24px] p-5 bg-black/40 backdrop-blur-2xl space-y-4 fade-in-up">
-            <div class="border-b border-white/5 pb-2 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-                <h4 class="text-xs font-black tracking-widest text-white/40 uppercase flex items-center">
-                    <span><i class="fa-solid fa-calculator text-white/60 mr-1"></i> Crew Expedition Cost Ledger Spreadsheet</span>
-                </h4>
-                
-                <div class="w-full sm:w-auto bg-black/20 p-2 rounded-xl border border-white/5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    <div class="flex items-center gap-1.5 px-2 text-[10px] uppercase font-black text-white/60">
-                        <img src="https://www.twint.ch/content/uploads/2021/04/favicon.ico" class="w-3.5 h-3.5 rounded">
-                        <span>Organizer TWINT Paylink:</span>
-                    </div>
-                    <input type="text" id="twintBaseInput" oninput="recomputeLedgerSplitsWithTwint()" placeholder="https://www.twint.ch/paylink/..." value="https://www.twint.ch/pay/alpensync-split" class="bg-white/5 text-[11px] font-mono border border-white/10 text-white rounded-lg px-2 py-1 focus:outline-none min-w-[200px]">
-                </div>
-
-                <div class="flex gap-2 text-[10px] uppercase font-bold">
-                    <button onclick="shareToWhatsAppClipboard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition-all">
-                        <i class="fa-brands fa-whatsapp text-xs"></i> Copy Share String
-                    </button>
-                    <button onclick="triggerPrintInvoiceWindow()" class="bg-white text-black hover:bg-stone-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition-all">
-                        <i class="fa-solid fa-file-pdf"></i> Print Invoice
-                    </button>
-                </div>
-            </div>
-            
-            <div class="overflow-x-auto text-xs font-sans text-stone-200">
-                <table class="w-full text-left border-collapse bg-transparent rounded-xl overflow-hidden border border-white/5 shadow-sm">
-                    <thead>
-                        <tr class="bg-white/5 text-white/50 font-bold text-[10px] uppercase tracking-wider border-b border-white/5">
-                            <th class="p-3">Expense Category Description</th>
-                            <th class="p-3" id="ledgerTableDurationHeader">Rate Per Person</th>
-                            <th class="p-3 text-right">Group Total Volume</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        <tr>
-                            <td class="p-3 font-medium text-white/80">SBB Transport Transit Passes (Standard 2nd Class Baseline)</td>
-                            <td class="p-3 font-mono text-white/60" id="tableCostSbbEach">CHF 0.00</td>
-                            <td class="p-3 font-mono font-bold text-right" id="tableCostSbbTotal">CHF 0.00</td>
-                        </tr>
-                        <tr>
-                            <td class="p-3 font-medium text-white/80">Mountain Target Resort Lift Access Tickets</td>
-                            <td class="p-3 font-mono text-white/60" id="tableCostLiftEach">CHF 0.00</td>
-                            <td class="p-3 font-mono font-bold text-right" id="tableCostLiftTotal">CHF 0.00</td>
-                        </tr>
-                        <tr>
-                            <td class="p-3 font-medium text-white/80">Active Selection Alpine Staging Stays (Chalet Tally)</td>
-                            <td class="p-3 font-mono text-white/60" id="tableCostHotelEach">CHF 0.00</td>
-                            <td class="p-3 font-mono font-bold text-right" id="tableCostHotelTotal">CHF 0.00</td>
-                        </tr>
-                        <tr class="bg-white/5 text-white font-black">
-                            <td class="p-3 uppercase tracking-wider">Calculated Split Matrix Tally</td>
-                            <td class="p-3 font-mono text-red-400" id="tableGrandEach">CHF 0.00 / individual</td>
-                            <td class="p-3 font-mono text-right text-emerald-400 text-sm" id="tableGrandTotal">CHF 0.00 Total</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="pt-2">
-                <div class="text-[10px] font-black uppercase tracking-wider text-white/40 mb-2">Individual Crew Member TWINT Settlements (Hover / Tap card to instantly scan QR):</div>
-                <div id="twintButtonsContainer" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                    </div>
-            </div>
-        </div>
-
-        <div class="p-5 bg-black/40 backdrop-blur-xl border border-white/5 rounded-[24px]">
-            <h4 class="text-xs font-black tracking-widest text-white/40 uppercase mb-2">Technical Equipment Framework Checklist</h4>
-            <div id="gearDisplayBox" class="text-xs text-stone-400 font-mono">Select objective to parse active gear arrays.</div>
-        </div>
-    </main>
-
-    <div id="privacyModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="bg-stone-900 border border-white/10 max-w-md w-full rounded-2xl p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-white/5 pb-2">
-                <h3 class="text-sm font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                    <i class="fa-solid fa-user-shield text-emerald-500"></i> Swiss nFADP Declaration Framework
-                </h3>
-                <button onclick="togglePrivacyModal()" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="text-xs text-stone-400 space-y-2 font-sans leading-relaxed">
-                <p><b>1. Transient Ephemeral Compute Array:</b> AlpenSync processes SBB transit route metrics and Open-Meteo climate variables entirely on-the-fly. No long-term storage records or trip tracking entries are written to databases.</p>
-                <p><b>2. Zero Cookie Footprints:</b> We collect no profiling structures, sell no traveler data to international agencies, and respect full user autonomy under the new Federal Act on Data Protection (nFADP).</p>
-                <p><b>3. Localized Security:</b> Financial ledgers remain isolated inside the client's transient app cache layer.</p>
-            </div>
-            <button onclick="togglePrivacyModal()" class="w-full bg-white text-black font-bold text-xs py-2 rounded-xl uppercase tracking-wider">Acknowledge Policy</button>
-        </div>
+    <!-- Far ridgeline: hazy background peaks -->
+    <div class="mtn-layer" id="mtnFar">
+        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+            <polygon fill="#C9DCEC" points="0,640 0,430 90,368 168,412 262,338 348,398 442,346 528,392 610,352 700,640"/>
+            <polygon fill="#C9DCEC" points="748,640 828,346 902,398 992,344 1082,400 1168,352 1262,406 1352,362 1440,412 1440,640"/>
+        </svg>
     </div>
 
-    <script>
-        let currentSeasonMode = "winter";
-        let globalCalculatedCache = null;
-        let activeSelectedHotelObj = null;
-        let mapInstance = null;
-        let activeRoutingEngineInstance = null;
+    <!-- Mid ridgeline: Dent Blanche & Obergabelhorn silhouettes with snow caps -->
+    <div class="mtn-layer" id="mtnMid">
+        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+            <polygon fill="#8FADC8" points="0,640 0,500 130,388 218,458 328,368 424,442 520,392 610,470 700,640"/>
+            <polygon fill="#8FADC8" points="752,640 860,388 948,452 1052,372 1148,448 1250,396 1342,462 1440,414 1440,640"/>
+            <!-- snow caps -->
+            <polygon fill="#EFF5FA" points="112,402 130,388 150,402 142,418 124,412"/>
+            <polygon fill="#EFF5FA" points="310,382 328,368 348,383 338,398 320,394"/>
+            <polygon fill="#EFF5FA" points="842,402 860,388 880,403 870,418 852,413"/>
+            <polygon fill="#EFF5FA" points="1034,386 1052,372 1072,387 1062,402 1044,398"/>
+            <polygon fill="#EFF5FA" points="1232,410 1250,396 1270,411 1260,426 1242,421"/>
+        </svg>
+    </div>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('paramDate').value = new Date().toISOString().split('T')[0];
-            updateMountainSectors();
-            populateObjectives();
-            handleCrewSizeMatrixChange(); // Initialize standard baseline crew toggles
-            
-            mapInstance = L.map('alpineMap').setView([46.8182, 8.2275], 8);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/dark_all/{z}/{x}/{y}.png', {
-                maxZoom: 18,
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(mapInstance);
+    <!-- The Matterhorn: Zermatt profile — Hörnli shoulder, faceted faces, snow couloirs -->
+    <div class="mtn-layer" id="mtnMain">
+        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+            <defs>
+                <linearGradient id="haze" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0" stop-color="#F8FAFC"/>
+                    <stop offset="1" stop-color="#F8FAFC" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+
+            <!-- Matterhorn massif: broad asymmetric pyramid (nearly as wide
+                 as tall, like the real mountain), stepped Hörnli shoulder on
+                 the left skyline, short sheer drop right of the hooked tip.
+                 North face (left) in shadow. -->
+            <polygon fill="#3A536C" points="
+                280,640 318,590 354,542 390,496 422,458 452,424 480,394 506,366
+                530,340 552,316 570,294 584,278
+                598,264 612,256 622,248 632,242
+                648,224 664,206 680,188 696,170 710,156 722,144 734,133 746,125
+                753,119 759,116
+                766,123 771,134 775,150 777,166
+                790,188 804,212 820,240 838,270 858,304 880,342 904,384 930,430
+                958,480 988,534 1018,588 1046,630 1056,640"/>
+
+            <!-- east face: sunlit, right of the summit arête -->
+            <polygon fill="#7A93AC" points="
+                759,116 766,123 771,134 775,150 777,166 790,188 804,212 820,240
+                838,270 858,304 880,342 904,384 930,430 958,480 988,534 1018,588
+                1046,630 1056,640
+                732,640 734,520 736,430 738,340 741,262 745,205 750,155 754,130"/>
+
+            <!-- summit snowfield: organic, jagged hem with tongues -->
+            <polygon fill="#FFFFFF" points="
+                648,224 664,206 680,188 696,170 710,156 722,144 734,133 746,125
+                753,119 759,116 766,123 771,134 775,150 777,166 786,182 794,196
+                786,208 776,204 780,226 768,234 772,252 758,244 752,264 742,250
+                734,268 726,252 716,262 712,244 700,252 696,232 684,238 682,220
+                668,230 660,242 652,236"/>
+            <!-- shadow tint on the north side of the snowfield -->
+            <polygon fill="#DEE9F2" opacity="0.85" points="
+                648,224 664,206 680,188 696,170 710,156 722,144 734,133 746,125
+                753,119 750,155 745,205 741,240 734,268 726,252 716,262 712,244
+                700,252 696,232 684,238 682,220 668,230 660,242 652,236"/>
+
+            <!-- Hörnli shoulder: snow ledge on the stepped ridge -->
+            <polygon fill="#EAF2F8" opacity="0.9" points="
+                584,278 598,264 612,256 622,248 632,242 640,252 628,262
+                616,268 604,276 594,286"/>
+
+            <!-- snow tongues bleeding down the north face -->
+            <polygon fill="#DCE8F2" opacity="0.55" points="660,242 672,248 655,330 640,372 636,330"/>
+            <polygon fill="#DCE8F2" opacity="0.35" points="600,320 612,326 588,430 574,470 574,404"/>
+            <polygon fill="#DCE8F2" opacity="0.22" points="540,404 552,410 528,506 514,540 516,470"/>
+
+            <!-- snow tongues on the east face -->
+            <polygon fill="#FFFFFF" opacity="0.7"  points="752,264 764,258 770,330 760,410 748,352"/>
+            <polygon fill="#FFFFFF" opacity="0.5"  points="796,300 810,306 828,390 818,450 800,372"/>
+            <polygon fill="#FFFFFF" opacity="0.35" points="852,400 866,406 892,480 884,540 862,470"/>
+            <polygon fill="#FFFFFF" opacity="0.25" points="912,490 926,496 954,564 946,610 922,542"/>
+
+            <!-- rock strata: faint diagonal bedding lines across the faces -->
+            <polygon fill="#2F4459" opacity="0.35" points="748,240 828,320 824,334 746,254"/>
+            <polygon fill="#2F4459" opacity="0.3"  points="742,330 884,470 880,484 740,344"/>
+            <polygon fill="#2F4459" opacity="0.25" points="736,440 946,616 940,628 735,455"/>
+            <polygon fill="#2F4459" opacity="0.3"  points="620,300 660,340 656,352 616,312"/>
+            <polygon fill="#2F4459" opacity="0.22" points="560,392 606,438 602,450 556,404"/>
+
+            <!-- valley haze -->
+            <rect x="0" y="400" width="1440" height="240" fill="url(#haze)"/>
+
+            <!-- rolling foreground snowfields -->
+            <path fill="#EDF4FA" d="M0,640 L0,540 Q160,492 340,528 T700,522 T1060,530 T1440,516 L1440,640 Z"/>
+            <path fill="#FFFFFF" d="M0,640 L0,576 Q200,538 400,566 T780,560 T1140,568 T1440,552 L1440,640 Z"/>
+        </svg>
+    </div>
+
+    <div class="hero-snow" id="heroSnow"></div>
+
+    <div class="hero-content" id="heroContent">
+        <div class="swiss-flag" aria-hidden="true"></div>
+        <h1>AlpenSync OS</h1>
+        <p class="tagline">Alpine Expedition Gateway — live telemetry, SBB tariffs & group settlement in one flow</p>
+        <p class="sectors">Zermatt · Verbier · Grindelwald · St. Moritz · Chamonix</p>
+        <button class="hero-cta" onclick="enterDashboard()">Begin Expedition</button>
+    </div>
+
+    <div class="scroll-indicator" onclick="enterDashboard()" title="Scroll to dashboard">▾</div>
+</section>
+
+<!-- ================= WORKING DASHBOARD ================= -->
+<main id="dashboard">
+    <div class="container">
+        <header class="dash-header reveal">
+            <h1>AlpenSync OS // Expedition Dashboard</h1>
+            <div class="header-controls">
+                <div class="engine-status" id="engineStatus" title="AlpenSync engine link">
+                    <span class="status-dot" id="engineDot"></span>
+                    <span id="engineLabel">ENGINE: LINKING...</span>
+                </div>
+                <div id="seasonToggle" class="season-badge" onclick="toggleSeason()">SEASON: WINTER</div>
+            </div>
+        </header>
+
+        <div class="grid">
+            <div class="card reveal">
+                <h2>SBB Mobility & Weather Telemetry Matrix</h2>
+
+                <label for="originHub">Departure Hub</label>
+                <select id="originHub">
+                    <option value="geneva">Geneva Airport / Cornavin</option>
+                    <option value="zurich">Zürich HB</option>
+                    <option value="lausanne">Lausanne</option>
+                    <option value="basel">Basel SBB</option>
+                </select>
+
+                <label for="destinationSector">Alpine Target Sector</label>
+                <select id="destinationSector" onchange="fetchTelemetry()">
+                    <option value="zermatt">Zermatt (Valais)</option>
+                    <option value="verbier">Verbier (Valais)</option>
+                    <option value="grindelwald">Grindelwald (Bernese Oberland)</option>
+                    <option value="stmoritz">St. Moritz (Graubünden)</option>
+                    <option value="chamonix">Chamonix (Cross-Border)</option>
+                </select>
+
+                <label for="swissPass">SwissPass Profile Configuration</label>
+                <select id="swissPass">
+                    <option value="none">Standard Fare (No Subscription)</option>
+                    <option value="halbtax">Half-Fare Card (Halbtax)</option>
+                    <option value="generalabonnement">GA Travelcard (Generalabonnement)</option>
+                    <option value="swiss-travel-pass">Swiss Travel Pass</option>
+                </select>
+
+                <label for="groupSize">Expedition Size (Roster Count)</label>
+                <input type="number" id="groupSize" value="1" min="1">
+                <p class="hint">Groups of 10+ receive the SBB collective rate (−30%).</p>
+
+                <button id="tariffButton" onclick="calculateTariff()">Sync Transport Tariffs</button>
+
+                <h3>Telemetry Updates</h3>
+                <div id="weatherOutput" class="output-box" aria-live="polite">Select a sector to fetch live telemetry...</div>
+                <h3>SBB Pricing Engine Matrix</h3>
+                <div id="tariffOutput" class="output-box" aria-live="polite">Run calculations to pull transit options...</div>
+            </div>
+
+            <div class="card reveal">
+                <h2>Group Financial Settlement Ledger</h2>
+                <p class="hint">Add shared items (Lodging, Passes, Equipment) to split via TWINT framework routing strings. Entries persist in this browser.</p>
+
+                <label for="groupRoster">Current Group Roster (Comma-separated)</label>
+                <input type="text" id="groupRoster" value="Nikita, Anna, Marc, Sofia">
+
+                <div id="expenseContainer">
+                    <label>Group Logistics Costs</label>
+                </div>
+
+                <button style="background: #475569; margin-top: 10px;" onclick="addExpenseRow()">+ Add Line Item</button>
+                <button id="settleButton" style="margin-top: 5px;" onclick="settleGroupLedger()">Execute Ledger Settlement</button>
+
+                <h3>Dynamic Financial Settlement Breakdown</h3>
+                <div id="ledgerOutput" class="output-box" aria-live="polite">Awaiting execution run...</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const STORAGE_KEY = 'alpensync-state-v1';
+    const DEFAULT_EXPENSES = [
+        { description: 'Chalet Lodging', amount: '600', payer: 'Nikita' },
+        { description: 'Resort Mountain Passes', amount: '240', payer: 'Anna' }
+    ];
+
+    let currentSeason = 'WINTER';
+    let lastWeatherData = null;
+
+    const chf = (value) => Number(value).toFixed(2);
+
+    const setOutput = (id, text, isError = false) => {
+        const box = document.getElementById(id);
+        box.innerText = text;
+        box.classList.toggle('error', isError);
+    };
+
+    // --- Hero: Matterhorn landing scene ---
+
+    function enterDashboard() {
+        document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function initHero() {
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Snowfall — randomized flakes drifting down the scene
+        if (!reducedMotion) {
+            const snow = document.getElementById('heroSnow');
+            for (let i = 0; i < 36; i++) {
+                const flake = document.createElement('span');
+                flake.className = 'flake';
+                const size = (Math.random() * 3 + 1.5).toFixed(1);
+                flake.style.cssText =
+                    `left:${(Math.random() * 100).toFixed(1)}%;` +
+                    `width:${size}px;height:${size}px;` +
+                    `animation-duration:${(Math.random() * 10 + 9).toFixed(1)}s;` +
+                    `animation-delay:-${(Math.random() * 19).toFixed(1)}s;` +
+                    `opacity:${(Math.random() * 0.45 + 0.3).toFixed(2)}`;
+                snow.appendChild(flake);
+            }
+        }
+
+        // Optional video upgrade: drop `matterhorn.mp4` beside index.html
+        // and the hero swaps the illustrated scene for real footage.
+        const video = document.getElementById('heroVideo');
+        video.addEventListener('canplay', () => {
+            document.getElementById('hero').classList.add('video-mode');
         });
+        video.src = 'matterhorn.mp4'; // fails silently if the file is absent
 
-        // --- SCROLL DRIVEN ATMOSPHERIC MORPHING SYSTEM ---
-        window.addEventListener('scroll', () => {
-            const scrollPos = window.scrollY;
-            const threshold1 = 280;
-            const threshold2 = 720;
-
-            const layer1 = document.getElementById('bgLayer1');
-            const layer2 = document.getElementById('bgLayer2');
-            const layer3 = document.getElementById('bgLayer3');
-
-            if (scrollPos < threshold1) {
-                layer1.style.opacity = "1"; layer1.style.transform = `scale(${1.02 + scrollPos * 0.00005})`;
-                layer2.style.opacity = "0";
-                layer3.style.opacity = "0";
-            } else if (scrollPos >= threshold1 && scrollPos < threshold2) {
-                const ratio = (scrollPos - threshold1) / (threshold2 - threshold1);
-                layer1.style.opacity = (1 - ratio).toString();
-                layer2.style.opacity = ratio.toString(); layer2.style.transform = `scale(${1.02 + (scrollPos - threshold1) * 0.00005})`;
-                layer3.style.opacity = "0";
-            } else {
-                layer1.style.opacity = "0";
-                layer2.style.opacity = "0";
-                layer3.style.opacity = "1"; layer3.style.transform = `scale(${1.02 + (scrollPos - threshold2) * 0.00005})`;
-            }
-        });
-
-        // --- DYNAMIC PASSENGER MATRIX ROW FACTORY ---
-        function handleCrewSizeMatrixChange() {
-            const size = parseInt(document.getElementById('paramGroupSize').value) || 1;
-            const container = document.getElementById('crewPassMatrixContainer');
-            container.innerHTML = "";
-
-            for (let i = 1; i <= size; i++) {
-                container.innerHTML += `
-                    <div class="bg-white/5 border border-white/10 p-2.5 rounded-xl flex flex-col gap-1">
-                        <span class="text-[9px] font-mono font-bold uppercase text-white/40">Operative P-${i} Pass</span>
-                        <select class="crew-pass-selector bg-stone-900 border border-white/10 text-white text-[11px] rounded px-1 py-1 focus:outline-none cursor-pointer font-bold">
-                            <option value="FullFare" ${i === 3 ? 'selected' : ''}>Full Price</option>
-                            <option value="HalfFare" ${i === 2 ? 'selected' : ''}>Half-Fare (1/2)</option>
-                            <option value="GA" ${i === 1 ? 'selected' : ''}>GA Subscription</option>
-                        </select>
-                    </div>`;
-            }
+        // Parallax: layers glide at different speeds as you scroll down
+        if (!reducedMotion) {
+            const far = document.getElementById('mtnFar');
+            const mid = document.getElementById('mtnMid');
+            const main = document.getElementById('mtnMain');
+            const content = document.getElementById('heroContent');
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    const y = window.scrollY;
+                    far.style.transform = `translateY(${y * 0.06}px)`;
+                    mid.style.transform = `translateY(${y * 0.14}px)`;
+                    main.style.transform = `translateY(${y * 0.24}px)`;
+                    content.style.transform = `translateY(${y * 0.4}px)`;
+                    content.style.opacity = Math.max(0, 1 - y / 420);
+                    ticking = false;
+                });
+            }, { passive: true });
         }
 
-        function togglePrivacyModal() {
-            document.getElementById('privacyModal').classList.toggle('hidden');
-        }
-
-        function setSeason(mode) {
-            currentSeasonMode = mode;
-            const winterBtn = document.getElementById('seasonWinter');
-            const summerBtn = document.getElementById('seasonSummer');
-            const heroTitle = document.getElementById('heroSeasonTitle');
-
-            if(mode === 'winter') {
-                winterBtn.className = "px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md";
-                summerBtn.className = "px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white";
-                heroTitle.innerText = "Winter Heights";
-                document.getElementById('bgLayer1').style.backgroundImage = "url('https://images.unsplash.com/photo-1531315630201-bb15abeb1653?auto=format&fit=crop&w=1920&q=90')";
-            } else {
-                summerBtn.className = "px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all bg-white text-black shadow-md";
-                winterBtn.className = "px-4 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all text-white/50 hover:text-white";
-                heroTitle.innerText = "Summer Wilderness";
-                document.getElementById('bgLayer1').style.backgroundImage = "url('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1920&q=90')";
-            }
-            updateMountainSectors();
-            populateObjectives();
-        }
-
-        function updateMountainSectors() {
-            const destKey = document.getElementById('paramDestination').value;
-            const sectorSelect = document.getElementById('paramSector');
-            const sectors = destinationSectorRegistry[destKey] || [];
-            
-            sectorSelect.innerHTML = "";
-            sectors.forEach(s => {
-                const activeContext = currentSeasonMode === "winter" ? s.winter : s.summer;
-                const opt = document.createElement('option');
-                opt.value = s.name;
-                opt.innerText = `${s.name} (${activeContext})`;
-                sectorSelect.appendChild(opt);
-            });
-        }
-
-        function populateObjectives() {
-            const objectiveSelect = document.getElementById('paramObjective');
-            const arrayItems = seasonObjectivesRegistry[currentSeasonMode] || [];
-            objectiveSelect.innerHTML = "";
-            arrayItems.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item; opt.innerText = item;
-                objectiveSelect.appendChild(opt);
-            });
-            runEngineGearUpdate();
-        }
-
-        function runEngineGearUpdate() {
-            const obj = document.getElementById('paramObjective').value;
-            const text = technicalApparelRegistry[obj] || "Standard mountain utility gear mapping packages active.";
-            document.getElementById('gearDisplayBox').innerText = text;
-        }
-
-        function selectAccommodationChoice(id, name, totalVolumePrice, singleNightBasePrice) {
-            document.getElementById('selectedHotelTally').innerText = `Selected: CHF ${totalVolumePrice}`;
-            activeSelectedHotelObj = { id, name, totalVolumePrice, singleNightBasePrice };
-            if (!globalCalculatedCache) return;
-
-            recomputeLedgerSplitsWithTwint();
-        }
-
-        function renderAltitudeProfileLine(originName, originElev, destName, destElev, currentTemp) {
-            const svg = document.getElementById('altitudeSVG');
-            document.getElementById('profileOriginLabel').innerText = `${originName} (${originElev}m)`;
-            document.getElementById('profileDestLabel').innerText = `${destName} (${destElev}m)`;
-            document.getElementById('altitudeProfileHUD').innerText = `Delta Climb: +${destElev - originElev}m vertical`;
-
-            const startX = 60, startY = 130;
-            const endX = 740, endY = 30;
-            const midX1 = 280, midY1 = 110;
-            const midX2 = 520, midY2 = 50;
-
-            const profileLineGradientColor = currentTemp <= 0 ? "url(#iceGradient)" : "url(#standardGradient)";
-
-            svg.innerHTML = `
-                <defs>
-                    <linearGradient id="standardGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.1" />
-                        <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.8" />
-                    </linearGradient>
-                    <linearGradient id="iceGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:0.2" />
-                        <stop offset="100%" style="stop-color:#e0f2fe;stop-opacity:0.8" />
-                    </linearGradient>
-                </defs>
-                <line x1="60" y1="30" x2="740" y2="30" stroke="#1f2937" stroke-dasharray="4,4"/>
-                <line x1="60" y1="130" x2="740" y2="130" stroke="#1f2937" stroke-dasharray="4,4"/>
-                <path d="M ${startX} ${startY} C ${midX1} ${midY1}, ${midX2} ${midY2}, ${endX} ${endY}" fill="none" stroke="${profileLineGradientColor}" stroke-width="3" stroke-linecap="round" />
-                <circle cx="${startX}" cy="${startY}" r="4" fill="#ffffff" />
-                <circle cx="${endX}" cy="${endY}" r="6" fill="#ffffff" class="animate-ping" style="transform-origin: ${endX}px ${endY}px;" />
-                <circle cx="${endX}" cy="${endY}" r="4" fill="#ffffff" />
-            `;
-            document.getElementById('altitudeProfileSection').classList.remove('hidden');
-        }
-
-        // --- THE STRATEGY RAID LOBBY PRINTER ENGINE ---
-        function paintTacticalRaidLobby(crewSize, passesArray) {
-            const container = document.getElementById('lobbyRaidCardsGrid');
-            container.innerHTML = "";
-            let successModifier = 100;
-
-            for (let i = 0; i < crewSize; i++) {
-                const pass = passesArray[i] || 'FullFare';
-                let roleTitle = "Full-Fare Recruit";
-                let roleIcon = "fa-user-astronaut opacity-40";
-                let perkText = "Standard Consumer Footprint";
-
-                if (pass === "GA") {
-                    roleTitle = "The GA Titan"; roleIcon = "fa-shield-cat text-white"; perkText = "Infinite Range Core Active";
-                } else if (pass === "HalfFare") {
-                    roleTitle = "Half-Fare Vanguard"; roleIcon = "fa-user-ninja text-white"; perkText = "50% Tariff Shielding Block";
-                } else if (i === 0) {
-                    roleTitle = "Expedition Commander"; roleIcon = "fa-user-shield text-white"; perkText = "Mission Blueprint Lead";
+        // Fluid reveal of dashboard elements as they scroll into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
                 }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }
 
-                if (globalCalculatedCache && globalCalculatedCache.telemetry.wind > 22) successModifier -= 6;
+    // --- Season handling (drives which telemetry is featured) ---
 
-                container.innerHTML += `
-                    <div class="bg-white/5 border border-white/5 p-4 rounded-xl relative flex flex-col justify-between overflow-hidden">
-                        <div class="space-y-1">
-                            <div class="text-[9px] font-mono text-white/30 uppercase tracking-widest">Squad Slot Active</div>
-                            <div class="text-xs font-black text-white flex items-center gap-1.5">
-                                <i class="fa-solid ${roleIcon}"></i> ${i === 0 ? 'Commander (You)' : `Operative P-${i+1}`}
-                            </div>
-                            <p class="text-[10px] text-white/50">${roleTitle}</p>
-                        </div>
-                        <div class="mt-4 pt-2 border-t border-white/5 text-[9px] font-mono text-white/30 flex items-center justify-between">
-                            <span>${perkText}</span>
-                            <span class="text-emerald-400">Ready</span>
-                        </div>
-                    </div>`;
-            }
-            document.getElementById('lobbyReadinessScore').innerText = `${Math.max(successModifier, 40)}% Success Rate`;
-            document.getElementById('tacticalRaidLobby').classList.remove('hidden');
+    function toggleSeason() {
+        currentSeason = currentSeason === 'WINTER' ? 'SUMMER' : 'WINTER';
+        applySeasonBadge();
+        if (lastWeatherData) renderWeather(lastWeatherData);
+        saveState();
+    }
+
+    function applySeasonBadge() {
+        const badge = document.getElementById('seasonToggle');
+        badge.innerText = `SEASON: ${currentSeason}`;
+        badge.style.backgroundColor = currentSeason === 'WINTER' ? '#1A252C' : '#047857';
+    }
+
+    // --- Engine health probe ---
+
+    async function pingEngine() {
+        const dot = document.getElementById('engineDot');
+        const label = document.getElementById('engineLabel');
+        try {
+            const res = await fetch('/api/health');
+            const data = await res.json();
+            dot.className = 'status-dot online';
+            label.innerText = `ENGINE: ONLINE v${data.version}`;
+        } catch (e) {
+            dot.className = 'status-dot offline';
+            label.innerText = 'ENGINE: OFFLINE';
+        }
+    }
+
+    // --- Weather telemetry ---
+
+    function formatOutlookDay(day) {
+        const date = new Date(`${day.date}T12:00:00`);
+        const stamp = date.toLocaleDateString('en-CH', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        const temps = `${Math.round(day.tempMin)}° / ${Math.round(day.tempMax)}°`;
+        const precip = currentSeason === 'WINTER'
+            ? `snow ${chf(day.snowfallCm || 0)} cm`
+            : `rain ${chf(day.precipitationMm || 0)} mm`;
+        return `  ${stamp}  ${temps.padStart(11)}  ·  ${day.condition}  ·  ${precip}`;
+    }
+
+    function renderWeather(data) {
+        let report = `Sector: ${data.destination} (${data.region}) — ${data.stationElevation}m a.s.l.\n` +
+                     `Conditions: ${data.current.condition}\n` +
+                     `Current Temp: ${data.current.temperature}°C\n` +
+                     `Wind Speed: ${data.current.windspeed} km/h\n`;
+
+        if (currentSeason === 'WINTER' && data.snowfallNext12h != null) {
+            report += `Snowfall (next 12h): ${data.snowfallNext12h} cm\n`;
+        } else if (currentSeason === 'SUMMER' && data.precipitationNext12h != null) {
+            report += `Precipitation (next 12h): ${data.precipitationNext12h} mm\n`;
         }
 
-        function recomputeLedgerSplitsWithTwint() {
-            if (!globalCalculatedCache || !activeSelectedHotelObj) return;
-
-            const crewSize = parseInt(document.getElementById('paramGroupSize').value) || 1;
-            const nights = globalCalculatedCache.durationNights || 1;
-            
-            const sbbTotal = globalCalculatedCache.railTariffs.cost2nd;
-            const sbbEach = sbbTotal / crewSize;
-
-            let liftTotal = 0;
-            if (globalCalculatedCache.resortPass.statusText.includes("Tariff") || globalCalculatedCache.resortPass.statusText.includes("Fee")) {
-                liftTotal = parseFloat(globalCalculatedCache.resortPass.statusText.replace(/[^0-9.]/g, '')) || 0;
-            }
-            const liftEach = liftTotal / crewSize;
-
-            const hotelTotal = parseFloat(activeSelectedHotelObj.totalVolumePrice);
-            const hotelEach = parseFloat(activeSelectedHotelObj.singleNightBasePrice);
-
-            const grandTotal = sbbTotal + liftTotal + hotelTotal;
-            const grandEach = grandTotal / crewSize;
-
-            const retailMarkupUnoptimizedPrice = grandTotal * 1.18; 
-            const absoluteSavingsSum = retailMarkupUnoptimizedPrice - grandTotal;
-            document.getElementById('savingsTallyCounter').innerText = `CHF ${absoluteSavingsSum.toFixed(2)}`;
-            document.getElementById('synergySavingsBanner').classList.remove('hidden');
-
-            document.getElementById('tableCostSbbEach').innerText = `CHF ${sbbEach.toFixed(2)}`;
-            document.getElementById('tableCostSbbTotal').innerText = `CHF ${sbbTotal.toFixed(2)}`;
-            document.getElementById('tableCostLiftEach').innerText = `CHF ${liftEach.toFixed(2)}`;
-            document.getElementById('tableCostLiftTotal').innerText = `CHF ${liftTotal.toFixed(2)}`;
-            document.getElementById('tableCostHotelEach').innerText = `CHF ${hotelEach.toFixed(2)}`;
-            document.getElementById('tableCostHotelTotal').innerText = `CHF ${hotelTotal.toFixed(2)}`;
-            
-            document.getElementById('tableGrandEach').innerText = `CHF ${grandEach.toFixed(2)} / individual`;
-            document.getElementById('tableGrandTotal').innerText = `CHF ${grandTotal.toFixed(2)} Gross Total`;
-
-            const twintBase = document.getElementById('twintBaseInput').value || "https://www.twint.ch/pay/alpensync";
-            const btnContainer = document.getElementById('twintButtonsContainer');
-            btnContainer.innerHTML = "";
-
-            for (let i = 1; i <= crewSize; i++) {
-                const isOrganizer = i === 1;
-                const computedPaylink = generatePreFilledTwintLink(twintBase, grandEach, i);
-                const qrImageAPISourceUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(computedPaylink)}&color=0c0d0f&bgcolor=ffffff`;
-
-                const cardHtml = isOrganizer ? `
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col justify-center text-center opacity-30">
-                        <span class="font-black text-xs text-white">Crew Member ${i}</span>
-                        <span class="text-[9px] uppercase font-bold text-white/40 tracking-wider">Group Organizer</span>
-                    </div>
-                ` : `
-                    <div class="bg-black/20 border border-white/5 rounded-xl p-3 flex items-center justify-between shadow-sm relative twint-card-overlay cursor-pointer group hover:border-white transition-all duration-300">
-                        <div class="text-left min-w-0 flex-1">
-                            <div class="font-black text-white text-xs truncate">Crew Member ${i}</div>
-                            <div class="text-[10px] text-emerald-400 font-bold font-mono">Owes CHF ${grandEach.toFixed(2)}</div>
-                        </div>
-                        <span class="bg-white text-black font-black text-[9px] uppercase tracking-wider px-2 py-1.5 rounded-lg shrink-0 flex items-center gap-1 shadow-sm transition-all">
-                            <i class="fa-solid fa-qrcode"></i> Scan
-                        </span>
-                        <div class="qr-popup-holder opacity-0 visibility-hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-white p-3 rounded-2xl shadow-2xl z-50 pointer-events-none transform translate-y-2 transition-all duration-300 w-40 text-center flex flex-col items-center">
-                            <img src="${qrImageAPISourceUrl}" class="w-28 h-24 object-contain rounded border mb-1.5" alt="TWINT QR Code">
-                            <span class="text-[8px] font-black text-stone-900 uppercase tracking-widest block"><i class="fa-solid fa-mobile-screen mr-0.5"></i> Scan to TWINT</span>
-                            <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white"></div>
-                        </div>
-                    </div>
-                `;
-                btnContainer.innerHTML += cardHtml;
-            }
-            
-            paintTacticalRaidLobby(crewSize, globalCalculatedCache.passengerPasses);
+        if (data.outlook && data.outlook.length) {
+            report += `\n3-DAY OUTLOOK [${currentSeason} MODE]:\n`;
+            report += data.outlook.map(formatOutlookDay).join('\n') + '\n';
         }
 
-        function shareToWhatsAppClipboard() {
-            if (!globalCalculatedCache || !activeSelectedHotelObj) return;
+        const freshness = data.cacheAgeSeconds > 0 ? `cached ${data.cacheAgeSeconds}s ago` : 'live';
+        report += `\nSystem Protocol: ${data.elevation_telemetry} · ${freshness}`;
+        setOutput('weatherOutput', report);
+    }
 
-            const from = document.getElementById('paramOrigin').value;
-            const to = document.getElementById('paramDestination').value;
-            const nights = globalCalculatedCache.durationNights;
-            const crew = document.getElementById('paramGroupSize').value;
-            const perPerson = document.getElementById('tableGrandEach').innerText;
-            const grossTotal = document.getElementById('tableGrandTotal').innerText;
-            const twintBase = document.getElementById('twintBaseInput').value;
+    async function fetchTelemetry() {
+        const dest = document.getElementById('destinationSector').value;
+        setOutput('weatherOutput', 'Connecting to Open-Meteo telemetry stream...');
 
-            const cleanNumericAmount = parseFloat(perPerson.replace(/[^0-9.]/g, '')) || 0;
-
-            const chatTemplateString = `🇨🇭 *ALPENYSNC EXPEDITION COALITION* 🇨🇭\n\n• *Path:* ${from} ➔ ${to}\n• *Duration:* ${nights} Night(s)\n• *Crew Size:* ${crew} Mountain Crew Members\n• *Locked Alpine Cabin:* ${activeSelectedHotelObj.name}\n\n📊 *FINANCIAL SPLIT MATRIX*:\n• *Cost Per Person:* ${perPerson}\n• *Gross Group Total:* ${grossTotal}\n\n📲 *SETTLE INSTANTLY VIA TWINT*:\nSettle your share with the group organizer pre-filled here:\n${twintBase}?amount=${cleanNumericAmount.toFixed(2)}\n\n_Generated securely via AlpenSync Port under FADP transient data compliance boundaries._`;
-
-            navigator.clipboard.writeText(chatTemplateString);
-            document.getElementById('logConsole').innerHTML = `<span class="text-emerald-600 font-bold">✓ Group chalet layout copied! Paste directly into your crew group chat.</span>`;
+        try {
+            const res = await fetch(`/api/weather?destination=${encodeURIComponent(dest)}`);
+            const data = await res.json();
+            if (data.error) {
+                setOutput('weatherOutput', `Error: ${data.error}`, true);
+                return;
+            }
+            lastWeatherData = data;
+            renderWeather(data);
+        } catch (e) {
+            setOutput('weatherOutput', 'Error pulling real-time meteorological stream.', true);
         }
+    }
 
-        function triggerPrintInvoiceWindow() { window.print(); }
+    // --- SBB tariff engine ---
 
-        async function executeClusterCalculation() {
-            const consentCheck = document.getElementById('privacyConsent');
-            const consoleBox = document.getElementById('logConsole');
+    async function calculateTariff() {
+        const groupSize = Math.max(1, parseInt(document.getElementById('groupSize').value, 10) || 1);
+        const payload = {
+            origin: document.getElementById('originHub').value,
+            destination: document.getElementById('destinationSector').value,
+            passType: document.getElementById('swissPass').value,
+            groupSize: groupSize
+        };
 
-            if (!consentCheck.checked) {
-                consoleBox.innerHTML = `<span class="text-red-600 font-bold">🚨 FADP Compliance Error: You must accept the terms before querying mountain networks.</span>`;
+        const button = document.getElementById('tariffButton');
+        button.disabled = true;
+
+        try {
+            const res = await fetch('/api/tariff/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.error) {
+                setOutput('tariffOutput', `Error: ${data.error}`, true);
                 return;
             }
 
-            const btn = document.getElementById('engineBtn');
-            const destKey = document.getElementById('paramDestination').value;
-            
-            btn.setAttribute('disabled', 'true');
-            btn.innerHTML = "<i class='fa-solid fa-spinner animate-spin'></i> Syncing...";
+            const b = data.breakdown;
+            const p = data.pricing;
+            let receipt = `Route: ${data.route}\n` +
+                          `-----------------------------------\n` +
+                          `Rail Leg:                CHF ${chf(b.railLeg).padStart(8)}\n` +
+                          `Alpine Sector Supplement: CHF ${chf(b.alpineSupplement).padStart(7)}\n` +
+                          `Standard Fare:           CHF ${chf(b.standardTicket).padStart(8)}\n` +
+                          `Pass Profile: ${b.passLabel} (−${b.passDiscountPct}%)\n`;
+            receipt += b.groupDiscountApplied
+                ? `Group Rate (10+): APPLIED (−30%)\n`
+                : `Group Rate (10+): not applicable at ${p.groupSize} pax\n`;
+            receipt += `-----------------------------------\n` +
+                       `Final Rate per Passenger: CHF ${chf(p.finalPricePerPerson)}\n` +
+                       `Savings per Passenger:    CHF ${chf(p.savingsPerPerson)}\n` +
+                       `===================================\n` +
+                       `TOTAL GROUP COST (${p.groupSize} pax): CHF ${chf(p.totalGroupCost)}`;
+            setOutput('tariffOutput', receipt);
+        } catch (e) {
+            setOutput('tariffOutput', 'Error running SBB calculation algorithm.', true);
+        } finally {
+            button.disabled = false;
+        }
+    }
 
-            // HARVEST ALL GRANULAR CREW CHIP DROPDOWN OPTIONS SECURELY
-            const selectNodesList = document.querySelectorAll('.crew-pass-selector');
-            const passProfileArray = [];
-            selectNodesList.forEach(select => passProfileArray.push(select.value));
+    // --- Expense ledger ---
 
-            const payload = {
-                originKey: document.getElementById('paramOrigin').value,
-                destKey: destKey,
-                dateVal: document.getElementById('paramDate').value,
-                timeVal: document.getElementById('paramTime').value,
-                passengerPasses: passProfileArray, // Send clean array array list to backend routers
-                passSystem: document.getElementById('paramPasses').value,
-                targetSectorName: document.getElementById('paramSector').value,
-                travelers: parseInt(document.getElementById('paramGroupSize').value) || 1,
-                daysCount: parseInt(document.getElementById('paramDays').value) || 1,
-                currentSeasonMode: currentSeasonMode
-            };
+    function addExpenseRow(item = {}) {
+        const container = document.getElementById('expenseContainer');
+        const div = document.createElement('div');
+        div.className = 'expense-item';
 
-            try {
-                const response = await fetch('/api/compute-expedition', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await response.json();
-                globalCalculatedCache = data;
+        const desc = document.createElement('input');
+        desc.type = 'text'; desc.placeholder = 'Item'; desc.className = 'exp-desc';
+        desc.value = item.description || '';
 
-                if(data.success) {
-                    consoleBox.innerHTML = `> Core metrics synchronised under Swiss Data Safety Guards. SBB Route Secure: ${data.liveRouteConfirmed}`;
-                    
-                    if (data.geoCoordinates && data.geoCoordinates.origin && data.geoCoordinates.dest) {
-                        const baseOriginElev = data.geoCoordinates.origin.elev || 400;
-                        const baseTargetElev = data.geoCoordinates.dest.elev || 2000;
-                        renderAltitudeProfileLine(payload.originKey, baseOriginElev, payload.targetSectorName, baseTargetElev, data.telemetry.temp);
-                    }
+        const amount = document.createElement('input');
+        amount.type = 'number'; amount.placeholder = 'Amount (CHF)'; amount.className = 'exp-amount';
+        amount.min = '0'; amount.step = '0.05';
+        amount.value = item.amount || '';
 
-                    if (mapInstance && data.geoCoordinates) {
-                        if (activeRoutingEngineInstance) {
-                            mapInstance.removeControl(activeRoutingEngineInstance);
-                        }
-                        mapInstance.eachLayer((layer) => {
-                            if (layer instanceof L.Marker) mapInstance.removeLayer(layer);
-                        });
+        const payer = document.createElement('input');
+        payer.type = 'text'; payer.placeholder = 'Payer Name'; payer.className = 'exp-payer';
+        payer.value = item.payer || '';
 
-                        const startPoint = [data.geoCoordinates.origin.lat, data.geoCoordinates.origin.lon];
-                        const stopPoint = [data.geoCoordinates.dest.lat, data.geoCoordinates.dest.lon];
+        const remove = document.createElement('button');
+        remove.type = 'button'; remove.className = 'remove-row';
+        remove.innerText = '×'; remove.title = 'Remove line item';
+        remove.onclick = () => { div.remove(); saveState(); };
 
-                        L.marker(startPoint).addTo(mapInstance).bindPopup(`<b>Start Hub:</b> ${payload.originKey}`).openPopup();
-                        L.marker(stopPoint).addTo(mapInstance).bindPopup(`<b>${payload.targetSectorName}</b>`);
+        div.append(desc, amount, payer, remove);
+        container.appendChild(div);
+    }
 
-                        document.getElementById('mapWrapperFrame').classList.remove('hidden');
+    function collectExpenses() {
+        return [...document.querySelectorAll('.expense-item')].map(row => ({
+            description: row.querySelector('.exp-desc').value.trim(),
+            amount: row.querySelector('.exp-amount').value,
+            payer: row.querySelector('.exp-payer').value.trim()
+        }));
+    }
 
-                        setTimeout(() => {
-                            mapInstance.invalidateSize();
-                            
-                            activeRoutingEngineInstance = L.Routing.control({
-                                waypoints: [L.latLng(startPoint[0], startPoint[1]), L.latLng(stopPoint[0], stopPoint[1])],
-                                router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
-                                lineOptions: { styles: [{ color: '#ffffff', opacity: 0.7, weight: 4 }] },
-                                addWaypoints: false,
-                                draggableWaypoints: false,
-                                fitSelectedRoutes: true,
-                                show: false
-                            }).addTo(mapInstance);
-                        }, 100);
-                    }
+    async function settleGroupLedger() {
+        const members = document.getElementById('groupRoster').value
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
 
-                    const activitySection = document.getElementById('activityRadarSection');
-                    const activityGrid = document.getElementById('activityDisplayGrid');
-                    const resortData = resortActivityRegistry[destKey] || { winter: [], summer: [] };
-                    const activeActivitiesList = currentSeasonMode === "winter" ? resortData.winter : resortData.summer;
-                    
-                    activityGrid.innerHTML = "";
-                    activeActivitiesList.forEach((act, idx) => {
-                        activityGrid.innerHTML += `
-                            <div class="bg-white/5 border border-white/5 p-3.5 rounded-xl flex gap-2.5 items-start">
-                                <span class="bg-white text-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0 mt-0.5">${idx+1}</span>
-                                <span class="font-sans text-stone-200 leading-normal font-medium">${act}</span>
-                            </div>`;
-                    });
-                    activitySection.classList.remove('hidden');
+        if (members.length === 0) {
+            setOutput('ledgerOutput', 'Error: Group roster is empty. Add at least one member.', true);
+            return;
+        }
 
-                    const hudTemp = document.getElementById('hudTemp');
-                    const hudWind = document.getElementById('hudWind');
-                    const matchRate = document.getElementById('matchRate');
-                    const meteoContainer = document.getElementById('meteoVillageContainer');
+        const expenses = collectExpenses()
+            .filter(e => e.amount !== '')
+            .map(e => ({ ...e, amount: parseFloat(e.amount) }));
 
-                    hudTemp.innerText = `${data.telemetry.temp} °C`;
-                    hudWind.innerText = `${data.telemetry.wind} km/h`;
+        const button = document.getElementById('settleButton');
+        button.disabled = true;
 
-                    meteoContainer.className = "text-xs p-5 rounded-2xl border font-mono transition-all duration-500 shadow-sm";
-
-                    if (data.telemetry.score === 2) {
-                        matchRate.innerText = "🚨 RISK DETECTED";
-                        matchRate.className = "text-red-500 font-black animate-pulse";
-                        meteoContainer.className = "text-xs p-5 rounded-2xl border border-red-500/20 bg-red-950/20 text-red-200 shadow-xl animate-pulse";
-                        document.getElementById('bgLayer1').style.filter = "hue-rotate(130deg) saturate(140%) brightness(30%)";
-                    } else {
-                        matchRate.innerText = "🟢 Safe Window";
-                        matchRate.className = "text-emerald-400 font-bold";
-                        meteoContainer.className = "text-xs p-5 rounded-2xl border border-white/5 bg-white/5 text-stone-300";
-                        document.getElementById('bgLayer1').style.filter = "none";
-                    }
-
-                    meteoContainer.innerHTML = `
-                        <div class="flex gap-4 items-start">
-                            <div class="text-white/40 text-3xl pt-1"><i class="fa-solid fa-cloud-sun"></i></div>
-                            <div class="space-y-1 flex-1">
-                                <div class="font-black uppercase tracking-wider text-[11px] text-white">Telemetry Forecast Hub</div>
-                                <p class="text-[11px] font-sans leading-relaxed text-white/60">
-                                    Current reading maps out ${data.telemetry.temp}°C ambient temp with localized wind velocities settling near ${data.telemetry.wind} km/h.
-                                </p>
-                            </div>
-                        </div>`;
-
-                    let lodgHtml = "";
-                    data.lodging.forEach((l, index) => {
-                        const checkedAttr = index === 0 ? "checked" : "";
-                        lodgHtml += `
-                            <label class='flex gap-3 items-center bg-white/5 p-3 rounded-xl border border-white/5 shadow-sm cursor-pointer hover:border-white transition-all block relative'>
-                                <input type="radio" name="accommodationOption" value="${l.id}" ${checkedAttr} 
-                                    onclick="selectAccommodationChoice('${l.id}', '${l.name}', '${l.price}', '${l.baseIndividualPrice}')"
-                                    class="accent-white h-4 w-4 shrink-0 focus:ring-0">
-                                <img src='${l.img}' class='w-12 h-12 object-cover rounded-lg border border-white/10 ml-1'>
-                                <div class='flex-1 min-w-0'>
-                                    <div class='font-bold text-white text-xs truncate'>${l.name}</div>
-                                    <div class='text-[10px] text-white/40 truncate'>${l.feature}</div>
-                                </div>
-                                <div class='font-mono font-black text-white text-xs shrink-0 pl-1'>CHF ${l.price}</div>
-                            </label>`;
-                    });
-                    document.getElementById('accommodationContainer').innerHTML = lodgHtml;
-
-                    if (data.lodging.length > 0) {
-                        selectAccommodationChoice(data.lodging[0].id, data.lodging[0].name, data.lodging[0].price, data.lodging[0].baseIndividualPrice);
-                    }
-
-                    let sbbLegsHtml = "";
-                    if (data.railTariffs.legs) {
-                        data.railTariffs.legs.forEach(leg => {
-                            if(leg.type === 'walk') {
-                                sbbLegsHtml += `<div class='bg-white/5 text-white/40 p-2 text-center text-[10px] rounded-lg font-mono'><i class="fa-solid fa-person-walking mr-1"></i> ${leg.walkLabel} (${leg.duration})</div>`;
-                            } else {
-                                sbbLegsHtml += `
-                                    <div class='bg-white/5 p-4 border border-white/5 rounded-xl shadow-sm space-y-2 text-left relative overflow-hidden'>
-                                        <div class="absolute top-0 left-0 w-1 h-full bg-white/40"></div>
-                                        <div class='flex justify-between font-black text-white text-xs tracking-tight'>
-                                            <span>${leg.dep} — ${leg.station}</span>
-                                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-mono text-white/60">Track ${leg.platform}</span>
-                                        </div>
-                                        <div class='text-[11px] font-mono text-white/60 flex items-center gap-2'>
-                                            <span class="bg-white text-black font-black px-1.5 py-0.5 rounded text-[9px] uppercase">${leg.type}</span>
-                                            <span class="font-bold text-white">${leg.num}</span> 
-                                            <span class="text-white/40 font-medium">→ ${leg.info}</span>
-                                        </div>
-                                        <div class='font-bold text-white/40 text-xs pt-1 border-t border-dashed border-white/5'>${leg.arr} — ${leg.dest}</div>
-                                    </div>`;
-                            }
-                        });
-                    }
-
-                    document.getElementById('itineraryContainer').innerHTML = `
-                        <div class='space-y-4 font-sans text-xs'>
-                            <div class='grid grid-cols-2 gap-3 text-left bg-white/5 p-4 rounded-xl text-white border border-white/5'>
-                                <div><span class='text-white/40 text-[9px] uppercase font-black tracking-wider block mb-0.5'>2nd Class Cost</span><b class='text-base text-white font-mono font-black'>CHF ${data.railTariffs.cost2nd.toFixed(2)}</b></div>
-                                <div><span class='text-white/30 text-[9px] uppercase font-black tracking-wider block mb-0.5'>1st Class Option</span><b class='text-base text-white/60 font-mono font-black'>CHF ${data.railTariffs.cost1st.toFixed(2)}</b></div>
-                            </div>
-                            
-                            <a href="${data.sbbBookingUrl}" target="_blank" class="w-full bg-white text-black hover:bg-stone-200 font-black py-3 rounded-xl uppercase tracking-wider text-center block transition-all shadow-md">
-                                <i class="fa-solid fa-ticket mr-2"></i> Book Live Fares on SBB.ch
-                            </a>
-
-                            <div class='text-left text-[11px] font-medium p-3 bg-white/5 border border-white/5 rounded-xl flex items-center justify-between shadow-sm'>
-                                <span><i class="fa-solid fa-ticket text-white/40 mr-2"></i><b class="text-white/60">Resort Lift Passes:</b></span>
-                                <span class="font-mono font-black text-white bg-white/10 px-2 py-1 rounded text-[10px]">${data.resortPass.statusText}</span>
-                            </div>
-                            <div class='space-y-2'>${sbbLegsHtml || 'Point-to-point routing loaded.'}</div>
-                        </div>`;
-                }
-            } catch (err) {
-                document.getElementById('logConsole').innerHTML = `<span class='text-red-600'>✕ UI Render Error.</span>`;
+        try {
+            const res = await fetch('/api/ledger/settle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ expenses, groupMembers: members })
+            });
+            const data = await res.json();
+            if (data.error) {
+                setOutput('ledgerOutput', `Error: ${data.error}`, true);
+                return;
             }
 
-            btn.removeAttribute('disabled');
-            btn.innerHTML = "Compute Search";
+            const nameWidth = Math.max(...members.map(m => m.length), 6);
+            let outString = `Total Expedition Balance: CHF ${chf(data.totalSpent)}\n` +
+                            `Even Distribution Share:  CHF ${chf(data.perPersonShare)}\n` +
+                            `===================================\n` +
+                            `MEMBER NET POSITIONS:\n`;
+            data.memberBalances.forEach(m => {
+                const sign = m.net > 0 ? '+' : '';
+                outString += `  ${m.name.padEnd(nameWidth)}  paid ${chf(m.paid).padStart(9)}  →  ${sign}${chf(m.net)}\n`;
+            });
+            outString += `===================================\n` +
+                         `REQUIRED PEER SETTLEMENTS (${data.settlements.length} transaction${data.settlements.length === 1 ? '' : 's'}):\n\n`;
+
+            if (data.settlements.length === 0) {
+                outString += 'All balances are equalized. No transactions required.';
+            } else {
+                data.settlements.forEach(s => {
+                    outString += `➔ ${s.from} owes ${s.to}: CHF ${chf(s.amount)}\n` +
+                                 `  [TWINT Link Matrix: ${s.twintMockString}]\n\n`;
+                });
+            }
+            setOutput('ledgerOutput', outString);
+            saveState();
+        } catch (e) {
+            setOutput('ledgerOutput', 'Error analyzing financial ledger distributions.', true);
+        } finally {
+            button.disabled = false;
         }
-    </script>
+    }
+
+    // --- Local persistence (roster, expenses, selections survive reloads) ---
+
+    function saveState() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                season: currentSeason,
+                origin: document.getElementById('originHub').value,
+                destination: document.getElementById('destinationSector').value,
+                passType: document.getElementById('swissPass').value,
+                groupSize: document.getElementById('groupSize').value,
+                roster: document.getElementById('groupRoster').value,
+                expenses: collectExpenses()
+            }));
+        } catch (e) { /* storage unavailable (private mode) — run stateless */ }
+    }
+
+    function loadState() {
+        let state = null;
+        try {
+            state = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        } catch (e) { /* corrupted or unavailable — fall through to defaults */ }
+
+        if (state) {
+            currentSeason = state.season === 'SUMMER' ? 'SUMMER' : 'WINTER';
+            if (state.origin) document.getElementById('originHub').value = state.origin;
+            if (state.destination) document.getElementById('destinationSector').value = state.destination;
+            if (state.passType) document.getElementById('swissPass').value = state.passType;
+            if (state.groupSize) document.getElementById('groupSize').value = state.groupSize;
+            if (state.roster != null) document.getElementById('groupRoster').value = state.roster;
+        }
+
+        const expenses = (state?.expenses?.length) ? state.expenses : DEFAULT_EXPENSES;
+        expenses.forEach(addExpenseRow);
+        applySeasonBadge();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        initHero();
+        loadState();
+        pingEngine();
+        fetchTelemetry();
+    });
+    document.addEventListener('change', saveState);
+</script>
 </body>
 </html>
