@@ -528,6 +528,24 @@
             .reveal { opacity: 1; transform: none; transition: none; }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        #map { height: 360px; width: 100%; border-radius: 16px; z-index: 0; background: #DCE8F2; }
+        .leaflet-container { font: inherit; }
+        .picker-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; align-items: start; }
+        @media (max-width: 820px) { .picker-grid { grid-template-columns: 1fr; } }
+        .resort-search { width: 100%; margin-bottom: 12px; }
+        .resort-list { max-height: 360px; overflow-y: auto; padding-right: 4px; }
+        .region-group { margin-bottom: 8px; }
+        .region-head { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); margin: 8px 4px 6px; }
+        .resort-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; cursor: pointer; background: rgba(255,255,255,0.75); transition: border-color .2s ease, background .2s ease; }
+        .resort-row:hover { border-color: var(--ink-3); }
+        .resort-row.selected { border-color: var(--swiss-red); background: #FFF3F3; }
+        .resort-row .rr-name { font-weight: 700; font-size: 13.5px; }
+        .resort-row .rr-meta { font-size: 11.5px; color: var(--ink-3); }
+        .resort-row .rr-elev { font-family: var(--font-display); font-weight: 700; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 
@@ -643,8 +661,19 @@
     <div class="container">
 
         <h2 class="section-title reveal">Choose your sector</h2>
-        <p class="section-sub reveal">Five alpine destinations, live-linked to Open-Meteo telemetry.</p>
-        <div class="resort-grid reveal" id="resortGrid"></div>
+        <p class="section-sub reveal">Search the list or tap a pin — every resort is live-linked to Open-Meteo telemetry.</p>
+        <section class="panel reveal">
+            <div class="picker-grid">
+                <div>
+                    <input type="text" id="resortSearch" class="resort-search" placeholder="Search resort or region…" oninput="renderPicker()" aria-label="Search resorts">
+                    <div class="resort-list" id="resortList"></div>
+                </div>
+                <div>
+                    <div id="map" aria-label="Map of Swiss alpine resorts"></div>
+                    <p class="hint" style="margin-top:8px;">Red dashed line traces the rail route from your selected departure hub.</p>
+                </div>
+            </div>
+        </section>
 
         <h2 class="section-title reveal">Mountain telemetry</h2>
         <p class="section-sub reveal">Current conditions, 12-hour accumulation and the 3-day window.</p>
@@ -658,12 +687,7 @@
             <div class="planner-grid">
                 <div>
                     <label for="originHub">Departure hub</label>
-                    <select id="originHub">
-                        <option value="geneva">Geneva Airport / Cornavin</option>
-                        <option value="zurich">Zürich HB</option>
-                        <option value="lausanne">Lausanne</option>
-                        <option value="basel">Basel SBB</option>
-                    </select>
+                    <select id="originHub" onchange="onOriginChange()"></select>
 
                     <label for="swissPass">SwissPass profile</label>
                     <select id="swissPass">
@@ -731,17 +755,117 @@
     ];
 
     const RESORTS = [
-        { id: 'zermatt', name: 'Zermatt', region: 'Valais', elev: 1620,
-          art: '<polygon points="8,44 30,16 36,7 39,4 42,10 45,15 60,44" fill="#6E8AA5"/><polygon class="snowpatch" points="33,11 36,7 39,4 42,10 40,16 35,17" fill="#FFFFFF"/>' },
-        { id: 'verbier', name: 'Verbier', region: 'Valais', elev: 1500,
-          art: '<polygon points="4,44 20,14 30,26 42,10 58,44" fill="#6E8AA5"/><polygon class="snowpatch" points="17,19 20,14 24,20 21,25" fill="#FFFFFF"/><polygon class="snowpatch" points="39,15 42,10 46,17 42,21" fill="#FFFFFF"/>' },
-        { id: 'grindelwald', name: 'Grindelwald', region: 'Bernese Oberland', elev: 1034,
-          art: '<polygon points="6,44 24,8 34,20 40,14 62,44" fill="#6E8AA5"/><polygon class="snowpatch" points="21,14 24,8 28,15 24,19" fill="#FFFFFF"/>' },
-        { id: 'stmoritz', name: 'St. Moritz', region: 'Graubünden', elev: 1822,
-          art: '<polygon points="4,44 18,18 28,28 40,12 50,24 62,44" fill="#6E8AA5"/><polygon class="snowpatch" points="37,17 40,12 44,19 40,23" fill="#FFFFFF"/><polygon class="snowpatch" points="15,23 18,18 22,24 18,28" fill="#FFFFFF"/>' },
-        { id: 'chamonix', name: 'Chamonix', region: 'Cross-Border', elev: 1035,
-          art: '<polygon points="10,44 28,20 34,4 38,20 56,44" fill="#6E8AA5"/><polygon class="snowpatch" points="31,12 34,4 37,13 34,18" fill="#FFFFFF"/>' }
+        // Vaud Alps
+        { id: 'villars', name: 'Villars-sur-Ollon', region: 'Vaud Alps', elev: 1300, lat: 46.2977, lon: 7.0553, baseTariff: 34,
+          facts: { topLift: 2120, pistesKm: 100, signature: 'Villars–Gryon–Diablerets domain' } },
+        { id: 'gryon', name: 'Gryon', region: 'Vaud Alps', elev: 1130, lat: 46.2711, lon: 7.0700, baseTariff: 34,
+          facts: { topLift: 2120, pistesKm: 100, signature: 'Linked to Villars · family slopes' } },
+        { id: 'diablerets', name: 'Les Diablerets', region: 'Vaud Alps', elev: 1160, lat: 46.3486, lon: 7.1636, baseTariff: 35,
+          facts: { topLift: 2971, pistesKm: 125, signature: 'Glacier 3000' } },
+        { id: 'leysin', name: 'Leysin', region: 'Vaud Alps', elev: 1263, lat: 46.3417, lon: 7.0119, baseTariff: 34,
+          facts: { topLift: 2205, pistesKm: 100, signature: 'Berneuse revolving restaurant' } },
+        { id: 'chateaudoex', name: "Château-d'Œx", region: 'Vaud Alps', elev: 1000, lat: 46.4736, lon: 7.1350, baseTariff: 33,
+          facts: { topLift: 1630, pistesKm: 20, signature: "Pays-d'Enhaut · hot-air balloons" } },
+        // Valais
+        { id: 'zermatt', name: 'Zermatt', region: 'Valais', elev: 1620, lat: 46.0207, lon: 7.7491, baseTariff: 45,
+          facts: { topLift: 3883, pistesKm: 360, signature: 'Matterhorn Glacier Paradise' } },
+        { id: 'verbier', name: 'Verbier', region: 'Valais', elev: 1500, lat: 46.0961, lon: 7.2286, baseTariff: 42,
+          facts: { topLift: 3330, pistesKm: 410, signature: 'Mont Fort · 4 Vallées' } },
+        { id: 'saasfee', name: 'Saas-Fee', region: 'Valais', elev: 1800, lat: 46.1089, lon: 7.9290, baseTariff: 46,
+          facts: { topLift: 3600, pistesKm: 100, signature: 'Feegletscher glacier village' } },
+        { id: 'cransmontana', name: 'Crans-Montana', region: 'Valais', elev: 1500, lat: 46.3080, lon: 7.4794, baseTariff: 40,
+          facts: { topLift: 3000, pistesKm: 140, signature: 'Plaine Morte glacier' } },
+        { id: 'nendaz', name: 'Nendaz', region: 'Valais', elev: 1365, lat: 46.1836, lon: 7.3060, baseTariff: 40,
+          facts: { topLift: 3330, pistesKm: 410, signature: '4 Vallées gateway' } },
+        { id: 'grimentz', name: 'Grimentz', region: 'Valais', elev: 1570, lat: 46.1783, lon: 7.5744, baseTariff: 43,
+          facts: { topLift: 2900, pistesKm: 120, signature: "Val d'Anniviers" } },
+        { id: 'leukerbad', name: 'Leukerbad', region: 'Valais', elev: 1411, lat: 46.3806, lon: 7.6300, baseTariff: 42,
+          facts: { topLift: 2700, pistesKm: 50, signature: 'Thermal spa resort' } },
+        // Bernese Oberland
+        { id: 'grindelwald', name: 'Grindelwald', region: 'Bernese Oberland', elev: 1034, lat: 46.6242, lon: 8.0414, baseTariff: 48,
+          facts: { topLift: 2486, pistesKm: 211, signature: 'Eiger North Face views' } },
+        { id: 'wengen', name: 'Wengen', region: 'Bernese Oberland', elev: 1274, lat: 46.6055, lon: 7.9220, baseTariff: 48,
+          facts: { topLift: 2320, pistesKm: 210, signature: 'Car-free · Lauberhorn' } },
+        { id: 'murren', name: 'Mürren', region: 'Bernese Oberland', elev: 1638, lat: 46.5586, lon: 7.8926, baseTariff: 49,
+          facts: { topLift: 2970, pistesKm: 54, signature: 'Schilthorn · Piz Gloria' } },
+        { id: 'adelboden', name: 'Adelboden', region: 'Bernese Oberland', elev: 1350, lat: 46.4939, lon: 7.5606, baseTariff: 44,
+          facts: { topLift: 2360, pistesKm: 210, signature: 'Chuenisbärgli World Cup' } },
+        { id: 'gstaad', name: 'Gstaad', region: 'Bernese Oberland', elev: 1050, lat: 46.4728, lon: 7.2861, baseTariff: 42,
+          facts: { topLift: 3000, pistesKm: 200, signature: 'Glacier 3000 · alpine chic' } },
+        // Central Switzerland
+        { id: 'engelberg', name: 'Engelberg', region: 'Central', elev: 1000, lat: 46.8210, lon: 8.4010, baseTariff: 44,
+          facts: { topLift: 3028, pistesKm: 82, signature: 'Titlis glacier' } },
+        { id: 'andermatt', name: 'Andermatt', region: 'Central', elev: 1444, lat: 46.6360, lon: 8.5940, baseTariff: 45,
+          facts: { topLift: 2963, pistesKm: 180, signature: 'Gemsstock · SkiArena' } },
+        // Graubünden
+        { id: 'stmoritz', name: 'St. Moritz', region: 'Graubünden', elev: 1822, lat: 46.4908, lon: 9.8355, baseTariff: 52,
+          facts: { topLift: 3303, pistesKm: 350, signature: 'Corvatsch · Engadin valley' } },
+        { id: 'davos', name: 'Davos', region: 'Graubünden', elev: 1560, lat: 46.8027, lon: 9.8360, baseTariff: 50,
+          facts: { topLift: 2844, pistesKm: 300, signature: 'Parsenn · Jakobshorn' } },
+        { id: 'arosa', name: 'Arosa', region: 'Graubünden', elev: 1775, lat: 46.7810, lon: 9.6790, baseTariff: 50,
+          facts: { topLift: 2653, pistesKm: 225, signature: 'Arosa–Lenzerheide link' } },
+        { id: 'laax', name: 'Laax / Flims', region: 'Graubünden', elev: 1100, lat: 46.8025, lon: 9.2580, baseTariff: 49,
+          facts: { topLift: 3018, pistesKm: 235, signature: 'Vorab glacier · freestyle' } },
+        // Cross-Border
+        { id: 'chamonix', name: 'Chamonix', region: 'Cross-Border', elev: 1035, lat: 45.9227, lon: 6.8685, baseTariff: 55,
+          facts: { topLift: 3842, pistesKm: 155, signature: 'Aiguille du Midi · Mont Blanc' } }
     ];
+    const REGION_ORDER = ['Vaud Alps', 'Valais', 'Bernese Oberland', 'Central', 'Graubünden', 'Cross-Border'];
+
+    // --- Client-side registries (everything runs in the browser — no server) ---
+    const ORIGINS = {
+        geneva:           { name: 'Geneva Airport / Cornavin', baseRailPrice: 40, lat: 46.2270, lon: 6.1090 },
+        lausanne:         { name: 'Lausanne', baseRailPrice: 28, lat: 46.5170, lon: 6.6290 },
+        montreux:         { name: 'Montreux', baseRailPrice: 26, lat: 46.4370, lon: 6.9110 },
+        aigle:            { name: 'Aigle', baseRailPrice: 24, lat: 46.3180, lon: 6.9680 },
+        fribourg:         { name: 'Fribourg', baseRailPrice: 34, lat: 46.8030, lon: 7.1510 },
+        bern:             { name: 'Bern', baseRailPrice: 38, lat: 46.9490, lon: 7.4390 },
+        interlaken:       { name: 'Interlaken Ost', baseRailPrice: 36, lat: 46.6900, lon: 7.8690 },
+        sion:             { name: 'Sion', baseRailPrice: 30, lat: 46.2270, lon: 7.3590 },
+        visp:             { name: 'Visp', baseRailPrice: 32, lat: 46.2940, lon: 7.8810 },
+        basel:            { name: 'Basel SBB', baseRailPrice: 45, lat: 47.5476, lon: 7.5896 },
+        zurich:           { name: 'Zürich HB', baseRailPrice: 50, lat: 47.3779, lon: 8.5403 },
+        'zurich-airport': { name: 'Zürich Airport', baseRailPrice: 52, lat: 47.4515, lon: 8.5645 }
+    };
+    const PASS_PROFILES = {
+        'none':              { label: 'Standard Fare', modifier: 1.0 },
+        'halbtax':           { label: 'Half-Fare Card (Halbtax)', modifier: 0.5 },
+        'generalabonnement': { label: 'GA Travelcard', modifier: 0.0 },
+        'swiss-travel-pass': { label: 'Swiss Travel Pass', modifier: 0.15 }
+    };
+    const WMO_CONDITIONS = {
+        0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+        45: 'Fog', 48: 'Depositing rime fog',
+        51: 'Light drizzle', 53: 'Drizzle', 55: 'Dense drizzle',
+        56: 'Freezing drizzle', 57: 'Dense freezing drizzle',
+        61: 'Light rain', 63: 'Rain', 65: 'Heavy rain',
+        66: 'Freezing rain', 67: 'Heavy freezing rain',
+        71: 'Light snowfall', 73: 'Snowfall', 75: 'Heavy snowfall', 77: 'Snow grains',
+        80: 'Light rain showers', 81: 'Rain showers', 82: 'Violent rain showers',
+        85: 'Light snow showers', 86: 'Heavy snow showers',
+        95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Thunderstorm with heavy hail'
+    };
+    const RESORT_BY_ID = Object.fromEntries(RESORTS.map(r => [r.id, r]));
+
+    const roundCHF = (v) => Math.round(v * 100) / 100;
+    const SETTLED_EPSILON = 0.005;
+    const WEATHER_TTL_MS = 5 * 60 * 1000;
+    const weatherCache = new Map();
+    const sumRange = (values, start, count) =>
+        (values || []).slice(start, start + count).reduce((s, v) => s + (v || 0), 0);
+
+    function pickBestDay(outlook) {
+        if (!outlook.length) return null;
+        let bestIndex = 0, bestScore = -Infinity;
+        outlook.forEach((day, i) => {
+            const score = -(day.precipitationMm || 0) * 2 + (day.tempMax || 0) * 0.3;
+            if (score > bestScore) { bestScore = score; bestIndex = i; }
+        });
+        return {
+            date: outlook[bestIndex].date,
+            reason: (outlook[bestIndex].precipitationMm || 0) < 1 ? 'clearest skies in the window' : 'driest day in the window'
+        };
+    }
 
     const AVATAR_PALETTES = [
         ['#E6F1FB', '#185FA5'], ['#E1F5EE', '#0F6E56'], ['#FAEEDA', '#854F0B'],
@@ -865,46 +989,125 @@
             : `${ICONS.sunSmall}<span>SUMMER</span>`;
     }
 
-    // --- Engine health ---
+    // --- Engine status (self-contained build) ---
 
-    async function pingEngine() {
-        const dot = document.getElementById('engineDot');
-        const label = document.getElementById('engineLabel');
-        try {
-            const res = await fetch('/api/health');
-            const data = await res.json();
-            dot.className = 'status-dot online';
-            label.innerText = `ENGINE: ONLINE v${data.version}`;
-        } catch (e) {
-            dot.className = 'status-dot offline';
-            label.innerText = 'ENGINE: OFFLINE';
-        }
+    function markReady() {
+        document.getElementById('engineDot').className = 'status-dot online';
+        document.getElementById('engineLabel').innerText = 'READY';
     }
 
-    // --- Resort cards ---
+    // --- Departure hub dropdown ---
 
-    function renderResorts() {
-        const grid = document.getElementById('resortGrid');
-        grid.innerHTML = RESORTS.map(r => `
-            <div class="resort-card ${r.id === currentDestination ? 'selected' : ''}" data-id="${r.id}"
-                 role="button" tabindex="0" aria-label="Select ${r.name}">
-                <svg viewBox="0 0 66 44" preserveAspectRatio="xMidYMax meet" aria-hidden="true">${r.art}</svg>
-                <div class="resort-name">${r.name}</div>
-                <div class="resort-meta">${r.elev} m · ${r.region}</div>
-                <span class="resort-badge">● selected sector</span>
+    function populateOrigins() {
+        const sel = document.getElementById('originHub');
+        sel.innerHTML = Object.entries(ORIGINS)
+            .map(([k, o]) => `<option value="${k}">${esc(o.name)}</option>`).join('');
+    }
+
+    function onOriginChange() {
+        refreshMap();
+        saveState();
+    }
+
+    // --- Searchable, region-grouped resort picker ---
+
+    function renderPicker() {
+        const q = (document.getElementById('resortSearch').value || '').trim().toLowerCase();
+        const list = document.getElementById('resortList');
+        const groups = {};
+        RESORTS.forEach(r => {
+            if (q && !`${r.name} ${r.region}`.toLowerCase().includes(q)) return;
+            (groups[r.region] = groups[r.region] || []).push(r);
+        });
+        const regions = REGION_ORDER.filter(rg => groups[rg]);
+        if (!regions.length) {
+            list.innerHTML = `<div class="hint" style="padding:10px;">No resort matches “${esc(q)}”.</div>`;
+            return;
+        }
+        list.innerHTML = regions.map(rg => `
+            <div class="region-group">
+                <div class="region-head">${esc(rg)}</div>
+                ${groups[rg].map(r => `
+                    <div class="resort-row ${r.id === currentDestination ? 'selected' : ''}" data-id="${r.id}"
+                         role="button" tabindex="0" aria-label="Select ${esc(r.name)}">
+                        <div>
+                            <div class="rr-name">${esc(r.name)}</div>
+                            <div class="rr-meta">${esc(r.facts.signature)}</div>
+                        </div>
+                        <div class="rr-elev">${r.elev} m</div>
+                    </div>`).join('')}
             </div>`).join('');
-        grid.querySelectorAll('.resort-card').forEach(card => {
-            const pick = () => selectResort(card.dataset.id);
-            card.addEventListener('click', pick);
-            card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+        list.querySelectorAll('.resort-row').forEach(row => {
+            const pick = () => selectResort(row.dataset.id);
+            row.addEventListener('click', pick);
+            row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
         });
     }
 
     function selectResort(id) {
+        if (!RESORT_BY_ID[id]) return;
         currentDestination = id;
-        document.querySelectorAll('.resort-card').forEach(c => c.classList.toggle('selected', c.dataset.id === id));
+        document.querySelectorAll('.resort-row').forEach(r => r.classList.toggle('selected', r.dataset.id === id));
+        refreshMap();
         fetchTelemetry();
         saveState();
+    }
+
+    // --- Leaflet map + rail route line ---
+
+    let map = null, resortMarkers = {}, originMarker = null, routeLine = null;
+
+    function markerStyle(selected) {
+        return selected
+            ? { radius: 9, color: '#EB0000', weight: 3, fillColor: '#EB0000', fillOpacity: 0.9 }
+            : { radius: 6, color: '#3A536C', weight: 2, fillColor: '#7A93AC', fillOpacity: 0.85 };
+    }
+
+    function initMap() {
+        const el = document.getElementById('map');
+        if (typeof L === 'undefined') {
+            el.style.height = 'auto';
+            el.innerHTML = '<div class="hint" style="padding:16px;">Map unavailable — the search list still works.</div>';
+            return;
+        }
+        map = L.map(el, { scrollWheelZoom: false }).setView([46.8, 8.23], 7);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap · © CARTO', subdomains: 'abcd', maxZoom: 18
+        }).addTo(map);
+        RESORTS.forEach(r => {
+            const m = L.circleMarker([r.lat, r.lon], markerStyle(r.id === currentDestination))
+                .addTo(map)
+                .bindTooltip(`${r.name} · ${r.elev} m`, { direction: 'top' });
+            m.on('click', () => selectResort(r.id));
+            resortMarkers[r.id] = m;
+        });
+        setTimeout(() => map.invalidateSize(), 350);
+        refreshMap();
+    }
+
+    function refreshMap() {
+        if (!map) return;
+        Object.entries(resortMarkers).forEach(([id, m]) => m.setStyle(markerStyle(id === currentDestination)));
+
+        const dest = RESORT_BY_ID[currentDestination];
+        const origin = ORIGINS[document.getElementById('originHub').value];
+
+        if (origin) {
+            const oll = [origin.lat, origin.lon];
+            if (!originMarker) {
+                originMarker = L.circleMarker(oll, { radius: 8, color: '#14202B', weight: 3, fillColor: '#F8FAFC', fillOpacity: 1 }).addTo(map);
+            } else {
+                originMarker.setLatLng(oll);
+            }
+            originMarker.bindTooltip(`Depart · ${origin.name}`, { direction: 'top' });
+        }
+
+        if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
+        if (origin && dest) {
+            routeLine = L.polyline([[origin.lat, origin.lon], [dest.lat, dest.lon]],
+                { color: '#EB0000', weight: 3, dashArray: '6 8', opacity: 0.85 }).addTo(map);
+            map.fitBounds(routeLine.getBounds().pad(0.4), { maxZoom: 9, animate: true });
+        }
     }
 
     // --- Weather ---
@@ -978,20 +1181,67 @@
             </div>`;
     }
 
+    function buildWeatherPayload(loc, data) {
+        const nowIndex = data.hourly?.time
+            ? data.hourly.time.findIndex(t => t >= data.current_weather.time)
+            : -1;
+        const snowfallNext12h = nowIndex === -1 ? null : roundCHF(sumRange(data.hourly.snowfall, nowIndex, 12));
+        const precipitationNext12h = nowIndex === -1 ? null : roundCHF(sumRange(data.hourly.precipitation, nowIndex, 12));
+        const outlook = (data.daily?.time || []).map((date, i) => ({
+            date,
+            condition: WMO_CONDITIONS[data.daily.weathercode?.[i]] || 'Unknown',
+            weathercode: data.daily.weathercode?.[i],
+            tempMax: data.daily.temperature_2m_max?.[i],
+            tempMin: data.daily.temperature_2m_min?.[i],
+            snowfallCm: data.daily.snowfall_sum?.[i],
+            precipitationMm: data.daily.precipitation_sum?.[i]
+        }));
+        return {
+            destination: loc.name,
+            region: loc.region,
+            facts: loc.facts,
+            current: {
+                ...data.current_weather,
+                condition: WMO_CONDITIONS[data.current_weather.weathercode] || 'Unknown'
+            },
+            snowfallNext12h,
+            precipitationNext12h,
+            outlook,
+            bestDay: pickBestDay(outlook),
+            stationElevation: Math.round(data.elevation),
+            cacheAgeSeconds: 0
+        };
+    }
+
     async function fetchTelemetry() {
         const body = document.getElementById('weatherBody');
         body.innerHTML = weatherSkeleton();
+        const loc = RESORT_BY_ID[currentDestination];
+
+        const cached = weatherCache.get(currentDestination);
+        if (cached && Date.now() - cached.fetchedAt < WEATHER_TTL_MS) {
+            lastWeatherData = { ...cached.payload, cacheAgeSeconds: Math.round((Date.now() - cached.fetchedAt) / 1000) };
+            renderWeather(lastWeatherData);
+            return;
+        }
+
         try {
-            const res = await fetch(`/api/weather?destination=${encodeURIComponent(currentDestination)}`);
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}` +
+                `&current_weather=true` +
+                `&hourly=temperature_2m,snowfall,precipitation,weathercode` +
+                `&daily=temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,weathercode` +
+                `&forecast_days=3&timezone=Europe/Berlin`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Open-Meteo responded with ${res.status}`);
             const data = await res.json();
-            if (data.error) {
-                body.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
-                return;
-            }
-            lastWeatherData = data;
-            renderWeather(data);
+            if (!data.current_weather) throw new Error('Missing current_weather block');
+
+            const payload = buildWeatherPayload(loc, data);
+            weatherCache.set(currentDestination, { fetchedAt: Date.now(), payload });
+            lastWeatherData = payload;
+            renderWeather(payload);
         } catch (e) {
-            body.innerHTML = `<div class="error-banner">Telemetry stream unavailable — is the AlpenSync engine running?</div>`;
+            body.innerHTML = `<div class="error-banner">Couldn't reach the Open-Meteo weather service. Check your connection and try again.</div>`;
         }
     }
 
@@ -1004,40 +1254,68 @@
     }
 
     function countUp(el, target, prefix) {
+        const final = `${prefix}${target.toFixed(2)}`;
+        // If motion is off or the tab isn't visible (rAF paused), show the value directly.
+        if (document.visibilityState !== 'visible' ||
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            el.textContent = final;
+            return;
+        }
         const start = performance.now();
         const dur = 750;
         const ease = (p) => 1 - Math.pow(1 - p, 3);
         function frame(t) {
             const p = Math.min(1, (t - start) / dur);
-            el.textContent = `${prefix}${(target * ease(p)).toFixed(2)}`;
+            el.textContent = p < 1 ? `${prefix}${(target * ease(p)).toFixed(2)}` : final;
             if (p < 1) requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);
     }
 
-    async function calculateTariff() {
-        const groupSize = Math.max(1, parseInt(document.getElementById('groupSize').value, 10) || 1);
-        const payload = {
-            origin: document.getElementById('originHub').value,
-            destination: currentDestination,
-            passType: document.getElementById('swissPass').value,
-            groupSize: groupSize
-        };
-        const button = document.getElementById('tariffButton');
-        const wrap = document.getElementById('ticketWrap');
-        button.disabled = true;
+    function computeTariff(originKey, destKey, passType, size) {
+        const fromLoc = ORIGINS[originKey];
+        const toLoc = RESORT_BY_ID[destKey];
+        size = Math.max(1, parseInt(size, 10) || 1);
+        const pass = PASS_PROFILES[passType] || PASS_PROFILES['none'];
 
-        try {
-            const res = await fetch('/api/tariff/calculate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.error) {
-                wrap.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
-                return;
+        const standardTicket = fromLoc.baseRailPrice + toLoc.baseTariff;
+        let modifier = pass.modifier;
+        const groupDiscountApplied = size >= 10;
+        if (groupDiscountApplied) modifier *= 0.70; // 30% group rate
+
+        const pricePerPerson = roundCHF(standardTicket * modifier);
+        return {
+            route: `${fromLoc.name} ➔ ${toLoc.name}`,
+            origin: fromLoc.name,
+            destinationName: toLoc.name,
+            breakdown: {
+                railLeg: fromLoc.baseRailPrice,
+                alpineSupplement: toLoc.baseTariff,
+                standardTicket: standardTicket,
+                passLabel: pass.label,
+                passDiscountPct: Math.round((1 - pass.modifier) * 100),
+                groupDiscountApplied: groupDiscountApplied
+            },
+            pricing: {
+                finalPricePerPerson: pricePerPerson,
+                savingsPerPerson: roundCHF(standardTicket - pricePerPerson),
+                totalGroupCost: roundCHF(pricePerPerson * size),
+                groupSize: size
             }
+        };
+    }
+
+    function calculateTariff() {
+        const groupSize = Math.max(1, parseInt(document.getElementById('groupSize').value, 10) || 1);
+        const wrap = document.getElementById('ticketWrap');
+
+        {
+            const data = computeTariff(
+                document.getElementById('originHub').value,
+                currentDestination,
+                document.getElementById('swissPass').value,
+                groupSize
+            );
             const b = data.breakdown;
             const p = data.pricing;
             const groupLine = b.groupDiscountApplied
@@ -1071,10 +1349,6 @@
                 </div>
             </div>`;
             countUp(document.getElementById('ticketTotal'), p.totalGroupCost, 'CHF ');
-        } catch (e) {
-            wrap.innerHTML = `<div class="error-banner">Fare engine unreachable — is the AlpenSync engine running?</div>`;
-        } finally {
-            button.disabled = false;
         }
     }
 
@@ -1139,7 +1413,50 @@
         }));
     }
 
-    async function settleGroupLedger() {
+    function computeSettlement(expenses, members) {
+        const invalid = expenses.filter(e => !(parseFloat(e.amount) > 0));
+        if (invalid.length > 0) {
+            return { error: `Invalid amount on line item(s): ${invalid.map(e => e.description || '(unnamed)').join(', ')}. Amounts must be positive numbers.` };
+        }
+        const unknown = [...new Set(expenses.map(e => e.payer).filter(p => !members.includes(p)))];
+        if (unknown.length > 0) {
+            return { error: `Payer(s) not on the roster: ${unknown.join(', ')}. Add them to the roster or correct the payer name.` };
+        }
+
+        const totalSpent = expenses.reduce((s, e) => s + parseFloat(e.amount), 0);
+        const perPersonShare = totalSpent / members.length;
+
+        const paidBy = {};
+        members.forEach(m => { paidBy[m] = 0; });
+        expenses.forEach(e => { paidBy[e.payer] += parseFloat(e.amount); });
+
+        const memberBalances = members.map(m => ({
+            name: m, paid: roundCHF(paidBy[m]), net: roundCHF(paidBy[m] - perPersonShare)
+        }));
+
+        const working = members.map(m => ({ name: m, balance: paidBy[m] - perPersonShare }));
+        const debtors = working.filter(m => m.balance < -SETTLED_EPSILON).sort((a, b) => a.balance - b.balance);
+        const creditors = working.filter(m => m.balance > SETTLED_EPSILON).sort((a, b) => b.balance - a.balance);
+
+        const settlements = [];
+        debtors.forEach(d => {
+            creditors.forEach(c => {
+                if (Math.abs(d.balance) < SETTLED_EPSILON || c.balance < SETTLED_EPSILON) return;
+                const payment = Math.min(Math.abs(d.balance), c.balance);
+                d.balance += payment;
+                c.balance -= payment;
+                const amt = roundCHF(payment);
+                settlements.push({
+                    from: d.name, to: c.name, amount: amt,
+                    twintMockString: `twint://pay?to=${encodeURIComponent(c.name)}&amount=${amt.toFixed(2)}&ref=AlpenSync-${Math.random().toString(36).substring(7).toUpperCase()}`
+                });
+            });
+        });
+
+        return { totalSpent: roundCHF(totalSpent), perPersonShare: roundCHF(perPersonShare), memberBalances, settlements };
+    }
+
+    function settleGroupLedger() {
         const members = rosterMembers();
         const results = document.getElementById('ledgerResults');
         if (members.length === 0) {
@@ -1150,16 +1467,8 @@
             .filter(e => e.amount !== '')
             .map(e => ({ ...e, amount: parseFloat(e.amount) }));
 
-        const button = document.getElementById('settleButton');
-        button.disabled = true;
-
-        try {
-            const res = await fetch('/api/ledger/settle', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ expenses, groupMembers: members })
-            });
-            const data = await res.json();
+        {
+            const data = computeSettlement(expenses, members);
             if (data.error) {
                 results.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
                 return;
@@ -1204,10 +1513,6 @@
                 <div class="group-lbl">Settlement plan · ${data.settlements.length} transfer${data.settlements.length === 1 ? '' : 's'}</div>
                 ${settleRows}`;
             saveState();
-        } catch (e) {
-            results.innerHTML = `<div class="error-banner">Ledger engine unreachable — is the AlpenSync engine running?</div>`;
-        } finally {
-            button.disabled = false;
         }
     }
 
@@ -1246,12 +1551,14 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+        populateOrigins();
         loadState();
         applySeason();
-        renderResorts();
+        renderPicker();
         renderRoster();
         initHero();
-        pingEngine();
+        initMap();
+        markReady();
         fetchTelemetry();
     });
     document.addEventListener('change', saveState);
