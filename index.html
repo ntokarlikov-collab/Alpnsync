@@ -628,6 +628,47 @@
         .o-temp, .metric .m-val, .t-total .amt, .net-amt, .settle-amt, .rr-elev,
         .t-row span:last-child, .chip span, #groupSize { font-family: var(--font-mono); }
         .t-total .amt { letter-spacing: -0.5px; }
+
+        /* ============================================================
+           FLUID MOTION — smooth reveals, results that ease in, tactile controls
+           ============================================================ */
+        :root { --ease: cubic-bezier(0.22, 1, 0.36, 1); --ease-soft: cubic-bezier(0.4, 0, 0.2, 1); }
+
+        @keyframes enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+        /* Softer, more graceful scroll reveals with a gentle stagger */
+        .reveal { transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+        .card.reveal:nth-child(2) { transition-delay: 0.12s; }
+
+        /* Results and cards ease in when they render */
+        .weather-now { animation: enter 0.55s var(--ease) both; }
+        .outlook-row .outlook-card { animation: enter 0.5s var(--ease) both; }
+        .outlook-row .outlook-card:nth-child(1) { animation-delay: 0.06s; }
+        .outlook-row .outlook-card:nth-child(2) { animation-delay: 0.14s; }
+        .outlook-row .outlook-card:nth-child(3) { animation-delay: 0.22s; }
+        .ticket { animation: enter 0.55s var(--ease) both; }
+        .ledger-summary .metric { animation: enter 0.5s var(--ease) both; }
+        .ledger-summary .metric:nth-child(2) { animation-delay: 0.08s; }
+        .net-row { animation: enter 0.5s var(--ease) both; }
+        .settle-row { animation: enter 0.55s var(--ease) both; }
+
+        /* Tactile, unified micro-interactions */
+        .btn-primary, .btn-secondary, .hero-cta, .season-toggle, .twint-btn,
+        .stepper button, .remove-row, .resort-row, .panel, .outlook-card, .chip {
+            transition: transform 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft),
+                        background 0.25s var(--ease-soft), border-color 0.25s var(--ease-soft), color 0.25s var(--ease-soft);
+        }
+        .btn-primary:active, .btn-secondary:active, .hero-cta:active,
+        .twint-btn:active, .stepper button:active { transform: scale(0.97); }
+        select, input[type="text"], input[type="number"] {
+            transition: border-color 0.2s var(--ease-soft), box-shadow 0.2s var(--ease-soft), background 0.2s var(--ease-soft);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .weather-now, .outlook-card, .ticket, .metric, .net-row, .settle-row { animation: none !important; }
+            .btn-primary:active, .btn-secondary:active, .hero-cta:active,
+            .twint-btn:active, .stepper button:active { transform: none; }
+        }
     </style>
 </head>
 <body>
@@ -815,8 +856,12 @@
         <section class="panel reveal">
             <div class="ledger-grid">
                 <div>
-                    <label for="groupRoster">Group roster (comma-separated)</label>
-                    <input type="text" id="groupRoster" value="Nikita, Anna, Marc, Sofia" oninput="renderRoster()">
+                    <label for="travellerCount">Number of travellers</label>
+                    <div class="stepper">
+                        <button type="button" onclick="stepTravellers(-1)" aria-label="Fewer travellers">−</button>
+                        <input type="number" id="travellerCount" value="4" min="1" onchange="renderRoster()">
+                        <button type="button" onclick="stepTravellers(1)" aria-label="More travellers">+</button>
+                    </div>
                     <div class="avatar-row" id="avatarRow"></div>
 
                     <div class="group-lbl">Shared costs</div>
@@ -845,10 +890,11 @@
 </main>
 
 <script>
-    const STORAGE_KEY = 'alpensync-state-v1';
+    const STORAGE_KEY = 'alpensync-state-v2';
+    const DEFAULT_TRAVELLERS = 4;
     const DEFAULT_EXPENSES = [
-        { description: 'Chalet Lodging', amount: '600', payer: 'Nikita' },
-        { description: 'Resort Mountain Passes', amount: '240', payer: 'Anna' }
+        { description: 'Chalet Lodging', amount: '600', payer: 'Traveller 1' },
+        { description: 'Resort Mountain Passes', amount: '240', payer: 'Traveller 2' }
     ];
 
     const RESORTS = [
@@ -1258,7 +1304,7 @@
                     <div class="weather-now">
                         <div class="w-icon">${iconForCode(data.current.weathercode)}</div>
                         <div>
-                            <div class="w-temp">${Math.round(data.current.temperature)}°</div>
+                            <div class="w-temp" id="wTemp">${Math.round(data.current.temperature)}°</div>
                             <div class="w-cond">${esc(data.current.condition)}</div>
                             <div class="w-place">${esc(data.destination)} · ${esc(data.region)} · station ${data.stationElevation} m</div>
                         </div>
@@ -1278,6 +1324,7 @@
                     ${(data.outlook || []).map(d => outlookCard(d, data.bestDay)).join('')}
                 </div>
             </div>`;
+        countNumber(document.getElementById('wTemp'), Math.round(data.current.temperature), { suffix: '°' });
     }
 
     function buildWeatherPayload(loc, data) {
@@ -1371,6 +1418,24 @@
         requestAnimationFrame(frame);
     }
 
+    function countNumber(el, target, { decimals = 0, prefix = '', suffix = '', dur = 700 } = {}) {
+        if (!el) return;
+        const final = `${prefix}${target.toFixed(decimals)}${suffix}`;
+        if (document.visibilityState !== 'visible' ||
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            el.textContent = final;
+            return;
+        }
+        const start = performance.now();
+        const ease = (p) => 1 - Math.pow(1 - p, 3);
+        function frame(t) {
+            const p = Math.min(1, (t - start) / dur);
+            el.textContent = p < 1 ? `${prefix}${(target * ease(p)).toFixed(decimals)}${suffix}` : final;
+            if (p < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    }
+
     function computeTariff(originKey, destKey, passType, size) {
         const fromLoc = ORIGINS[originKey];
         const toLoc = RESORT_BY_ID[destKey];
@@ -1453,9 +1518,18 @@
 
     // --- Ledger ---
 
+    function travellerCount() {
+        return Math.max(1, parseInt(document.getElementById('travellerCount').value, 10) || 1);
+    }
+
     function rosterMembers() {
-        return document.getElementById('groupRoster').value
-            .split(',').map(s => s.trim()).filter(Boolean);
+        return Array.from({ length: travellerCount() }, (_, i) => `Traveller ${i + 1}`);
+    }
+
+    function stepTravellers(delta) {
+        const input = document.getElementById('travellerCount');
+        input.value = Math.max(1, (parseInt(input.value, 10) || 1) + delta);
+        renderRoster();
     }
 
     function paletteFor(name, members) {
@@ -1474,7 +1548,15 @@
             return `<span class="avatar" style="background:${bg}; color:${fg};">
                 <span class="dot" style="color:${fg};">${esc(initials(m))}</span>${esc(m)}</span>`;
         }).join('');
+        document.querySelectorAll('.exp-payer').forEach(sel => populatePayerSelect(sel, sel.value));
         saveState();
+    }
+
+    function populatePayerSelect(sel, preferred) {
+        const members = rosterMembers();
+        const value = members.includes(preferred) ? preferred : members[0];
+        sel.innerHTML = members.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
+        sel.value = value;
     }
 
     function addExpenseRow(item = {}) {
@@ -1491,9 +1573,9 @@
         amount.min = '0'; amount.step = '0.05';
         amount.value = item.amount || '';
 
-        const payer = document.createElement('input');
-        payer.type = 'text'; payer.placeholder = 'Payer'; payer.className = 'exp-payer';
-        payer.value = item.payer || '';
+        const payer = document.createElement('select');
+        payer.className = 'exp-payer';
+        populatePayerSelect(payer, item.payer);
 
         const remove = document.createElement('button');
         remove.type = 'button'; remove.className = 'remove-row';
@@ -1604,13 +1686,15 @@
 
             results.innerHTML = `
                 <div class="ledger-summary">
-                    <div class="metric"><div class="m-lbl">Total spent</div><div class="m-val">CHF ${chf(data.totalSpent)}</div></div>
-                    <div class="metric"><div class="m-lbl">Share per person</div><div class="m-val">CHF ${chf(data.perPersonShare)}</div></div>
+                    <div class="metric"><div class="m-lbl">Total spent</div><div class="m-val" id="mTotal">CHF ${chf(data.totalSpent)}</div></div>
+                    <div class="metric"><div class="m-lbl">Share per person</div><div class="m-val" id="mShare">CHF ${chf(data.perPersonShare)}</div></div>
                 </div>
                 <div class="group-lbl">Net positions</div>
                 ${netRows}
                 <div class="group-lbl">Settlement plan · ${data.settlements.length} transfer${data.settlements.length === 1 ? '' : 's'}</div>
                 ${settleRows}`;
+            countNumber(document.getElementById('mTotal'), data.totalSpent, { prefix: 'CHF ', decimals: 2 });
+            countNumber(document.getElementById('mShare'), data.perPersonShare, { prefix: 'CHF ', decimals: 2 });
             saveState();
         }
     }
@@ -1625,7 +1709,7 @@
                 destination: currentDestination,
                 passType: document.getElementById('swissPass').value,
                 groupSize: document.getElementById('groupSize').value,
-                roster: document.getElementById('groupRoster').value,
+                travellers: travellerCount(),
                 expenses: collectExpenses()
             }));
         } catch (e) { /* storage unavailable — run stateless */ }
@@ -1643,7 +1727,7 @@
             if (state.origin) document.getElementById('originHub').value = state.origin;
             if (state.passType) document.getElementById('swissPass').value = state.passType;
             if (state.groupSize) document.getElementById('groupSize').value = state.groupSize;
-            if (state.roster != null) document.getElementById('groupRoster').value = state.roster;
+            if (state.travellers) document.getElementById('travellerCount').value = Math.max(1, parseInt(state.travellers, 10) || DEFAULT_TRAVELLERS);
         }
         const expenses = (state?.expenses?.length) ? state.expenses : DEFAULT_EXPENSES;
         expenses.forEach(addExpenseRow);
