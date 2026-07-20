@@ -301,7 +301,7 @@
             font-size: 12px; font-weight: 600; color: var(--ink-2);
         }
         .chip svg { width: 13px; height: 13px; }
-        .outlook-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .outlook-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(84px, 1fr); gap: 10px; overflow-x: auto; padding-bottom: 2px; }
         .outlook-card {
             background: rgba(255, 255, 255, 0.75);
             border: 1px solid var(--line);
@@ -610,6 +610,9 @@
         .valley-backdrop { opacity: 0.9; }
 
         /* Gold "summit light" marks the best forecast day */
+        **CHUNK 2 of 4.** Put your cursor at the very end of chunk 1 (right after that `/* Gold "summit light"... */` comment) and paste this straight on — no blank line between.
+
+```html
         .outlook-card.best { border-color: var(--gold); background: var(--gold-soft); }
         .o-best-tag { color: #8A5A12; }
 
@@ -701,13 +704,45 @@
 
         /* Mountain passes */
         .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold); margin-top: 30px; }
-        .pass-table { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+        .pass-table { margin: 6px 0 4px; }
         .pass-card { background: rgba(255, 255, 255, 0.7); border: 1px solid var(--line); border-radius: 12px; padding: 12px 13px; }
         .pass-card .pc-name { font-family: var(--font-display); font-weight: 700; font-size: 12.5px; line-height: 1.25; margin-bottom: 8px; }
         .pass-card .pc-row { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; padding: 3px 0; color: var(--ink-2); }
         .pass-card .pc-price { font-family: var(--font-mono); font-weight: 700; color: var(--ink); white-space: nowrap; }
         .pass-price { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--ink-2); margin: 16px 0 2px; }
-        .pass-price .amt { font-size: 22px; letter-spacing: -0.5px; color: var(--swiss-red); margin-left: 4px; }
+        .pass-price .amt { font-size: 22px; letter-spacing: -0.5px; color: var(--swiss-red); margin-left: 4px; font-family: var(--font-mono); }
+        .pass-ref-head { font-family: var(--font-display); font-weight: 700; font-size: 12.5px; color: var(--ink-2); margin: 2px 0 8px; text-transform: capitalize; }
+        .pass-ref-wrap { max-height: 300px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; }
+        .pass-ref { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+        .pass-ref th { position: sticky; top: 0; background: var(--indigo); color: #fff; text-align: right; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; padding: 8px 12px; }
+        .pass-ref th:first-child { text-align: left; }
+        .pass-ref td { padding: 7px 12px; text-align: right; font-family: var(--font-mono); color: var(--ink); border-top: 1px solid var(--line); }
+        .pass-ref td:first-child { text-align: left; font-family: var(--font-body); font-weight: 700; color: var(--ink-2); }
+        .pass-ref tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.5); }
+        .pass-ref tbody tr.sel td { background: #FFF1EC; }
+        .pass-ref tbody tr.sel td:first-child { color: var(--swiss-red); }
+        .pass-empty { padding: 22px 16px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ink-3); border: 2px dashed var(--line); border-radius: 12px; }
+        input[type="date"] { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; box-sizing: border-box; font-size: 13.5px; font-family: var(--font-body); color: var(--ink); background: rgba(255, 255, 255, 0.9); transition: border-color 0.2s var(--ease-soft), box-shadow 0.2s var(--ease-soft); }
+        input[type="date"]:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(227, 165, 68, 0.22); }
+        .date-row { display: flex; align-items: center; gap: 8px; }
+        .date-row input[type="date"] { flex: 1; }
+        .date-arrow { color: var(--ink-3); font-weight: 700; }
+        .t-note { margin-top: 10px; font-size: 11.5px; line-height: 1.45; font-weight: 600; color: var(--ink-3); border-left: 2px solid var(--line); padding-left: 9px; }
+        .t-note.warn { color: #9B1C1C; border-left-color: var(--swiss-red); }
+        .date-note { margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--ink-2); font-family: var(--font-mono); }
+        .w-coverage { font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+        .rollup { background: linear-gradient(135deg, #241C4E 0%, #3A2E66 100%); border: 1px solid rgba(255,255,255,0.06); color: #fff; }
+        .rollup:hover { box-shadow: 0 24px 56px rgba(42, 27, 78, 0.28); }
+        .rollup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+        .rollup-lbl { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+        .rollup-amt { font-family: var(--font-mono); font-weight: 700; font-size: 42px; letter-spacing: -1.5px; margin: 6px 0 4px; color: #fff; }
+        .rollup-ctx { font-size: 13px; color: rgba(255,255,255,0.82); font-weight: 600; }
+        .rollup-break { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 14px 16px; }
+        .rb-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; color: rgba(255,255,255,0.85); }
+        .rb-row span:last-child { font-family: var(--font-mono); }
+        .rb-row.total { border-top: 1px solid rgba(255,255,255,0.18); margin-top: 4px; padding-top: 9px; font-weight: 700; color: #fff; }
+        .rb-row.group { color: rgba(255,255,255,0.7); }
+        @media (max-width: 680px) { .rollup-grid { grid-template-columns: 1fr; } }
         @media (max-width: 1040px) {
             .trip-grid { grid-template-columns: 1fr 1fr; }
             .trip-grid .tg-weather { grid-column: 1 / -1; }
@@ -884,6 +919,14 @@
                 <section class="panel reveal">
                     <div class="planner-grid">
                         <div>
+                            <label for="tripStart">Trip dates</label>
+                            <div class="date-row">
+                                <input type="date" id="tripStart" onchange="onTripDatesChange()" aria-label="Arrival date">
+                                <span class="date-arrow">→</span>
+                                <input type="date" id="tripEnd" onchange="onTripDatesChange()" aria-label="Departure date">
+                            </div>
+                            <div class="date-note" id="tripDatesNote"></div>
+
                             <label for="originHub">Departure hub</label>
                     <select id="originHub" onchange="onOriginChange()"></select>
 
@@ -891,7 +934,15 @@
                     <input type="hidden" id="travelClass" value="second">
                     <div class="segmented seg-full" id="classSeg" aria-label="Travel class">
                         <button type="button" class="seg-opt active" data-value="second" onclick="setTravelClass('second')">2nd class</button>
-                        <button type="button" class="seg-opt" data-value="first" onclick="setTravelClass('first')">1st class · +75%</button>
+                        <button type="button" class="seg-opt" data-value="first" onclick="setTravelClass('first')">1st class</button>
+                        <span class="seg-indicator"></span>
+                    </div>
+
+                    <label for="tripTypeSeg">Ticket</label>
+                    <input type="hidden" id="tripType" value="roundTrip">
+                    <div class="segmented seg-full" id="tripTypeSeg" aria-label="Ticket type">
+                        <button type="button" class="seg-opt" data-value="oneWay" onclick="setTripType('oneWay')">One way</button>
+                        <button type="button" class="seg-opt active" data-value="roundTrip" onclick="setTripType('roundTrip')">Round trip</button>
                         <span class="seg-indicator"></span>
                     </div>
 
@@ -920,20 +971,26 @@
             <div>
                 <div class="eyebrow reveal">Get to the slopes</div>
                 <h2 class="section-title reveal" style="margin-top:3px;">Mountain passes</h2>
-                <p class="section-sub reveal">1-day lift passes for the Vaud Alps ski systems.</p>
+                <p class="section-sub reveal">Multi-day lift passes for the Vaud Alps ski systems — prices follow the season.</p>
                 <section class="panel reveal">
-                    <div class="pass-table" id="passTable"></div>
                     <div class="pass-picker">
-                        <label for="passAge">Select your age category</label>
-                        <select id="passAge" onchange="updatePassPrice()"></select>
                         <label for="passMountain">Select mountain</label>
                         <select id="passMountain" onchange="updatePassPrice()"></select>
-                        <div class="pass-price" id="passPrice">1-day pass: —</div>
+                        <label for="passCategory">Ticket type</label>
+                        <select id="passCategory" onchange="updatePassPrice()"></select>
+                        <label for="passOption">Duration / option</label>
+                        <select id="passOption" onchange="updatePassPrice()"></select>
+                        <div class="pass-price" id="passPrice">Pass: —</div>
                         <button class="btn-primary" id="passAddBtn" onclick="addPassToTrip()">Add to trip</button>
                     </div>
+                    <div class="pass-table" id="passTable"></div>
                 </section>
             </div>
         </div>
+
+        <h2 class="section-title reveal">Your trip, all in</h2>
+        <p class="section-sub reveal">Rail, passes and shared costs rolled into one per-person number — updates live.</p>
+        <section class="panel reveal rollup" id="tripRollup"></section>
 
         <h2 class="section-title reveal">Settle the ledger</h2>
         <p class="section-sub reveal">Split shared costs into the fewest possible TWINT transfers.</p>
@@ -1042,12 +1099,109 @@
     };
 
     // --- Client-side registries (everything runs in the browser — no server) ---
+    // `baseRailPrice` is a legacy placeholder, used only where MOUNTAIN_FARES has no entry.
     const ORIGINS = {
-        geneva:   { name: 'Geneva Airport / Cornavin', baseRailPrice: 40, lat: 46.2270, lon: 6.1090 },
-        lausanne: { name: 'Lausanne', baseRailPrice: 28, lat: 46.5170, lon: 6.6290 },
-        bern:     { name: 'Bern', baseRailPrice: 38, lat: 46.9490, lon: 7.4390 },
-        fribourg: { name: 'Freiburg', baseRailPrice: 34, lat: 46.8030, lon: 7.1510 }
+        'geneva-airport': { name: 'Geneva Airport', baseRailPrice: 40, lat: 46.2381, lon: 6.1089 },
+        'geneva':         { name: 'Geneva (Cornavin)', baseRailPrice: 40, lat: 46.2102, lon: 6.1424 },
+        'lausanne':       { name: 'Lausanne', baseRailPrice: 28, lat: 46.5170, lon: 6.6290 },
+        'bern':           { name: 'Bern', baseRailPrice: 38, lat: 46.9490, lon: 7.4390 },
+        'fribourg':       { name: 'Freiburg', baseRailPrice: 34, lat: 46.8030, lon: 7.1510 }
     };
+
+    // Shown whenever a fare is flagged `variableRouting`.
+    const VARIABLE_ROUTING_NOTE =
+        'Price varies with the number of connections, the speed of the route taken, and current ' +
+        'SBB construction work. Shown fare is the fastest / fewest-connection option.';
+
+    // --- SBB RAIL FARE MATRIX ---
+    // Published SBB fares in CHF, per origin → mountain sector.
+    // Tiers: oneWay2nd / oneWay1st / roundTrip2nd / roundTrip1st.
+    //
+    // VARIABLE ROUTING: fares from Bern (→ Les Diablerets, Leysin, Glacier 3000) and from
+    // Fribourg (→ Les Diablerets, Glacier 3000) are not fixed — they move with the number of
+    // connections, the speed of the route chosen, and ongoing SBB construction. Those entries
+    // are marked `variableRouting: true` and record the fastest / fewest-connection option.
+    const MOUNTAIN_FARES = {
+        'villars': {
+            name: 'Villars',
+            fares: {
+                // ⚠ FLAGGED UNVERIFIED — pending re-check on sbb.ch.
+                // Round trip is not 2x the one-way here, in either class:
+                //   2nd class: 96.80  (2 x 50.40 would be 100.80)
+                //   1st class: 148.80 (2 x 79.40 would be 158.80)
+                // BUT this is not unique to Villars: EVERY 'geneva-airport' row in this matrix
+                // prices the return below 2x the one-way (gryon, diablerets, leysin and
+                // glacier3000 all behave the same way). That consistency points to a genuine
+                // airport return discount rather than a transcription error.
+                // Values kept exactly as supplied.
+                'geneva-airport': { oneWay2nd: 50.40, oneWay1st: 79.40, roundTrip2nd: 96.80, roundTrip1st: 148.80, unverified: true },
+                'geneva':         { oneWay2nd: 45.40, oneWay1st: 71.40, roundTrip2nd: 90.80, roundTrip1st: 142.80 },
+                'lausanne':       { oneWay2nd: 27.00, oneWay1st: 46.00, roundTrip2nd: 54.00, roundTrip1st: 92.00 },
+                'bern':           { oneWay2nd: 50.40, oneWay1st: 79.40, roundTrip2nd: 100.80, roundTrip1st: 158.80 },
+                'fribourg':       { oneWay2nd: 40.40, oneWay1st: 62.40, roundTrip2nd: 80.80, roundTrip1st: 124.80 }
+            }
+        },
+        'gryon': {
+            name: 'Gryon',
+            fares: {
+                'geneva-airport': { oneWay2nd: 50.40, oneWay1st: 79.40, roundTrip2nd: 96.80, roundTrip1st: 148.80 },
+                'geneva':         { oneWay2nd: 45.20, oneWay1st: 72.20, roundTrip2nd: 90.40, roundTrip1st: 144.40 },
+                'lausanne':       { oneWay2nd: 28.80, oneWay1st: 49.00, roundTrip2nd: 57.60, roundTrip1st: 98.00 },
+                'bern':           { oneWay2nd: 58.20, oneWay1st: 94.20, roundTrip2nd: 116.40, roundTrip1st: 188.40 },
+                'fribourg':       { oneWay2nd: 47.20, oneWay1st: 75.20, roundTrip2nd: 94.40, roundTrip1st: 150.40 }
+            }
+        },
+        'diablerets': {
+            name: 'Les Diablerets',
+            fares: {
+                'geneva-airport': { oneWay2nd: 53.60, oneWay1st: 91.60, roundTrip2nd: 103.00, roundTrip1st: 173.00 },
+                'geneva':         { oneWay2nd: 48.60, oneWay1st: 83.60, roundTrip2nd: 97.20, roundTrip1st: 167.20 },
+                'lausanne':       { oneWay2nd: 28.80, oneWay1st: 49.00, roundTrip2nd: 57.60, roundTrip1st: 98.00 },
+                'bern':           { oneWay2nd: 59.80, oneWay1st: 91.80, roundTrip2nd: 119.60, roundTrip1st: 183.60, variableRouting: true },
+                'fribourg':       { oneWay2nd: 59.80, oneWay1st: 88.60, roundTrip2nd: 119.60, roundTrip1st: 183.60, variableRouting: true }
+            }
+        },
+        'leysin': {
+            name: 'Leysin',
+            fares: {
+                'geneva-airport': { oneWay2nd: 51.20, oneWay1st: 82.20, roundTrip2nd: 98.40, roundTrip1st: 154.40 },
+                'geneva':         { oneWay2nd: 46.20, oneWay1st: 72.20, roundTrip2nd: 92.40, roundTrip1st: 144.40 },
+                'lausanne':       { oneWay2nd: 27.00, oneWay1st: 46.00, roundTrip2nd: 54.00, roundTrip1st: 92.00 },
+                'bern':           { oneWay2nd: 58.20, oneWay1st: 92.20, roundTrip2nd: 116.40, roundTrip1st: 184.40, variableRouting: true },
+                'fribourg':       { oneWay2nd: 47.20, oneWay1st: 73.20, roundTrip2nd: 94.40, roundTrip1st: 146.40 }
+            }
+        },
+        'glacier3000': {
+            name: 'Glacier 3000',
+            routedVia: 'Les Diablerets',
+            fares: {
+                'geneva-airport': { oneWay2nd: 53.60, oneWay1st: 91.60, roundTrip2nd: 103.00, roundTrip1st: 173.00 },
+                'geneva':         { oneWay2nd: 48.60, oneWay1st: 83.60, roundTrip2nd: 97.20, roundTrip1st: 167.20 },
+                'lausanne':       { oneWay2nd: 28.80, oneWay1st: 49.00, roundTrip2nd: 57.60, roundTrip1st: 98.00 },
+                'bern':           { oneWay2nd: 59.80, oneWay1st: 91.80, roundTrip2nd: 119.60, roundTrip1st: 183.60, variableRouting: true },
+                'fribourg':       { oneWay2nd: 59.80, oneWay1st: 88.60, roundTrip2nd: 119.60, roundTrip1st: 183.60, variableRouting: true }
+            }
+        }
+        // All five Vaud Alps sectors now carry published fares — the legacy estimate is unused.
+    };
+
+    // Returns null when no published fare exists, so callers fall back rather than invent one.
+    function lookupFare(destinationKey, originKey, travelClass, tripType) {
+        const dest = MOUNTAIN_FARES[destinationKey];
+        if (!dest) return null;
+        const entry = dest.fares[originKey];
+        if (!entry) return null;
+        const first = travelClass === 'first';
+        const roundTrip = tripType === 'roundTrip';
+        const tier = roundTrip ? (first ? 'roundTrip1st' : 'roundTrip2nd')
+                               : (first ? 'oneWay1st' : 'oneWay2nd');
+        if (entry[tier] == null) return null;
+        return {
+            amount: entry[tier], tier,
+            variableRouting: entry.variableRouting === true,
+            unverified: entry.unverified === true
+        };
+    }
     const PASS_PROFILES = {
         'none':              { label: 'Standard Fare', modifier: 1.0 },
         'halbtax':           { label: 'Half-Fare Card (Halbtax)', modifier: 0.5 },
@@ -1071,6 +1225,9 @@
         85: 'Light snow showers', 86: 'Heavy snow showers',
         95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Thunderstorm with heavy hail'
     };
+    **CHUNK 3 of 4.** Paste directly onto the end of chunk 2 (right after that `};` closing the weather codes).
+
+```html
     const RESORT_BY_ID = Object.fromEntries(RESORTS.map(r => [r.id, r]));
 
     const roundCHF = (v) => Math.round(v * 100) / 100;
@@ -1210,6 +1367,7 @@
         renderActivities();
         renderPicker();
         refreshMap();
+        updatePassPrice();
         if (lastWeatherData) renderWeather(lastWeatherData);
         saveState();
     }
@@ -1243,6 +1401,13 @@
     function setTravelClass(v) {
         document.getElementById('travelClass').value = v;
         syncSegmented(document.getElementById('classSeg'), v);
+        calculateTariff();
+        saveState();
+    }
+
+    function setTripType(v) {
+        document.getElementById('tripType').value = v;
+        syncSegmented(document.getElementById('tripTypeSeg'), v);
         calculateTariff();
         saveState();
     }
@@ -1399,7 +1564,7 @@
         calculateTariff();
         saveState();
     }
-    
+
     // --- Leaflet map + rail route line ---
 
     let map = null, resortMarkers = {}, originMarker = null, routeLine = null;
@@ -1523,8 +1688,11 @@
                         ${data.bestDay ? ` · best day: ${esc(data.bestDay.reason)}` : ''}
                     </p>
                 </div>
-                <div class="outlook-row">
-                    ${(data.outlook || []).map(d => outlookCard(d, data.bestDay)).join('')}
+                <div>
+                    ${data.coverage ? `<div class="w-coverage">${esc(data.coverage)}</div>` : ''}
+                    <div class="outlook-row">
+                        ${(data.outlook || []).map(d => outlookCard(d, data.bestDay)).join('')}
+                    </div>
                 </div>
             </div>`;
         countNumber(document.getElementById('wTemp'), Math.round(data.current.temperature), { suffix: '°' });
@@ -1544,7 +1712,7 @@
             tempMin: data.daily.temperature_2m_min?.[i],
             snowfallCm: data.daily.snowfall_sum?.[i],
             precipitationMm: data.daily.precipitation_sum?.[i]
-        }));
+        })).slice(0, 8);
         return {
             destination: loc.name,
             region: loc.region,
@@ -1566,8 +1734,10 @@
         const body = document.getElementById('weatherBody');
         body.innerHTML = weatherSkeleton();
         const loc = RESORT_BY_ID[currentDestination];
+        const fp = tripForecastParams();
+        const cacheKey = `${currentDestination}|${fp.key}`;
 
-        const cached = weatherCache.get(currentDestination);
+        const cached = weatherCache.get(cacheKey);
         if (cached && Date.now() - cached.fetchedAt < WEATHER_TTL_MS) {
             lastWeatherData = { ...cached.payload, cacheAgeSeconds: Math.round((Date.now() - cached.fetchedAt) / 1000) };
             renderWeather(lastWeatherData);
@@ -1579,14 +1749,15 @@
                 `&current_weather=true` +
                 `&hourly=temperature_2m,snowfall,precipitation,weathercode` +
                 `&daily=temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,weathercode` +
-                `&forecast_days=3&timezone=Europe/Berlin`;
+                fp.query + `&timezone=Europe/Berlin`;
             const res = await fetch(url);
             if (!res.ok) throw new Error(`Open-Meteo responded with ${res.status}`);
             const data = await res.json();
             if (!data.current_weather) throw new Error('Missing current_weather block');
 
             const payload = buildWeatherPayload(loc, data);
-            weatherCache.set(currentDestination, { fetchedAt: Date.now(), payload });
+            payload.coverage = fp.coverage;
+            weatherCache.set(cacheKey, { fetchedAt: Date.now(), payload });
             lastWeatherData = payload;
             renderWeather(payload);
         } catch (e) {
@@ -1640,17 +1811,20 @@
         requestAnimationFrame(frame);
     }
 
-    function computeTariff(originKey, destKey, passType, size, travelClass) {
+    function computeTariff(originKey, destKey, passType, size, travelClass, tripType) {
         const fromLoc = ORIGINS[originKey];
         const toLoc = RESORT_BY_ID[destKey];
         size = Math.max(1, parseInt(size, 10) || 1);
         const pass = PASS_PROFILES[passType] || PASS_PROFILES['none'];
         const cls = TRAVEL_CLASSES[travelClass] || TRAVEL_CLASSES['second'];
+        const roundTrip = tripType === 'roundTrip';
 
-        // Class applies to the rail leg; the alpine sector supplement is single-class.
-        const railLeg = roundCHF(fromLoc.baseRailPrice * cls.multiplier);
-        const alpineSupplement = toLoc.baseTariff;
-        const standardTicket = roundCHF(railLeg + alpineSupplement);
+        // Published SBB fare where we have one — it is already all-in and class-specific.
+        const fare = lookupFare(destKey, originKey, travelClass, tripType);
+        // Legacy estimate only for routes with no fare on file (currently Villars).
+        const estimate = roundCHF((fromLoc.baseRailPrice * cls.multiplier + toLoc.baseTariff) * (roundTrip ? 2 : 1));
+        const standardTicket = fare ? fare.amount : estimate;
+
         let modifier = pass.modifier;
         const groupDiscountApplied = size >= 10;
         if (groupDiscountApplied) modifier *= 0.70; // 30% group rate
@@ -1661,11 +1835,13 @@
             origin: fromLoc.name,
             destinationName: toLoc.name,
             breakdown: {
-                railLeg: railLeg,
-                alpineSupplement: alpineSupplement,
                 standardTicket: standardTicket,
-                classLabel: cls.label,
-                classShort: cls.short,
+                fareTier: fare ? fare.tier : null,
+                estimated: !fare,
+                variableRouting: fare ? fare.variableRouting : false,
+                classLabel: cls.label,                classShort: cls.short,
+                tripLabel: roundTrip ? 'Round trip' : 'One way',
+                tripShort: roundTrip ? 'RETURN' : 'ONE WAY',
                 passLabel: pass.label,
                 passDiscountPct: Math.round((1 - pass.modifier) * 100),
                 groupDiscountApplied: groupDiscountApplied
@@ -1689,7 +1865,8 @@
                 currentDestination,
                 document.getElementById('swissPass').value,
                 groupSize,
-                document.getElementById('travelClass').value
+                document.getElementById('travelClass').value,
+                document.getElementById('tripType').value
             );
             const b = data.breakdown;
             const p = data.pricing;
@@ -1697,12 +1874,15 @@
                 ? `<div class="t-row"><span>Group rate (10+)</span><span class="pos">−30% applied</span></div>` : '';
             const savings = p.savingsPerPerson > 0
                 ? `<span class="savings-badge">Group saves CHF ${chf(p.savingsPerPerson * p.groupSize)} vs standard fare</span>` : '';
+            const fareNotes =
+                (b.estimated ? `<div class="t-note warn">Estimated fare — no published SBB price on file for this route yet.</div>` : '') +
+                (b.variableRouting ? `<div class="t-note">${esc(VARIABLE_ROUTING_NOTE)}</div>` : '');
 
             wrap.innerHTML = `
             <div class="ticket">
                 <div class="ticket-head">
                     <span class="t-brand"><span class="mini-flag" style="width:16px;height:16px;border-radius:3px;"></span>ALPENSYNC RAIL</span>
-                    <span class="t-class">${b.classShort} · ${p.groupSize} PAX</span>
+                    <span class="t-class">${b.classShort} · ${b.tripShort} · ${p.groupSize} PAX</span>
                 </div>
                 <div class="ticket-route">
                     <div class="t-stop">${esc(data.origin)}<small>DEPARTURE HUB</small></div>
@@ -1711,8 +1891,7 @@
                 </div>
                 <div class="ticket-perf"></div>
                 <div class="ticket-body">
-                    <div class="t-row"><span>Rail leg (${esc(b.classLabel)})</span><span>CHF ${chf(b.railLeg)}</span></div>
-                    <div class="t-row"><span>Alpine sector supplement</span><span>CHF ${chf(b.alpineSupplement)}</span></div>
+                    <div class="t-row"><span>${esc(b.tripLabel)} · ${esc(b.classLabel)}</span><span>CHF ${chf(b.standardTicket)}</span></div>
                     <div class="t-row"><span>${esc(b.passLabel)}</span><span class="pos">−${b.passDiscountPct}%</span></div>
                     ${groupLine}
                     <div class="t-row strong"><span>Per passenger</span><span>CHF ${chf(p.finalPricePerPerson)}</span></div>
@@ -1721,9 +1900,11 @@
                         <span class="amt" id="ticketTotal">CHF 0.00</span>
                     </div>
                     ${savings}
+                    ${fareNotes}
                 </div>
             </div>`;
             countUp(document.getElementById('ticketTotal'), p.totalGroupCost, 'CHF ');
+            updateTripRollup();
         }
     }
 
@@ -1761,6 +1942,7 @@
         }).join('');
         document.querySelectorAll('.exp-payer').forEach(sel => populatePayerSelect(sel, sel.value));
         saveState();
+        updateTripRollup();
     }
 
     function populatePayerSelect(sel, preferred) {
@@ -1791,10 +1973,11 @@
         const remove = document.createElement('button');
         remove.type = 'button'; remove.className = 'remove-row';
         remove.innerText = '×'; remove.title = 'Remove line item';
-        remove.onclick = () => { div.remove(); saveState(); };
+        remove.onclick = () => { div.remove(); saveState(); updateTripRollup(); };
 
         div.append(desc, amount, payer, remove);
         container.appendChild(div);
+        updateTripRollup();
     }
 
     function collectExpenses() {
@@ -1910,56 +2093,167 @@
         }
     }
 
-    // --- Mountain passes ---
+    // --- Mountain passes (season-aware; each system/season defines its own ticket grid) ---
 
     const PASS_SYSTEMS = {
-        vgd:         { name: 'Villars–Gryon–Les Diablerets', prices: { adult: 69, young: 61, child: 47, senior: 49 } },
-        leysin:      { name: 'Leysin–Les Mosses–La Lécherette', prices: { adult: 68, young: 61, child: 44, senior: 40 } },
-        glacier3000: { name: 'Glacier 3000', prices: { adult: 89, young: 79, child: 45, senior: 65 } }
+        vgd:         { name: 'Villars–Gryon–Les Diablerets' },
+        leysin:      { name: 'Leysin–Les Mosses–La Lécherette' },
+        glacier3000: { name: 'Glacier 3000' }
     };
     const MOUNTAIN_PASS = { villars: 'vgd', gryon: 'vgd', diablerets: 'vgd', leysin: 'leysin', glacier3000: 'glacier3000' };
-    const AGE_CATEGORIES = [
-        { id: 'adult',  short: 'Adult',  label: 'Adult (born 2001+)' },
-        { id: 'young',  short: 'Young',  label: 'Young / Teen (born 2002–2009)' },
-        { id: 'child',  short: 'Child',  label: 'Child (born 2010–2019)' },
-        { id: 'senior', short: 'Senior', label: 'Senior (born 1960 or earlier)' }
+
+    // Build a day-count scheme (1..maxDays) from per-category price arrays.
+    function buildDayScheme(categories, arrays, maxDays) {
+        const options = [], prices = {};
+        for (let d = 1; d <= maxDays; d++) {
+            const id = 'd' + d;
+            options.push({ id, label: d + ' day' + (d > 1 ? 's' : '') });
+            prices[id] = {};
+            categories.forEach(c => { prices[id][c.id] = arrays[c.id][d - 1]; });
+        }
+        return { categories, options, prices };
+    }
+
+    const WINTER_AGE_CATS = [
+        { id: 'adult',       label: 'Adult',          short: 'Adult' },
+        { id: 'youthsenior', label: 'Youth / Senior', short: 'Youth/Senior' },
+        { id: 'child',       label: 'Child',          short: 'Child' }
     ];
-    const AGE_SHORT = Object.fromEntries(AGE_CATEGORIES.map(a => [a.id, a.short]));
+
+    // Each scheme: { categories:[{id,label,short}], options:[{id,label}], prices:{ optionId:{ categoryId: CHF } } }.
+    // Set a season to null until its official rate sheet is loaded.
+    const PASS_SCHEMES = {
+        glacier3000: {
+            winter: buildDayScheme(WINTER_AGE_CATS, {
+                adult:       [89, 159, 219, 279, 329, 379, 419, 469, 519, 569, 619, 669, 719, 769, 819],
+                youthsenior: [81, 144, 198, 252, 297, 342, 378, 423, 468, 513, 558, 603, 648, 693, 738],
+                child:       [58, 104, 143, 182, 214, 247, 273, 305, 338, 370, 403, 435, 468, 500, 533]
+            }, 15),
+            summer: null
+        },
+        vgd: {
+            winter: null,
+            summer: {
+                categories: [
+                    { id: 'adult',   label: 'Adult',                                       short: 'Adult' },
+                    { id: 'reduced', label: 'Reduced — SwissPass ½/GA · child 2011–2020', short: 'Reduced' },
+                    { id: 'loyalty', label: 'With Loyalty / Welcome card',                 short: 'Loyalty' }
+                ],
+                options: [
+                    { id: 'sec1', label: '1 section' },
+                    { id: 'sec2', label: '2 sections' },
+                    { id: 'day',  label: 'Day card' }
+                ],
+                prices: {
+                    sec1: { adult: 20, reduced: 10, loyalty: 16 },
+                    sec2: { adult: 28, reduced: 14, loyalty: 22 },
+                    day:  { adult: 36, reduced: 18, loyalty: 29 }
+                }
+            }
+        },
+        leysin: { winter: null, summer: null }
+    };
+
+    let passSchemeKey = null;
+
+    function passMountainValue() { return document.getElementById('passMountain').value; }
+
+    function currentPassScheme() {
+        const sysId = MOUNTAIN_PASS[passMountainValue()];
+        return (PASS_SCHEMES[sysId] && PASS_SCHEMES[sysId][currentSeason.toLowerCase()]) || null;
+    }
+
+    // Rebuild the ticket-type + option dropdowns only when the system/season changes,
+    // preserving the current selection by id where the new scheme still offers it.
+    function syncPassPickers() {
+        const sysId = MOUNTAIN_PASS[passMountainValue()];
+        const key = sysId + '|' + currentSeason.toLowerCase();
+        if (key === passSchemeKey) return;
+        passSchemeKey = key;
+        const scheme = currentPassScheme();
+        const catSel = document.getElementById('passCategory');
+        const optSel = document.getElementById('passOption');
+        if (!scheme) {
+            catSel.innerHTML = ''; optSel.innerHTML = '';
+            catSel.disabled = true; optSel.disabled = true;
+            return;
+        }
+        catSel.disabled = false; optSel.disabled = false;
+        const prevCat = catSel.value, prevOpt = optSel.value;
+        catSel.innerHTML = scheme.categories.map(c => `<option value="${c.id}">${esc(c.label)}</option>`).join('');
+        if (scheme.categories.some(c => c.id === prevCat)) catSel.value = prevCat;
+        optSel.innerHTML = scheme.options.map(o => `<option value="${o.id}">${esc(o.label)}</option>`).join('');
+        if (scheme.options.some(o => o.id === prevOpt)) optSel.value = prevOpt;
+    }
 
     function renderPassTable() {
-        const rows = [['adult', 'Adult'], ['young', 'Young'], ['child', 'Child'], ['senior', 'Senior']];
-        document.getElementById('passTable').innerHTML = Object.values(PASS_SYSTEMS).map(sys => `
-            <div class="pass-card">
-                <div class="pc-name">${esc(sys.name)}</div>
-                ${rows.map(([id, lbl]) => `<div class="pc-row"><span>${lbl}</span><span class="pc-price">CHF ${sys.prices[id]}</span></div>`).join('')}
-            </div>`).join('');
+        const host = document.getElementById('passTable');
+        if (!host) return;
+        const sys = PASS_SYSTEMS[MOUNTAIN_PASS[passMountainValue()]];
+        const season = currentSeason.toLowerCase();
+        if (!sys) { host.innerHTML = ''; return; }
+        const scheme = currentPassScheme();
+        if (!scheme) {
+            host.innerHTML = `<div class="pass-empty">${esc(sys.name)} — ${season} pricing not loaded yet.</div>`;
+            return;
+        }
+        const selOpt = document.getElementById('passOption').value;
+        const rows = scheme.options.map(o =>
+            `<tr class="${o.id === selOpt ? 'sel' : ''}"><td>${esc(o.label)}</td>` +
+            scheme.categories.map(c => {
+                const v = scheme.prices[o.id] ? scheme.prices[o.id][c.id] : null;
+                return `<td>${v != null ? v + '.-' : '—'}</td>`;
+            }).join('') + `</tr>`).join('');
+        host.innerHTML =
+            `<div class="pass-ref-head">${esc(sys.name)} · ${season} rates</div>` +
+            `<div class="pass-ref-wrap"><table class="pass-ref"><thead><tr><th>Rates</th>` +
+            scheme.categories.map(c => `<th>${esc(c.short)}</th>`).join('') +
+            `</tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
     function populatePassPickers() {
-        document.getElementById('passAge').innerHTML = AGE_CATEGORIES.map(a => `<option value="${a.id}">${esc(a.label)}</option>`).join('');
         document.getElementById('passMountain').innerHTML = RESORTS.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('');
         document.getElementById('passMountain').value = currentDestination;
-    }
-
-    function passPrice(mountainId, ageId) {
-        const sys = PASS_SYSTEMS[MOUNTAIN_PASS[mountainId]];
-        return sys ? sys.prices[ageId] : null;
+        passSchemeKey = null;
+        syncPassPickers();
     }
 
     function updatePassPrice() {
-        const p = passPrice(document.getElementById('passMountain').value, document.getElementById('passAge').value);
-        document.getElementById('passPrice').innerHTML = p != null
-            ? `1-day pass: <span class="amt">CHF ${p}.00</span>`
-            : '1-day pass: —';
+        syncPassPickers();
+        renderPassTable();
+        const scheme = currentPassScheme();
+        const el = document.getElementById('passPrice');
+        const btn = document.getElementById('passAddBtn');
+        if (!scheme) {
+            el.innerHTML = `<span style="color:var(--ink-3);">${currentSeason === 'SUMMER' ? 'Summer' : 'Winter'} pricing coming soon</span>`;
+            if (btn) btn.disabled = true;
+            return;
+        }
+        const catId = document.getElementById('passCategory').value;
+        const optId = document.getElementById('passOption').value;
+        const p = scheme.prices[optId] ? scheme.prices[optId][catId] : null;
+        if (p != null) {
+            const optLabel = (scheme.options.find(o => o.id === optId) || {}).label || '';
+            el.innerHTML = `${esc(optLabel)}: <span class="amt">CHF ${p}.-</span>`;
+            if (btn) btn.disabled = false;
+        } else {
+            el.innerHTML = '—';
+            if (btn) btn.disabled = true;
+        }
     }
 
     function addPassToTrip() {
-        const m = document.getElementById('passMountain').value;
-        const a = document.getElementById('passAge').value;
-        const p = passPrice(m, a);
+        const mId = passMountainValue();
+        const scheme = currentPassScheme();
+        if (!scheme) return;
+        const catId = document.getElementById('passCategory').value;
+        const optId = document.getElementById('passOption').value;
+        const p = scheme.prices[optId] ? scheme.prices[optId][catId] : null;
         if (p == null) return;
-        const mName = RESORT_BY_ID[m]?.name || m;
-        addExpenseRow({ description: `Lift pass · ${mName} (${AGE_SHORT[a]})`, amount: String(p), payer: rosterMembers()[0] });
+        const mName = RESORT_BY_ID[mId] ? RESORT_BY_ID[mId].name : mId;
+        const optLabel = (scheme.options.find(o => o.id === optId) || {}).label || '';
+        const catShort = (scheme.categories.find(c => c.id === catId) || {}).short || '';
+        addExpenseRow({ description: `Lift pass · ${mName} · ${optLabel} (${catShort})`, amount: String(p), payer: rosterMembers()[0] });
         saveState();
         const btn = document.getElementById('passAddBtn');
         const label = btn.textContent;
@@ -1967,6 +2261,121 @@
         btn.disabled = true;
         setTimeout(() => { btn.textContent = label; btn.disabled = false; }, 1400);
         if (document.querySelector('#ledgerResults .ledger-summary')) settleGroupLedger();
+    }
+
+    // --- Trip dates & cost roll-up ---
+
+    function fmtDate(d) {
+        const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), da = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${da}`;
+    }
+    function parseDate(s) { const p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+    function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+
+    function tripDayCount() {
+        const s = document.getElementById('tripStart').value, e = document.getElementById('tripEnd').value;
+        if (!s || !e) return 0;
+        return Math.max(1, Math.round((parseDate(e) - parseDate(s)) / 86400000) + 1);
+    }
+
+    function updateTripDatesNote() {
+        const sEl = document.getElementById('tripStart'), eEl = document.getElementById('tripEnd');
+        const note = document.getElementById('tripDatesNote');
+        if (!sEl.value || !eEl.value) { note.textContent = ''; return; }
+        if (parseDate(eEl.value) < parseDate(sEl.value)) eEl.value = sEl.value;
+        const days = tripDayCount();
+        const opts = { weekday: 'short', day: 'numeric', month: 'short' };
+        const sTxt = parseDate(sEl.value).toLocaleDateString('en-CH', opts);
+        const eTxt = parseDate(eEl.value).toLocaleDateString('en-CH', opts);
+        note.textContent = `${days} day${days > 1 ? 's' : ''} · ${sTxt} – ${eTxt}`;
+    }
+
+    function initTripDates() {
+        const s = document.getElementById('tripStart'), e = document.getElementById('tripEnd');
+        if (!s.value) {
+            const t = new Date(); t.setHours(0, 0, 0, 0);
+            const untilSat = ((6 - t.getDay() + 7) % 7) || 7;   // next Saturday, at least a day out
+            const start = addDays(t, untilSat);
+            s.value = fmtDate(start);
+            e.value = fmtDate(addDays(start, 2));               // Sat → Mon, a 3-day weekend
+        } else if (!e.value) {
+            e.value = s.value;
+        }
+        updateTripDatesNote();
+    }
+
+    // Open-Meteo forecast reaches ~16 days out; clamp the trip range into that window.
+    function tripForecastParams() {
+        const sVal = document.getElementById('tripStart').value;
+        const eVal = document.getElementById('tripEnd').value;
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const maxDate = addDays(today, 15);
+        if (sVal && eVal) {
+            let s = parseDate(sVal), e = parseDate(eVal);
+            if (e < s) e = s;
+            if (e >= today && s <= maxDate) {
+                const cs = s < today ? today : s;
+                const ce = e > maxDate ? maxDate : e;
+                const clamped = (s < today) || (e > maxDate);
+                return {
+                    key: `${fmtDate(cs)}_${fmtDate(ce)}`,
+                    query: `&start_date=${fmtDate(cs)}&end_date=${fmtDate(ce)}`,
+                    coverage: clamped ? 'Forecast for the in-range part of your trip' : 'Forecast for your trip dates'
+                };
+            }
+            return { key: 'live', query: '&forecast_days=3', coverage: 'Trip is outside the 16-day forecast window — showing the next 3 days' };
+        }
+        return { key: 'live', query: '&forecast_days=3', coverage: '' };
+    }
+
+    function onTripDatesChange() {
+        updateTripDatesNote();
+        fetchTelemetry();
+        updateTripRollup();
+        saveState();
+    }
+
+    function computeSharedPerPerson() {
+        const total = collectExpenses().reduce((acc, e) => {
+            const v = parseFloat(e.amount);
+            return acc + (v > 0 ? v : 0);
+        }, 0);
+        const n = travellerCount();
+        return { total: roundCHF(total), per: roundCHF(total / n), n };
+    }
+
+    function updateTripRollup() {
+        const host = document.getElementById('tripRollup');
+        if (!host) return;
+        const fare = computeTariff(
+            document.getElementById('originHub').value,
+            currentDestination,
+            document.getElementById('swissPass').value,
+            document.getElementById('groupSize').value,
+            document.getElementById('travelClass').value,
+            document.getElementById('tripType').value
+        );
+        const railPer = fare.pricing.finalPricePerPerson;
+        const shared = computeSharedPerPerson();
+        const allInPer = roundCHF(railPer + shared.per);
+        const groupTotal = roundCHF(allInPer * shared.n);
+        const dest = RESORT_BY_ID[currentDestination].name;
+        const dateLabel = document.getElementById('tripDatesNote').textContent || '';
+        host.innerHTML =
+            `<div class="rollup-grid">
+                <div class="rollup-main">
+                    <div class="rollup-lbl">Per person, all in</div>
+                    <div class="rollup-amt" id="rollupPer">CHF ${chf(allInPer)}</div>
+                    <div class="rollup-ctx">${esc(dest)}${dateLabel ? ' · ' + esc(dateLabel) : ''}</div>
+                </div>
+                <div class="rollup-break">
+                    <div class="rb-row"><span>Rail fare / passenger</span><span>CHF ${chf(railPer)}</span></div>
+                    <div class="rb-row"><span>Shared costs / person</span><span>CHF ${chf(shared.per)}</span></div>
+                    <div class="rb-row total"><span>All in / person</span><span>CHF ${chf(allInPer)}</span></div>
+                    <div class="rb-row group"><span>Group of ${shared.n}</span><span>CHF ${chf(groupTotal)}</span></div>
+                </div>
+            </div>`;
+        countUp(document.getElementById('rollupPer'), allInPer, 'CHF ');
     }
 
     // --- Persistence ---
@@ -1979,7 +2388,10 @@
                 destination: currentDestination,
                 passType: document.getElementById('swissPass').value,
                 travelClass: document.getElementById('travelClass').value,
+                tripType: document.getElementById('tripType').value,
                 groupSize: document.getElementById('groupSize').value,
+                tripStart: document.getElementById('tripStart').value,
+                tripEnd: document.getElementById('tripEnd').value,
                 travellers: travellerCount(),
                 expenses: collectExpenses()
             }));
@@ -1998,7 +2410,10 @@
             if (state.origin) document.getElementById('originHub').value = state.origin;
             if (state.passType) document.getElementById('swissPass').value = state.passType;
             if (state.travelClass) document.getElementById('travelClass').value = state.travelClass;
+            if (state.tripType) document.getElementById('tripType').value = state.tripType;
             if (state.groupSize) document.getElementById('groupSize').value = state.groupSize;
+            if (state.tripStart) document.getElementById('tripStart').value = state.tripStart;
+            if (state.tripEnd) document.getElementById('tripEnd').value = state.tripEnd;
             if (state.travellers) document.getElementById('travellerCount').value = Math.max(1, parseInt(state.travellers, 10) || DEFAULT_TRAVELLERS);
         }
         const expenses = (state?.expenses?.length) ? state.expenses : DEFAULT_EXPENSES;
@@ -2010,22 +2425,27 @@
         loadState();
         applySeason();
         syncSegmented(document.getElementById('classSeg'), document.getElementById('travelClass').value);
+        syncSegmented(document.getElementById('tripTypeSeg'), document.getElementById('tripType').value);
         renderActivities();
         renderPicker();
         renderRoster();
-        renderPassTable();
         populatePassPickers();
         updatePassPrice();
         initHero();
         initMap();
         markReady();
+        initTripDates();
         fetchTelemetry();
         calculateTariff();
+        updateTripRollup();
         requestAnimationFrame(positionAllSegmented);
         setTimeout(positionAllSegmented, 450);
     });
     window.addEventListener('resize', positionAllSegmented);
     document.addEventListener('change', saveState);
+    document.addEventListener('input', (e) => {
+        if (e.target && e.target.closest && e.target.closest('#expenseContainer')) updateTripRollup();
+    });
 </script>
 </body>
 </html>
