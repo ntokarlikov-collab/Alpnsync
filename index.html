@@ -610,10 +610,7 @@
         .valley-backdrop { opacity: 0.9; }
 
         /* Gold "summit light" marks the best forecast day */
-        **CHUNK 2 of 4.** Put your cursor at the very end of chunk 1 (right after that `/* Gold "summit light"... */` comment) and paste this straight on — no blank line between.
-
-```html
-        .outlook-card.best { border-color: var(--gold); background: var(--gold-soft); }
+                .outlook-card.best { border-color: var(--gold); background: var(--gold-soft); }
         .o-best-tag { color: #8A5A12; }
 
         /* Weightier hover states */
@@ -1224,11 +1221,7 @@
         80: 'Light rain showers', 81: 'Rain showers', 82: 'Violent rain showers',
         85: 'Light snow showers', 86: 'Heavy snow showers',
         95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Thunderstorm with heavy hail'
-    };
-    **CHUNK 3 of 4.** Paste directly onto the end of chunk 2 (right after that `};` closing the weather codes).
-
-```html
-    const RESORT_BY_ID = Object.fromEntries(RESORTS.map(r => [r.id, r]));
+    };    const RESORT_BY_ID = Object.fromEntries(RESORTS.map(r => [r.id, r]));
 
     const roundCHF = (v) => Math.round(v * 100) / 100;
     const SETTLED_EPSILON = 0.005;
