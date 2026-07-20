@@ -449,9 +449,10 @@
             background: rgba(255, 255, 255, 0.6);
         }
         .expense-item {
-            display: grid; grid-template-columns: 2fr 1fr 1fr 36px;
-            gap: 8px; margin-bottom: 8px; align-items: center;
+            display: grid; grid-template-columns: 1.7fr 0.85fr 1.1fr 0.95fr 34px;
+            gap: 7px; margin-bottom: 8px; align-items: center;
         }
+        @media (max-width: 560px) { .expense-item { grid-template-columns: 1fr 1fr 34px; } }
         .remove-row {
             width: 36px; height: 38px;
             background: none; border: 1px solid var(--line); border-radius: 10px;
@@ -567,7 +568,7 @@
             background-image:
                 radial-gradient(150% 62% at 50% -12%, rgba(224,112,140,0.12) 0%, rgba(227,165,68,0.07) 28%, rgba(36,28,78,0) 56%),
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='840' height='840'%3E%3Cg fill='none' stroke='%23241C4E' stroke-opacity='0.035' stroke-width='1'%3E%3Cpath d='M0,140 Q210,96 420,140 T840,140'/%3E%3Cpath d='M0,290 Q210,246 420,290 T840,290'/%3E%3Cpath d='M0,440 Q210,396 420,440 T840,440'/%3E%3Cpath d='M0,590 Q210,546 420,590 T840,590'/%3E%3Cpath d='M0,740 Q210,696 420,740 T840,740'/%3E%3C/g%3E%3C/svg%3E");
-            background-repeat: no-repeat, repeat;
+                        background-repeat: no-repeat, repeat;
             background-attachment: fixed, fixed;
             background-position: center top, center top;
         }
@@ -610,7 +611,7 @@
         .valley-backdrop { opacity: 0.9; }
 
         /* Gold "summit light" marks the best forecast day */
-                .outlook-card.best { border-color: var(--gold); background: var(--gold-soft); }
+        .outlook-card.best { border-color: var(--gold); background: var(--gold-soft); }
         .o-best-tag { color: #8A5A12; }
 
         /* Weightier hover states */
@@ -728,6 +729,39 @@
         .t-note.warn { color: #9B1C1C; border-left-color: var(--swiss-red); }
         .date-note { margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--ink-2); font-family: var(--font-mono); }
         .w-coverage { font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+        /* Gear rental */
+        /* The recommendation is the module — one shop, chosen from the activity already picked. */
+        .rec { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: rgba(255,255,255,0.72); }
+        .rec-top { padding: 20px 22px 18px; background: linear-gradient(135deg, #FFFCF3 0%, rgba(255,255,255,0.6) 100%); border-bottom: 1px solid var(--line); }
+        .rec-for { font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; text-transform: uppercase; color: var(--ink-3); }
+        .rec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 7px; flex-wrap: wrap; }
+        .rec-name { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -0.3px; }
+        .rec-link { font-size: 12px; font-weight: 700; color: var(--swiss-red); text-decoration: none; white-space: nowrap; }
+        .rec-where { font-size: 13px; color: var(--ink-2); margin-top: 5px; line-height: 1.55; }
+        .rec-why { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+        .rec-why span { font-size: 11px; font-weight: 700; background: var(--gold); color: #3A2A00; border-radius: 999px; padding: 3px 10px; }
+        .rec-note { font-size: 12px; color: #1F6B3A; font-weight: 700; margin-top: 10px; }
+        .rec-kit { display: flex; gap: 7px; margin-top: 14px; flex-wrap: wrap; }
+        .rec-kit button { font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--line); background: rgba(255,255,255,0.8); color: var(--ink-2); border-radius: 999px; padding: 6px 14px; transition: all .18s var(--ease-soft); }
+        .rec-kit button:hover { border-color: var(--gold); }
+        .rec-kit button.on { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+        .rec-book { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; padding: 16px 22px; }
+        .rec-field { display: flex; flex-direction: column; gap: 5px; }
+        .rec-field > label { font-size: 10.5px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--ink-3); }
+        .rec-field select, .rec-field input { min-width: 108px; }
+        .rec-book .btn-primary { margin-left: auto; }
+        .rec-total { font-family: var(--font-mono); font-weight: 700; font-size: 14px; color: var(--ink); align-self: flex-end; padding-bottom: 8px; }
+        .rec-alt { margin-top: 12px; }
+        .rec-alt summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--ink-3); list-style: none; padding: 6px 2px; }
+        .rec-alt summary::-webkit-details-marker { display: none; }
+        .rec-alt summary::before { content: '▸ '; }
+        .rec-alt[open] summary::before { content: '▾ '; }
+        .rec-alt summary:hover { color: var(--swiss-red); }
+        .alt-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 4px; border-top: 1px solid var(--line); font-size: 12.5px; }
+        .alt-name { font-weight: 700; }
+        .alt-why { color: var(--ink-3); font-size: 11.5px; }
+        .rental-empty { padding: 26px 18px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ink-3); border: 2px dashed var(--line); border-radius: 14px; }
+        .rental-hint { font-size: 11.5px; color: var(--ink-3); font-weight: 600; margin-top: 6px; line-height: 1.45; width: 100%; }
         .rollup { background: linear-gradient(135deg, #241C4E 0%, #3A2E66 100%); border: 1px solid rgba(255,255,255,0.06); color: #fff; }
         .rollup:hover { box-shadow: 0 24px 56px rgba(42, 27, 78, 0.28); }
         .rollup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
@@ -985,6 +1019,13 @@
             </div>
         </div>
 
+        <h2 class="section-title reveal">Rent your gear</h2>
+        <p class="section-sub reveal">Your activity already tells us what you need — here’s the best place to get it.</p>
+        <section class="panel reveal">
+            <div id="rentalRec"></div>
+            <input type="hidden" id="gearScope" value="personal">
+        </section>
+
         <h2 class="section-title reveal">Your trip, all in</h2>
         <p class="section-sub reveal">Rail, passes and shared costs rolled into one per-person number — updates live.</p>
         <section class="panel reveal rollup" id="tripRollup"></section>
@@ -1031,8 +1072,7 @@
     const STORAGE_KEY = 'alpensync-state-v3';
     const DEFAULT_TRAVELLERS = 4;
     const DEFAULT_EXPENSES = [
-        { description: 'Chalet Lodging', amount: '600', payer: 'Traveller 1' },
-        { description: 'Resort Mountain Passes', amount: '240', payer: 'Traveller 2' }
+        { description: 'Shared transport / groceries', amount: '240', payer: 'Traveller 1', scope: 'split' }
     ];
 
     const RESORTS = [
@@ -1097,8 +1137,7 @@
 
     // --- Client-side registries (everything runs in the browser — no server) ---
     // `baseRailPrice` is a legacy placeholder, used only where MOUNTAIN_FARES has no entry.
-    const ORIGINS = {
-        'geneva-airport': { name: 'Geneva Airport', baseRailPrice: 40, lat: 46.2381, lon: 6.1089 },
+    const ORIGINS = {        'geneva-airport': { name: 'Geneva Airport', baseRailPrice: 40, lat: 46.2381, lon: 6.1089 },
         'geneva':         { name: 'Geneva (Cornavin)', baseRailPrice: 40, lat: 46.2102, lon: 6.1424 },
         'lausanne':       { name: 'Lausanne', baseRailPrice: 28, lat: 46.5170, lon: 6.6290 },
         'bern':           { name: 'Bern', baseRailPrice: 38, lat: 46.9490, lon: 7.4390 },
@@ -1221,7 +1260,8 @@
         80: 'Light rain showers', 81: 'Rain showers', 82: 'Violent rain showers',
         85: 'Light snow showers', 86: 'Heavy snow showers',
         95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Thunderstorm with heavy hail'
-    };    const RESORT_BY_ID = Object.fromEntries(RESORTS.map(r => [r.id, r]));
+    };
+    const RESORT_BY_ID = Object.fromEntries(RESORTS.map(r => [r.id, r]));
 
     const roundCHF = (v) => Math.round(v * 100) / 100;
     const SETTLED_EPSILON = 0.005;
@@ -1361,6 +1401,7 @@
         renderPicker();
         refreshMap();
         updatePassPrice();
+        updateRental();
         if (lastWeatherData) renderWeather(lastWeatherData);
         saveState();
     }
@@ -1522,6 +1563,7 @@
         currentActivity = (currentActivity === id) ? null : id;
         renderActivities();
         renderPicker();
+        updateRental();
         const matches = matchingResorts();
         if (currentActivity && matches.length && !matches.includes(currentDestination)) {
             selectResort(matches[0]);      // jump to the best-matching sector
@@ -1552,6 +1594,7 @@
         document.querySelectorAll('.resort-row').forEach(r => r.classList.toggle('selected', r.dataset.id === id));
         const pm = document.getElementById('passMountain');
         if (pm) { pm.value = id; updatePassPrice(); }
+        updateRental();
         refreshMap();
         fetchTelemetry();
         calculateTariff();
@@ -1664,7 +1707,7 @@
                     <div class="weather-now">
                         <div class="w-icon">${iconForCode(data.current.weathercode)}</div>
                         <div>
-                            <div class="w-temp" id="wTemp">${Math.round(data.current.temperature)}°</div>
+                                                    <div class="w-temp" id="wTemp">${Math.round(data.current.temperature)}°</div>
                             <div class="w-cond">${esc(data.current.condition)}</div>
                             <div class="w-place">${esc(data.destination)} · ${esc(data.region)} · station ${data.stationElevation} m</div>
                             ${currentResortActs()}
@@ -1832,7 +1875,8 @@
                 fareTier: fare ? fare.tier : null,
                 estimated: !fare,
                 variableRouting: fare ? fare.variableRouting : false,
-                classLabel: cls.label,                classShort: cls.short,
+                classLabel: cls.label,
+                classShort: cls.short,
                 tripLabel: roundTrip ? 'Round trip' : 'One way',
                 tripShort: roundTrip ? 'RETURN' : 'ONE WAY',
                 passLabel: pass.label,
@@ -1963,21 +2007,42 @@
         payer.className = 'exp-payer';
         populatePayerSelect(payer, item.payer);
 
+        // Split = shared across the group and settled. Personal = each traveller pays their
+        // own (gear, lift passes) — counted per person and excluded from the settlement.
+        const scope = document.createElement('select');
+        scope.className = 'exp-scope';
+        scope.innerHTML = '<option value="split">Split</option><option value="personal">Personal</option>';
+        scope.value = item.scope === 'personal' ? 'personal' : 'split';
+        scope.onchange = () => { syncExpenseRow(div); saveState(); updateTripRollup(); };
+
         const remove = document.createElement('button');
         remove.type = 'button'; remove.className = 'remove-row';
         remove.innerText = '×'; remove.title = 'Remove line item';
         remove.onclick = () => { div.remove(); saveState(); updateTripRollup(); };
 
-        div.append(desc, amount, payer, remove);
+        div.append(desc, amount, payer, scope, remove);
         container.appendChild(div);
+        syncExpenseRow(div);
         updateTripRollup();
+    }
+
+    // A personal cost has no payer to settle against — everyone covers their own.
+    function syncExpenseRow(div) {
+        const scopeEl = div.querySelector('.exp-scope');
+        const payerEl = div.querySelector('.exp-payer');
+        if (!scopeEl || !payerEl) return;
+        const personal = scopeEl.value === 'personal';
+        payerEl.disabled = personal;
+        payerEl.style.opacity = personal ? '0.4' : '1';
+        payerEl.title = personal ? 'Personal costs are paid by each traveller — nothing to settle' : '';
     }
 
     function collectExpenses() {
         return [...document.querySelectorAll('.expense-item')].map(row => ({
             description: row.querySelector('.exp-desc').value.trim(),
             amount: row.querySelector('.exp-amount').value,
-            payer: row.querySelector('.exp-payer').value.trim()
+            payer: row.querySelector('.exp-payer').value.trim(),
+            scope: row.querySelector('.exp-scope') ? row.querySelector('.exp-scope').value : 'split'
         }));
     }
 
@@ -2031,8 +2096,9 @@
             results.innerHTML = `<div class="error-banner">The roster is empty — add at least one member.</div>`;
             return;
         }
+        // Personal costs never enter the settlement — each traveller covers their own.
         const expenses = collectExpenses()
-            .filter(e => e.amount !== '')
+            .filter(e => e.amount !== '' && e.scope !== 'personal')
             .map(e => ({ ...e, amount: parseFloat(e.amount) }));
 
         {
@@ -2210,8 +2276,7 @@
         passSchemeKey = null;
         syncPassPickers();
     }
-
-    function updatePassPrice() {
+        function updatePassPrice() {
         syncPassPickers();
         renderPassTable();
         const scheme = currentPassScheme();
@@ -2246,13 +2311,315 @@
         const mName = RESORT_BY_ID[mId] ? RESORT_BY_ID[mId].name : mId;
         const optLabel = (scheme.options.find(o => o.id === optId) || {}).label || '';
         const catShort = (scheme.categories.find(c => c.id === catId) || {}).short || '';
-        addExpenseRow({ description: `Lift pass · ${mName} · ${optLabel} (${catShort})`, amount: String(p), payer: rosterMembers()[0] });
+        addExpenseRow({ description: `Lift pass · ${mName} · ${optLabel} (${catShort})`, amount: String(p), payer: rosterMembers()[0], scope: 'personal' });
         saveState();
         const btn = document.getElementById('passAddBtn');
         const label = btn.textContent;
         btn.textContent = 'Added to trip ✓';
         btn.disabled = true;
         setTimeout(() => { btn.textContent = label; btn.disabled = false; }, 1400);
+        if (document.querySelector('#ledgerResults .ledger-summary')) settleGroupLedger();
+    }
+
+    // --- GEAR RENTAL ---
+    // Shop directory verified against the Alpes Vaudoises tourist board listings and the
+    // shops' own sites. Rental rates are NOT published anywhere (every shop quotes through a
+    // date-driven booking engine), so `prices` stays null until a real rate card is loaded —
+    // we never invent a price for a real business. Until then the user enters the quoted price.
+
+    const RENTAL_MAX_DAYS = 7;
+
+    const GEAR_TYPES = {
+        ski:       { label: 'Ski set',            includes: 'Skis · boots · poles' },
+        snowboard: { label: 'Snowboard set',      includes: 'Board · boots' },
+        freeride:  { label: 'Freeride set',       includes: 'Wide skis · boots · poles' },
+        touring:   { label: 'Ski touring set',    includes: 'Touring skis · skins · boots · poles' },
+        xc:        { label: 'Cross-country set',  includes: 'XC skis · boots · poles' },
+        snowshoe:  { label: 'Snowshoes',          includes: 'Snowshoes · poles' },
+        mtb:       { label: 'Mountain bike',      includes: 'MTB · helmet' },
+        ebike:     { label: 'E-bike',             includes: 'E-MTB · helmet · battery' },
+        ferrata:   { label: 'Via ferrata kit',    includes: 'Harness · lanyard · helmet' },
+        alpine:    { label: 'Mountaineering kit', includes: 'Harness · crampons · axe' }
+    };
+
+    // App activity → gear it needs. Activities absent here (hike, trail, paraglide) need no rental.
+    const ACTIVITY_GEAR = {
+        ski:      ['ski', 'snowboard'],
+        freeride: ['freeride', 'snowboard'],
+        touring:  ['touring'],
+        xc:       ['xc'],
+        snowshoe: ['snowshoe'],
+        mtb:      ['mtb', 'ebike'],
+        ferrata:  ['ferrata'],
+        alpine:   ['alpine']
+    };
+
+    // `gear` lists only equipment a source explicitly confirms the shop rents.
+    const RENTAL_SHOPS = [
+        {
+            id: 'mcboard', name: 'McBoard / Paragon Sport', url: 'https://www.mcboard.ch',
+            note: '−10% booking online via INTERSPORT Rent · family shop since 1983',
+            serves: ['villars', 'gryon'],
+            branches: [
+                { village: 'villars', label: 'Villars-sur-Ollon', address: 'Rue Centrale 117, 1884', phone: '+41 24 495 13 39' },
+                { village: 'gryon',   label: 'Gryon',             address: 'Route de Solalex 15, 1882', phone: '+41 24 498 16 30' },
+                { village: 'gryon',   label: 'Alpe des Chaux',    address: null, phone: null }
+            ],
+            gear: ['ski', 'snowboard', 'freeride', 'mtb', 'ebike', 'ferrata'],
+            onlineDiscount: 10,
+            prices: null   // pending the McBoard winter + summer rate PDFs
+        },
+        {
+            id: 'villarssports', name: 'Villars Sports Shop', url: 'https://villars.ski/en/',
+            note: 'Villars Ski School shop',
+            serves: ['villars'],
+            branches: [{ village: 'villars', label: 'Villars-sur-Ollon', address: 'Route des hôtels 5', phone: '+41 24 495 45 45' }],
+            gear: ['ski', 'snowboard', 'mtb'], prices: null
+        },
+        {
+            id: 'daetwyler', name: 'Dätwyler Bazar-Sports', url: 'https://www.daetwyler-sports-villars.ch/en/ski/',
+            note: 'Opposite Villars station · tuning, bootfitting, lockers · 3 branches',
+            serves: ['villars'],
+            branches: [{ village: 'villars', label: 'Villars-sur-Ollon', address: 'Opposite Villars railway station', phone: null }],
+            gear: ['ski', 'snowboard', 'mtb'], service: true, prices: null
+        },
+        {
+            id: 'sportshouse', name: "Sport's House", url: null,
+            note: 'Summer + winter · e-bike hire and sales',
+            serves: ['villars'],
+            branches: [{ village: 'villars', label: 'Villars-sur-Ollon', address: null, phone: null }],
+            gear: ['ski', 'snowboard', 'mtb', 'ebike'], prices: null
+        },
+        {
+            id: 'happyskis', name: 'Happyskis', url: 'https://en.happyskis.ch/ski-hire/',
+            note: 'Packages happybasic → happypro · helmet CHF 6/day',
+            serves: ['villars', 'gryon'],
+            branches: [{ village: 'villars', label: 'Villars-Gryon', address: null, phone: '+41 24 495 14 64' }],
+            gear: ['ski', 'snowboard'], prices: null
+        },
+        {
+            id: 'holidaysport', name: 'Holiday Sport', url: 'https://www.holidaysport.ch/',
+            note: 'In the village 30+ years · also runs the Glacier 3000 top-station shop',
+            serves: ['diablerets', 'glacier3000'],
+            branches: [
+                { village: 'diablerets',  label: 'Les Diablerets', address: 'Village centre', phone: null },
+                { village: 'glacier3000', label: 'Glacier 3000',   address: 'Top station', phone: null }
+            ],
+            gear: ['ski', 'snowboard'], atLifts: ['glacier3000'], prices: null
+        },
+        {
+            id: 'passemontagne', name: 'Diablerets Passe Montagne', url: 'https://diablerets-pm.ch/',
+            note: 'DPM Pro Shop',
+            serves: ['diablerets'],
+            branches: [{ village: 'diablerets', label: 'Les Diablerets', address: 'Rue de la Gare 50', phone: null }],
+            gear: ['ski', 'snowboard'], prices: null
+        },
+        {
+            id: 'jackysports', name: 'Jacky Sports (INTERSPORT)', url: 'https://www.intersportrent.ch/skirent-les-diablerets~3949477',
+            note: null,
+            serves: ['diablerets'],
+            branches: [{ village: 'diablerets', label: 'Les Diablerets', address: null, phone: null }],
+            gear: ['ski', 'snowboard', 'mtb'], prices: null
+        },
+        {
+            id: 'hefti', name: 'Hefti Sports', url: 'https://heftisports.ch/',
+            note: 'At the foot of the lifts · touring + cross-country specialist · 2nd branch Les Mosses',
+            serves: ['leysin'],
+            branches: [{ village: 'leysin', label: 'Leysin', address: 'Route du Belvédère 3, 1854', phone: null }],
+            gear: ['ski', 'snowboard', 'touring', 'xc', 'mtb', 'alpine'],
+            specialistIn: ['touring', 'xc'], atLifts: ['leysin'], prices: null
+        }
+    ];
+
+    function shopsFor(destId, gearId) {
+        return RENTAL_SHOPS.filter(s =>
+            s.serves.includes(destId) && (!gearId || s.gear.includes(gearId)));
+    }
+
+    // Which season each kit belongs to — no ski sets in July.
+    const GEAR_SEASON = {
+        ski: 'winter', snowboard: 'winter', freeride: 'winter',
+        touring: 'winter', xc: 'winter', snowshoe: 'winter',
+        mtb: 'summer', ebike: 'summer', ferrata: 'summer', alpine: 'summer'
+    };
+
+    // Gear on offer at this sector this season, with the current activity's gear surfaced first.
+    function gearOptionsFor(destId) {
+        const season = currentSeason.toLowerCase();
+        const all = [...new Set(shopsFor(destId).flatMap(s => s.gear))]
+            .filter(g => GEAR_SEASON[g] === season);
+        const preferred = (currentActivity && ACTIVITY_GEAR[currentActivity]) || [];
+        const head = preferred.filter(g => all.includes(g));
+        return [...head, ...all.filter(g => !head.includes(g))];
+    }
+
+    // True when the chosen activity needs kit that nobody here stocks.
+    function activityGearGap(destId) {
+        const needed = (currentActivity && ACTIVITY_GEAR[currentActivity]) || [];
+        if (!needed.length) return null;
+        const available = gearOptionsFor(destId);
+        if (needed.some(g => available.includes(g))) return null;
+        return GEAR_TYPES[needed[0]] ? GEAR_TYPES[needed[0]].label : needed[0];
+    }
+
+    // Ranks the shops that rent `gearId` at `destId`, best first.
+    // Every point scored comes from something a source states outright — nothing is
+    // inferred about quality, and the reasons are shown to the user so the order is auditable.
+    function rankShopsFor(destId, gearId) {
+        const shops = shopsFor(destId, gearId);
+        const sole = shops.length === 1;
+        return shops.map(s => {
+            let score = 0; const why = [];
+            if (sole) { score += 5; why.push('the only shop on file renting this here'); }
+            if ((s.specialistIn || []).includes(gearId)) { score += 4; why.push('declares this its specialism'); }
+            if ((s.atLifts || []).includes(destId)) { score += 3; why.push('at the lifts'); }
+            if (s.branches.some(b => b.village === destId)) { score += 2; why.push('has a branch here'); }
+            if (s.prices) { score += 2; why.push('published rate card'); }
+            if (s.service) { score += 1; why.push('tuning, bootfitting and lockers'); }
+            if (s.onlineDiscount) { score += 1; why.push(`−${s.onlineDiscount}% booking online`); }
+            score += s.gear.length * 0.1;   // breadth, as a tiebreak only
+            return { shop: s, score, why };
+        }).sort((a, b) => b.score - a.score);
+    }
+
+    function rentalRate(shop, gearId, days) {
+        if (!shop || !shop.prices || !shop.prices[gearId]) return null;
+        const v = shop.prices[gearId][days - 1];
+        return (v == null) ? null : v;
+    }
+
+    function setGearScope(v) {
+        document.getElementById('gearScope').value = v;
+        const seg = document.getElementById('gearScopeSeg');
+        if (seg) syncSegmented(seg, v);
+        saveState();
+    }
+
+    // The activity drives everything: no gear picker, no shop list. We derive the kit
+    // from the chosen activity, rank the shops, and lead with the single best one.
+    let recGearChoice = null;                    // pill the user tapped (ski vs snowboard etc.)
+    let recState = { gearId: null, shopId: null, days: 1, price: '' };
+
+    function pickRecGear(g) { recGearChoice = g; recState.price = ''; updateRental(); }
+    function setRecDays(v) { recState.days = Math.max(1, parseInt(v, 10) || 1); updateRental(); }
+    // Patch in place — a full re-render here would rebuild the input mid-keystroke.
+    function setRecPrice(v) {
+        recState.price = v;
+        const amount = parseFloat(v);
+        const totalEl = document.querySelector('#rentalRec .rec-total');
+        const btn = document.getElementById('gearAddBtn');
+        if (totalEl) totalEl.textContent = amount > 0 ? `CHF ${chf(amount)}` : '—';
+        if (btn) btn.disabled = !(amount > 0);
+    }
+
+    function updateRental() {
+        const host = document.getElementById('rentalRec');
+        if (!host) return;
+        const dest = currentDestination;
+        const destName = RESORT_BY_ID[dest].name;
+        const empty = msg => `<div class="rental-empty">${msg}</div>`;
+
+        if (!currentActivity) {
+            host.innerHTML = empty('Pick an activity above — the gear recommendation follows from it.');
+            return;
+        }
+        const needs = ACTIVITY_GEAR[currentActivity] || [];
+        if (!needs.length) {
+            host.innerHTML = empty(`${esc(ACT_LABEL[currentActivity])} needs no rental gear — you’re already set.`);
+            return;
+        }
+        // Kit the activity calls for that someone here actually stocks, in preference order.
+        const stocked = gearOptionsFor(dest);
+        const kitChoices = needs.filter(g => stocked.includes(g));
+        if (!kitChoices.length) {
+            host.innerHTML = empty(`No shop on file rents ${esc(GEAR_TYPES[needs[0]].label)} at ${esc(destName)}. Try another sector for this activity.`);
+            return;
+        }
+        const gearId = kitChoices.includes(recGearChoice) ? recGearChoice : kitChoices[0];
+        const ranked = rankShopsFor(dest, gearId);
+        const best = ranked[0], alts = ranked.slice(1);
+        const s = best.shop;
+
+        // Reset the manual price when the recommendation itself changes.
+        if (recState.gearId !== gearId || recState.shopId !== s.id) recState.price = '';
+        recState.gearId = gearId; recState.shopId = s.id;
+
+        let branches = s.branches.filter(b => b.village === dest);
+        if (!branches.length) branches = s.branches;
+        const where = branches.map(b =>
+            `${esc(b.label)}${b.address ? ' · ' + esc(b.address) : ''}${b.phone ? ' · ' + esc(b.phone) : ''}`).join('<br>');
+
+        const kitPills = kitChoices.length > 1
+            ? `<div class="rec-kit">${kitChoices.map(g =>
+                `<button type="button" class="${g === gearId ? 'on' : ''}" onclick="pickRecGear('${g}')">${esc(GEAR_TYPES[g].label)}</button>`).join('')}</div>`
+            : '';
+
+        const altHtml = alts.length
+            ? `<details class="rec-alt"><summary>${alts.length} other option${alts.length > 1 ? 's' : ''} in ${esc(destName)}</summary>
+                ${alts.map(r => `<div class="alt-row">
+                    <span><span class="alt-name">${esc(r.shop.name)}</span> <span class="alt-why">· ${esc(r.why.join(' · ') || 'in the area')}</span></span>
+                    ${r.shop.url ? `<a class="rec-link" href="${esc(r.shop.url)}" target="_blank" rel="noopener">website ↗</a>` : ''}
+                </div>`).join('')}</details>`
+            : '';
+
+        const rate = rentalRate(s, gearId, recState.days);
+        const amount = rate != null ? rate : parseFloat(recState.price);
+        const scope = document.getElementById('gearScope').value;
+        const dayOpts = Array.from({ length: RENTAL_MAX_DAYS }, (_, i) =>
+            `<option value="${i + 1}" ${recState.days === i + 1 ? 'selected' : ''}>${i + 1} day${i > 0 ? 's' : ''}</option>`).join('');
+
+        host.innerHTML = `<div class="rec">
+            <div class="rec-top">
+                <div class="rec-for">Best for ${esc(ACT_LABEL[currentActivity])} · ${esc(destName)}</div>
+                <div class="rec-head">
+                    <span class="rec-name">${esc(s.name)}</span>
+                    ${s.url ? `<a class="rec-link" href="${esc(s.url)}" target="_blank" rel="noopener">website ↗</a>` : ''}
+                </div>
+                <div class="rec-where">${where}</div>
+                <div class="rec-why">${best.why.map(w => `<span>${esc(w)}</span>`).join('')}</div>
+                ${s.note ? `<div class="rec-note">${esc(s.note)}</div>` : ''}
+                ${kitPills}
+                ${altHtml}
+            </div>
+            <div class="rec-book">
+                <div class="rec-field"><label>${esc(GEAR_TYPES[gearId].label)} · days</label>
+                    <select onchange="setRecDays(this.value)">${dayOpts}</select></div>
+                <div class="rec-field"><label>Price / person (CHF)</label>
+                    <input type="number" min="0" step="0.05" placeholder="e.g. 45" value="${rate != null ? rate : esc(recState.price)}"
+                        ${rate != null ? 'readonly' : ''} oninput="setRecPrice(this.value)"></div>
+                <div class="rec-field"><label>Cost handling</label>
+                    <div class="segmented" id="gearScopeSeg">
+                        <button type="button" class="seg-opt ${scope === 'personal' ? 'active' : ''}" data-value="personal" onclick="setGearScope('personal')">Personal</button>
+                        <button type="button" class="seg-opt ${scope === 'split' ? 'active' : ''}" data-value="split" onclick="setGearScope('split')">Split</button>
+                        <span class="seg-indicator"></span>
+                    </div></div>
+                <div class="rec-total">${amount > 0 ? `CHF ${chf(amount)}` : '—'}</div>
+                <button class="btn-primary" id="gearAddBtn" onclick="addRentalToTrip()" ${amount > 0 ? '' : 'disabled'}>Add to trip</button>
+                <div class="rental-hint">${rate != null
+                    ? 'From the shop’s published rate card.'
+                    : 'No rate card on file yet — enter the price the shop quotes you.'}</div>
+            </div>
+        </div>`;
+        syncSegmented(document.getElementById('gearScopeSeg'), scope);
+    }
+
+    function addRentalToTrip() {
+        const shop = RENTAL_SHOPS.find(s => s.id === recState.shopId);
+        const gearId = recState.gearId;
+        const rate = rentalRate(shop, gearId, recState.days);
+        const amount = rate != null ? rate : parseFloat(recState.price);
+        if (!(amount > 0) || !shop) return;
+        addExpenseRow({
+            description: `${GEAR_TYPES[gearId].label} · ${shop.name} · ${recState.days} day${recState.days > 1 ? 's' : ''}`,
+            amount: String(amount),
+            payer: rosterMembers()[0],
+            scope: document.getElementById('gearScope').value
+        });
+        saveState();
+        const btn = document.getElementById('gearAddBtn');
+        btn.textContent = 'Added to trip ✓';
+        btn.disabled = true;
+        setTimeout(() => { recState.price = ''; updateRental(); }, 1400);
         if (document.querySelector('#ledgerResults .ledger-summary')) settleGroupLedger();
     }
 
@@ -2328,13 +2695,21 @@
         saveState();
     }
 
+    // Split costs divide across the group; personal costs are already per-person.
     function computeSharedPerPerson() {
-        const total = collectExpenses().reduce((acc, e) => {
+        let shared = 0, personal = 0;
+        collectExpenses().forEach(e => {
             const v = parseFloat(e.amount);
-            return acc + (v > 0 ? v : 0);
-        }, 0);
+            if (!(v > 0)) return;
+            if (e.scope === 'personal') personal += v; else shared += v;
+        });
         const n = travellerCount();
-        return { total: roundCHF(total), per: roundCHF(total / n), n };
+        return {
+            total: roundCHF(shared),
+            per: roundCHF(shared / n),
+            personalPer: roundCHF(personal),
+            n
+        };
     }
 
     function updateTripRollup() {
@@ -2350,7 +2725,7 @@
         );
         const railPer = fare.pricing.finalPricePerPerson;
         const shared = computeSharedPerPerson();
-        const allInPer = roundCHF(railPer + shared.per);
+        const allInPer = roundCHF(railPer + shared.per + shared.personalPer);
         const groupTotal = roundCHF(allInPer * shared.n);
         const dest = RESORT_BY_ID[currentDestination].name;
         const dateLabel = document.getElementById('tripDatesNote').textContent || '';
@@ -2363,6 +2738,7 @@
                 </div>
                 <div class="rollup-break">
                     <div class="rb-row"><span>Rail fare / passenger</span><span>CHF ${chf(railPer)}</span></div>
+                    <div class="rb-row"><span>Personal costs / person</span><span>CHF ${chf(shared.personalPer)}</span></div>
                     <div class="rb-row"><span>Shared costs / person</span><span>CHF ${chf(shared.per)}</span></div>
                     <div class="rb-row total"><span>All in / person</span><span>CHF ${chf(allInPer)}</span></div>
                     <div class="rb-row group"><span>Group of ${shared.n}</span><span>CHF ${chf(groupTotal)}</span></div>
@@ -2424,6 +2800,7 @@
         renderRoster();
         populatePassPickers();
         updatePassPrice();
+        updateRental();
         initHero();
         initMap();
         markReady();
