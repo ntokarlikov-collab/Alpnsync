@@ -63,6 +63,9 @@
         #topNav.visible { transform: translateY(0); }
         .nav-brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
         .nav-spacer { flex: 1; }
+        .nav-cost { font-family: var(--font-mono); font-weight: 700; font-size: 13px; color: var(--ink); background: rgba(227,165,68,0.16); border: 1px solid rgba(227,165,68,0.45); border-radius: 999px; padding: 5px 13px; white-space: nowrap; }
+        .nav-cost:empty { display: none; }
+        @media (max-width: 720px) { #topNav .engine-status { display: none; } }
         .mini-flag {
             position: relative; width: 20px; height: 20px;
             background: var(--swiss-red); border-radius: 4px; flex: none;
@@ -234,7 +237,7 @@
             font-weight: 700; letter-spacing: -1px;
             margin: 46px 0 6px;
         }
-        .section-sub { font-size: 14px; color: var(--ink-3); margin: 0 0 18px; }
+        .section-sub { font-size: 14px; color: var(--ink-3); margin: 0 0 13px; }
 
         .panel {
             background: var(--glass);
@@ -243,7 +246,7 @@
             border: 1px solid rgba(255, 255, 255, 0.85);
             border-radius: 18px;
             box-shadow: 0 10px 34px rgba(20, 45, 70, 0.08);
-            padding: 24px;
+            padding: 20px;
             transition: box-shadow 0.35s ease, transform 0.35s ease;
         }
         .panel:hover { box-shadow: 0 16px 44px rgba(20, 45, 70, 0.12); }
@@ -675,7 +678,7 @@
         .season-seg .seg-opt { flex: 0 0 auto; padding: 5px 13px; font-size: 12px; }
 
         /* Compact dashboard — sector + map + weather in one row, journey + ledger paired */
-        .section-title { margin-top: 32px; }
+        .section-title { margin-top: 22px; }
         .trip-grid { display: grid; grid-template-columns: 285px minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
         .trip-grid #map { height: 300px; }
         .tg-picker .resort-list { max-height: 300px; }
@@ -853,6 +856,7 @@
 <nav id="topNav">
     <div class="nav-brand"><span class="mini-flag"></span>AlpenSync OS</div>
     <div class="nav-spacer"></div>
+    <div class="nav-cost" id="navCost" title="Per person, all in"></div>
     <div class="engine-status"><span class="status-dot" id="engineDot"></span><span id="engineLabel">ENGINE: LINKING...</span></div>
     <div class="segmented season-seg" id="seasonSeg" aria-label="Season">
         <button type="button" class="seg-opt active" data-value="WINTER" onclick="setSeason('WINTER')">Winter</button>
@@ -1040,18 +1044,23 @@
             </div>
         </div>
 
-        <h2 class="section-title reveal">Rent your gear</h2>
-        <p class="section-sub reveal">Your activity already tells us what you need — here’s the best place to get it.</p>
-        <section class="panel reveal">
-            <div id="rentalRec"></div>
-            <input type="hidden" id="gearScope" value="personal">
-        </section>
-
-        <h2 class="section-title reveal">Your itinerary</h2>
-        <p class="section-sub reveal">Each day of your trip with its live forecast — so you can save the big outing for the best day.</p>
-        <section class="panel reveal">
-            <div id="itinerary"></div>
-        </section>
+        <div class="dash-pair">
+            <div>
+                <h2 class="section-title reveal">Rent your gear</h2>
+                <p class="section-sub reveal">Your activity tells us what you need — here’s the best place to get it.</p>
+                <section class="panel reveal">
+                    <div id="rentalRec"></div>
+                    <input type="hidden" id="gearScope" value="personal">
+                </section>
+            </div>
+            <div>
+                <h2 class="section-title reveal">Your itinerary</h2>
+                <p class="section-sub reveal">Each day with its live forecast — save the big outing for the best one.</p>
+                <section class="panel reveal">
+                    <div id="itinerary"></div>
+                </section>
+            </div>
+        </div>
 
         <h2 class="section-title reveal">Your trip, all in</h2>
         <p class="section-sub reveal">Rail, passes and shared costs rolled into one per-person number — updates live.</p>
@@ -2849,6 +2858,8 @@
         const shared = computeSharedPerPerson();
         const allInPer = roundCHF(railPer + shared.per + shared.personalPer);
         const groupTotal = roundCHF(allInPer * shared.n);
+        const navCost = document.getElementById('navCost');
+        if (navCost) navCost.textContent = `CHF ${chf(allInPer)} / person`;
         const dest = RESORT_BY_ID[currentDestination].name;
         const dateLabel = document.getElementById('tripDatesNote').textContent || '';
         host.innerHTML =
