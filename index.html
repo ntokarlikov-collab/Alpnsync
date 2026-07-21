@@ -568,7 +568,7 @@
             background-image:
                 radial-gradient(150% 62% at 50% -12%, rgba(224,112,140,0.12) 0%, rgba(227,165,68,0.07) 28%, rgba(36,28,78,0) 56%),
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='840' height='840'%3E%3Cg fill='none' stroke='%23241C4E' stroke-opacity='0.035' stroke-width='1'%3E%3Cpath d='M0,140 Q210,96 420,140 T840,140'/%3E%3Cpath d='M0,290 Q210,246 420,290 T840,290'/%3E%3Cpath d='M0,440 Q210,396 420,440 T840,440'/%3E%3Cpath d='M0,590 Q210,546 420,590 T840,590'/%3E%3Cpath d='M0,740 Q210,696 420,740 T840,740'/%3E%3C/g%3E%3C/svg%3E");
-                        background-repeat: no-repeat, repeat;
+            background-repeat: no-repeat, repeat;
             background-attachment: fixed, fixed;
             background-position: center top, center top;
         }
@@ -762,6 +762,27 @@
         .alt-why { color: var(--ink-3); font-size: 11.5px; }
         .rental-empty { padding: 26px 18px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ink-3); border: 2px dashed var(--line); border-radius: 14px; }
         .rental-hint { font-size: 11.5px; color: var(--ink-3); font-weight: 600; margin-top: 6px; line-height: 1.45; width: 100%; }
+        /* Day-by-day itinerary timeline — built only from trip dates + live forecast */
+        .itin-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; margin-bottom: 18px; }
+        .itin-head .ih-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+        .itin-head .ih-sub { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
+        .itin-day { display: grid; grid-template-columns: 84px 1fr; gap: 16px; }
+        .itin-date { text-align: right; padding-top: 1px; }
+        .itin-dow { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
+        .itin-dnum { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+        .itin-body { border-left: 2px solid var(--line); padding: 0 0 20px 22px; position: relative; }
+        .itin-day:last-child .itin-body { border-left-color: transparent; padding-bottom: 2px; }
+        .itin-body::before { content: ''; position: absolute; left: -8px; top: 3px; width: 13px; height: 13px; border-radius: 50%; background: #fff; border: 2px solid var(--indigo); box-shadow: 0 0 0 3px var(--snow); }
+        .itin-day.travel .itin-body::before { border-color: var(--swiss-red); }
+        .itin-day.best .itin-body::before { border-color: var(--gold); background: var(--gold); }
+        .itin-role { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.2px; }
+        .itin-badge { display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; background: var(--gold); color: #3A2A00; border-radius: 999px; padding: 2px 9px; vertical-align: middle; white-space: nowrap; }
+        .itin-wx { display: flex; align-items: center; gap: 9px; margin-top: 7px; font-size: 13px; color: var(--ink-2); font-weight: 600; flex-wrap: wrap; }
+        .itin-wx .iw-ic { width: 24px; height: 24px; color: var(--ink-2); flex: none; }
+        .itin-wx .iw-ic svg { width: 100%; height: 100%; }
+        .itin-wx .iw-temp { font-family: var(--font-mono); font-weight: 700; }
+        .itin-wx .iw-sep { color: var(--ink-3); }
+        .itin-none { font-size: 12px; color: var(--ink-3); font-weight: 600; margin-top: 6px; font-style: italic; }
         .rollup { background: linear-gradient(135deg, #241C4E 0%, #3A2E66 100%); border: 1px solid rgba(255,255,255,0.06); color: #fff; }
         .rollup:hover { box-shadow: 0 24px 56px rgba(42, 27, 78, 0.28); }
         .rollup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
@@ -1026,6 +1047,12 @@
             <input type="hidden" id="gearScope" value="personal">
         </section>
 
+        <h2 class="section-title reveal">Your itinerary</h2>
+        <p class="section-sub reveal">Each day of your trip with its live forecast — so you can save the big outing for the best day.</p>
+        <section class="panel reveal">
+            <div id="itinerary"></div>
+        </section>
+
         <h2 class="section-title reveal">Your trip, all in</h2>
         <p class="section-sub reveal">Rail, passes and shared costs rolled into one per-person number — updates live.</p>
         <section class="panel reveal rollup" id="tripRollup"></section>
@@ -1137,7 +1164,8 @@
 
     // --- Client-side registries (everything runs in the browser — no server) ---
     // `baseRailPrice` is a legacy placeholder, used only where MOUNTAIN_FARES has no entry.
-    const ORIGINS = {        'geneva-airport': { name: 'Geneva Airport', baseRailPrice: 40, lat: 46.2381, lon: 6.1089 },
+    const ORIGINS = {
+        'geneva-airport': { name: 'Geneva Airport', baseRailPrice: 40, lat: 46.2381, lon: 6.1089 },
         'geneva':         { name: 'Geneva (Cornavin)', baseRailPrice: 40, lat: 46.2102, lon: 6.1424 },
         'lausanne':       { name: 'Lausanne', baseRailPrice: 28, lat: 46.5170, lon: 6.6290 },
         'bern':           { name: 'Bern', baseRailPrice: 38, lat: 46.9490, lon: 7.4390 },
@@ -1403,6 +1431,7 @@
         updatePassPrice();
         updateRental();
         if (lastWeatherData) renderWeather(lastWeatherData);
+        renderItinerary();
         saveState();
     }
 
@@ -1564,6 +1593,7 @@
         renderActivities();
         renderPicker();
         updateRental();
+        renderItinerary();
         const matches = matchingResorts();
         if (currentActivity && matches.length && !matches.includes(currentDestination)) {
             selectResort(matches[0]);      // jump to the best-matching sector
@@ -1707,7 +1737,7 @@
                     <div class="weather-now">
                         <div class="w-icon">${iconForCode(data.current.weathercode)}</div>
                         <div>
-                                                    <div class="w-temp" id="wTemp">${Math.round(data.current.temperature)}°</div>
+                            <div class="w-temp" id="wTemp">${Math.round(data.current.temperature)}°</div>
                             <div class="w-cond">${esc(data.current.condition)}</div>
                             <div class="w-place">${esc(data.destination)} · ${esc(data.region)} · station ${data.stationElevation} m</div>
                             ${currentResortActs()}
@@ -1732,6 +1762,96 @@
                 </div>
             </div>`;
         countNumber(document.getElementById('wTemp'), Math.round(data.current.temperature), { suffix: '°' });
+        renderItinerary();
+    }
+
+    // Day-by-day timeline for the trip window. Uses ONLY the trip dates, the chosen
+    // activity/resort, and the live Open-Meteo outlook we already fetched — nothing invented.
+    function renderItinerary() {
+        const host = document.getElementById('itinerary');
+        if (!host) return;
+        const sVal = document.getElementById('tripStart').value;
+        const eVal = document.getElementById('tripEnd').value;
+        if (!sVal || !eVal) {
+            host.innerHTML = `<div class="empty-hint">Set your trip dates in “Plan the journey” to see a day-by-day plan.</div>`;
+            return;
+        }
+        const start = parseDate(sVal);
+        const dayCount = tripDayCount();
+        const resort = RESORT_BY_ID[currentDestination].name;
+        const origin = ORIGINS[document.getElementById('originHub').value].name;
+        const actLabel = currentActivity ? ACT_LABEL[currentActivity] : null;
+
+        const byDate = {};
+        ((lastWeatherData && lastWeatherData.outlook) || []).forEach(d => { byDate[d.date] = d; });
+
+        // Keys for every trip day, and the best-forecast day *within the trip* so the
+        // badge is consistent with these cards rather than the wider 8-day outlook.
+        const tripKeys = [];
+        for (let i = 0; i < dayCount; i++) tripKeys.push(fmtDate(addDays(start, i)));
+        let bestKey = null, bestScore = -Infinity, wxCount = 0;
+        tripKeys.forEach(k => {
+            const wx = byDate[k];
+            if (!wx) return;
+            wxCount++;
+            const score = -(wx.precipitationMm || 0) * 2 + (wx.tempMax || 0) * 0.3;
+            if (score > bestScore) { bestScore = score; bestKey = k; }
+        });
+        if (wxCount < 2) bestKey = null;   // no point badging the only forecast day
+
+        const dayCards = tripKeys.map((key, i) => {
+            const wx = byDate[key];
+            const isFirst = i === 0, isLast = i === dayCount - 1, single = dayCount === 1;
+
+            let role, cls = '';
+            if (single) { role = `Day trip · ${esc(origin)} → ${esc(resort)}`; cls = 'travel'; }
+            else if (isFirst) { role = `Arrival · ${esc(origin)} → ${esc(resort)}`; cls = 'travel'; }
+            else if (isLast) { role = `Departure · ${esc(resort)} → ${esc(origin)}`; cls = 'travel'; }
+            else { role = actLabel ? `${esc(actLabel)} at ${esc(resort)}` : `On the mountain · ${esc(resort)}`; }
+
+            const isBest = key === bestKey;
+            if (isBest) cls += ' best';
+
+            let wxHtml;
+            if (!lastWeatherData) {
+                wxHtml = `<div class="itin-none">Fetching forecast…</div>`;
+            } else if (!wx) {
+                wxHtml = `<div class="itin-none">Beyond the 16-day forecast window</div>`;
+            } else {
+                const precip = currentSeason === 'WINTER'
+                    ? `${chf(wx.snowfallCm || 0)} cm snow`
+                    : `${chf(wx.precipitationMm || 0)} mm rain`;
+                wxHtml = `<div class="itin-wx">
+                    <span class="iw-ic">${iconForCode(wx.weathercode)}</span>
+                    <span>${esc(WMO_CONDITIONS[wx.weathercode] || '—')}</span>
+                    <span class="iw-sep">·</span>
+                    <span class="iw-temp">${Math.round(wx.tempMax)}° / ${Math.round(wx.tempMin)}°</span>
+                    <span class="iw-sep">·</span>
+                    <span>${precip}</span>
+                </div>`;
+            }
+
+            const d = new Date(`${key}T12:00:00`);
+            const dow = d.toLocaleDateString('en-CH', { weekday: 'short' });
+            const dnum = d.toLocaleDateString('en-CH', { day: 'numeric', month: 'short' });
+            const badge = isBest ? `<span class="itin-badge">★ Best conditions</span>` : '';
+
+            return `<div class="itin-day ${cls}">
+                <div class="itin-date"><div class="itin-dow">${esc(dow)}</div><div class="itin-dnum">${esc(dnum)}</div></div>
+                <div class="itin-body">
+                    <div class="itin-role">${role}${badge}</div>
+                    ${wxHtml}
+                </div>
+            </div>`;
+        }).join('');
+
+        const bestNote = bestKey
+            ? ` · best day looks like ${new Date(`${bestKey}T12:00:00`).toLocaleDateString('en-CH', { weekday: 'long' })}`
+            : '';
+        host.innerHTML = `<div class="itin-head">
+                <span class="ih-title">${dayCount} day${dayCount > 1 ? 's' : ''} in ${esc(resort)}</span>
+                <span class="ih-sub">${actLabel ? esc(actLabel) : 'Trip'}${bestNote}</span>
+            </div>${dayCards}`;
     }
 
     function buildWeatherPayload(loc, data) {
@@ -2276,7 +2396,8 @@
         passSchemeKey = null;
         syncPassPickers();
     }
-        function updatePassPrice() {
+
+    function updatePassPrice() {
         syncPassPickers();
         renderPassTable();
         const scheme = currentPassScheme();
@@ -2692,6 +2813,7 @@
         updateTripDatesNote();
         fetchTelemetry();
         updateTripRollup();
+        renderItinerary();
         saveState();
     }
 
@@ -2808,6 +2930,7 @@
         fetchTelemetry();
         calculateTariff();
         updateTripRollup();
+        renderItinerary();
         requestAnimationFrame(positionAllSegmented);
         setTimeout(positionAllSegmented, 450);
     });
