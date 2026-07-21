@@ -452,10 +452,13 @@
             background: rgba(255, 255, 255, 0.6);
         }
         .expense-item {
-            display: grid; grid-template-columns: 1.7fr 0.85fr 1.1fr 0.95fr 34px;
+            display: grid; grid-template-columns: 2fr 1fr 1.1fr 34px;
             gap: 7px; margin-bottom: 8px; align-items: center;
         }
-        @media (max-width: 560px) { .expense-item { grid-template-columns: 1fr 1fr 34px; } }
+        @media (max-width: 560px) {
+            .expense-item { grid-template-columns: 1fr 1fr 34px; }
+            .expense-item .exp-desc { grid-column: 1 / -1; }
+        }
         .remove-row {
             width: 36px; height: 38px;
             background: none; border: 1px solid var(--line); border-radius: 10px;
@@ -928,7 +931,7 @@
     <div class="hero-content" id="heroContent">
         <div class="swiss-flag" aria-hidden="true"></div>
         <h1>AlpenSync OS</h1>
-        <p class="tagline">Vaud Alps Gateway — live telemetry, SBB fares & group settlement for the Alpes Vaudoises</p>
+        <p class="tagline">Vaud Alps Gateway — live telemetry, SBB fares & trip costs for the Alpes Vaudoises</p>
         <p class="sectors">Villars · Gryon · Les Diablerets · Leysin · Glacier 3000</p>
         <button class="hero-cta" onclick="enterDashboard()">Begin Expedition</button>
     </div>
@@ -1063,32 +1066,22 @@
         </div>
 
         <h2 class="section-title reveal">Your trip, all in</h2>
-        <p class="section-sub reveal">Rail, passes and shared costs rolled into one per-person number — updates live.</p>
-        <section class="panel reveal rollup" id="tripRollup"></section>
-
-        <h2 class="section-title reveal">Settle the ledger</h2>
-        <p class="section-sub reveal">Split shared costs into the fewest possible TWINT transfers.</p>
-        <section class="panel reveal">
-            <div class="ledger-grid">
-                <div>
-                    <label for="travellerCount">Number of travellers</label>
-                    <div class="stepper">
-                        <button type="button" onclick="stepTravellers(-1)" aria-label="Fewer travellers">−</button>
-                        <input type="number" id="travellerCount" value="4" min="1" onchange="renderRoster()">
-                        <button type="button" onclick="stepTravellers(1)" aria-label="More travellers">+</button>
-                    </div>
-                    <div class="avatar-row" id="avatarRow"></div>
-
-                    <div class="group-lbl">Shared costs</div>
-                    <div id="expenseContainer"></div>
-                    <button class="btn-secondary" onclick="addExpenseRow()">+ Add line item</button>
-                    <button class="btn-primary" id="settleButton" onclick="settleGroupLedger()">Settle the group</button>
+        <p class="section-sub reveal">Travellers and shared costs on the left; the live per-person total on the right.</p>
+        <div class="ledger-grid reveal">
+            <section class="panel">
+                <label for="travellerCount">Number of travellers</label>
+                <div class="stepper">
+                    <button type="button" onclick="stepTravellers(-1)" aria-label="Fewer travellers">−</button>
+                    <input type="number" id="travellerCount" value="4" min="1" onchange="renderRoster()">
+                    <button type="button" onclick="stepTravellers(1)" aria-label="More travellers">+</button>
                 </div>
-                <div id="ledgerResults">
-                    <div class="empty-hint">Member balances and the settlement plan appear here.</div>
-                </div>
-            </div>
-        </section>
+
+                <div class="group-lbl">Shared costs</div>
+                <div id="expenseContainer"></div>
+                <button class="btn-secondary" onclick="addExpenseRow()">+ Add line item</button>
+            </section>
+            <section class="panel rollup" id="tripRollup"></section>
+        </div>
 
     </div>
 
@@ -1099,7 +1092,7 @@
         <div class="footer-inner">
             <div class="footer-brand"><span class="mini-flag"></span>AlpenSync OS</div>
             <div>Vaud Alps routes · Villars — Gryon — Les Diablerets — Leysin — Glacier 3000</div>
-            <div style="opacity:0.55;">Weather: Open-Meteo · Fares: demo SBB matrix · TWINT links are mock deep links</div>
+            <div style="opacity:0.55;">Weather: Open-Meteo · Fares: demo SBB matrix</div>
         </div>
     </footer>
 </main>
@@ -2080,42 +2073,16 @@
         return Math.max(1, parseInt(document.getElementById('travellerCount').value, 10) || 1);
     }
 
-    function rosterMembers() {
-        return Array.from({ length: travellerCount() }, (_, i) => `Traveller ${i + 1}`);
-    }
-
     function stepTravellers(delta) {
         const input = document.getElementById('travellerCount');
         input.value = Math.max(1, (parseInt(input.value, 10) || 1) + delta);
         renderRoster();
     }
 
-    function paletteFor(name, members) {
-        const i = Math.max(0, members.indexOf(name));
-        return AVATAR_PALETTES[i % AVATAR_PALETTES.length];
-    }
-
-    function initials(name) {
-        return name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    }
-
+    // Traveller count feeds the per-person split; recompute the roll-up when it changes.
     function renderRoster() {
-        const members = rosterMembers();
-        document.getElementById('avatarRow').innerHTML = members.map(m => {
-            const [bg, fg] = paletteFor(m, members);
-            return `<span class="avatar" style="background:${bg}; color:${fg};">
-                <span class="dot" style="color:${fg};">${esc(initials(m))}</span>${esc(m)}</span>`;
-        }).join('');
-        document.querySelectorAll('.exp-payer').forEach(sel => populatePayerSelect(sel, sel.value));
         saveState();
         updateTripRollup();
-    }
-
-    function populatePayerSelect(sel, preferred) {
-        const members = rosterMembers();
-        const value = members.includes(preferred) ? preferred : members[0];
-        sel.innerHTML = members.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
-        sel.value = value;
     }
 
     function addExpenseRow(item = {}) {
@@ -2132,153 +2099,29 @@
         amount.min = '0'; amount.step = '0.05';
         amount.value = item.amount || '';
 
-        const payer = document.createElement('select');
-        payer.className = 'exp-payer';
-        populatePayerSelect(payer, item.payer);
-
-        // Split = shared across the group and settled. Personal = each traveller pays their
-        // own (gear, lift passes) — counted per person and excluded from the settlement.
+        // Split = divided across the group. Personal = each traveller’s own (gear, passes).
         const scope = document.createElement('select');
         scope.className = 'exp-scope';
         scope.innerHTML = '<option value="split">Split</option><option value="personal">Personal</option>';
         scope.value = item.scope === 'personal' ? 'personal' : 'split';
-        scope.onchange = () => { syncExpenseRow(div); saveState(); updateTripRollup(); };
+        scope.onchange = () => { saveState(); updateTripRollup(); };
 
         const remove = document.createElement('button');
         remove.type = 'button'; remove.className = 'remove-row';
         remove.innerText = '×'; remove.title = 'Remove line item';
         remove.onclick = () => { div.remove(); saveState(); updateTripRollup(); };
 
-        div.append(desc, amount, payer, scope, remove);
+        div.append(desc, amount, scope, remove);
         container.appendChild(div);
-        syncExpenseRow(div);
         updateTripRollup();
-    }
-
-    // A personal cost has no payer to settle against — everyone covers their own.
-    function syncExpenseRow(div) {
-        const scopeEl = div.querySelector('.exp-scope');
-        const payerEl = div.querySelector('.exp-payer');
-        if (!scopeEl || !payerEl) return;
-        const personal = scopeEl.value === 'personal';
-        payerEl.disabled = personal;
-        payerEl.style.opacity = personal ? '0.4' : '1';
-        payerEl.title = personal ? 'Personal costs are paid by each traveller — nothing to settle' : '';
     }
 
     function collectExpenses() {
         return [...document.querySelectorAll('.expense-item')].map(row => ({
             description: row.querySelector('.exp-desc').value.trim(),
             amount: row.querySelector('.exp-amount').value,
-            payer: row.querySelector('.exp-payer').value.trim(),
             scope: row.querySelector('.exp-scope') ? row.querySelector('.exp-scope').value : 'split'
         }));
-    }
-
-    function computeSettlement(expenses, members) {
-        const invalid = expenses.filter(e => !(parseFloat(e.amount) > 0));
-        if (invalid.length > 0) {
-            return { error: `Invalid amount on line item(s): ${invalid.map(e => e.description || '(unnamed)').join(', ')}. Amounts must be positive numbers.` };
-        }
-        const unknown = [...new Set(expenses.map(e => e.payer).filter(p => !members.includes(p)))];
-        if (unknown.length > 0) {
-            return { error: `Payer(s) not on the roster: ${unknown.join(', ')}. Add them to the roster or correct the payer name.` };
-        }
-
-        const totalSpent = expenses.reduce((s, e) => s + parseFloat(e.amount), 0);
-        const perPersonShare = totalSpent / members.length;
-
-        const paidBy = {};
-        members.forEach(m => { paidBy[m] = 0; });
-        expenses.forEach(e => { paidBy[e.payer] += parseFloat(e.amount); });
-
-        const memberBalances = members.map(m => ({
-            name: m, paid: roundCHF(paidBy[m]), net: roundCHF(paidBy[m] - perPersonShare)
-        }));
-
-        const working = members.map(m => ({ name: m, balance: paidBy[m] - perPersonShare }));
-        const debtors = working.filter(m => m.balance < -SETTLED_EPSILON).sort((a, b) => a.balance - b.balance);
-        const creditors = working.filter(m => m.balance > SETTLED_EPSILON).sort((a, b) => b.balance - a.balance);
-
-        const settlements = [];
-        debtors.forEach(d => {
-            creditors.forEach(c => {
-                if (Math.abs(d.balance) < SETTLED_EPSILON || c.balance < SETTLED_EPSILON) return;
-                const payment = Math.min(Math.abs(d.balance), c.balance);
-                d.balance += payment;
-                c.balance -= payment;
-                const amt = roundCHF(payment);
-                settlements.push({
-                    from: d.name, to: c.name, amount: amt,
-                    twintMockString: `twint://pay?to=${encodeURIComponent(c.name)}&amount=${amt.toFixed(2)}&ref=AlpenSync-${Math.random().toString(36).substring(7).toUpperCase()}`
-                });
-            });
-        });
-
-        return { totalSpent: roundCHF(totalSpent), perPersonShare: roundCHF(perPersonShare), memberBalances, settlements };
-    }
-
-    function settleGroupLedger() {
-        const members = rosterMembers();
-        const results = document.getElementById('ledgerResults');
-        if (members.length === 0) {
-            results.innerHTML = `<div class="error-banner">The roster is empty — add at least one member.</div>`;
-            return;
-        }
-        // Personal costs never enter the settlement — each traveller covers their own.
-        const expenses = collectExpenses()
-            .filter(e => e.amount !== '' && e.scope !== 'personal')
-            .map(e => ({ ...e, amount: parseFloat(e.amount) }));
-
-        {
-            const data = computeSettlement(expenses, members);
-            if (data.error) {
-                results.innerHTML = `<div class="error-banner">${esc(data.error)}</div>`;
-                return;
-            }
-
-            const maxNet = Math.max(...data.memberBalances.map(m => Math.abs(m.net)), 1);
-            const netRows = data.memberBalances.map(m => {
-                const pct = Math.round(Math.abs(m.net) / maxNet * 100);
-                const cls = m.net >= 0 ? 'pos' : 'neg';
-                const sign = m.net > 0 ? '+' : m.net < 0 ? '−' : '';
-                return `<div class="net-row">
-                    <span class="net-name">${esc(m.name)}</span>
-                    <span class="net-bar-track"><span class="net-bar ${cls}" style="width:${pct}%;"></span></span>
-                    <span class="net-amt ${cls}">${sign}${chf(Math.abs(m.net))}</span>
-                </div>`;
-            }).join('');
-
-            const settleRows = data.settlements.length === 0
-                ? `<div class="empty-hint" style="padding:22px;">All balances are equalized — no transfers needed.</div>`
-                : data.settlements.map(s => {
-                    const [fromBg, fromFg] = paletteFor(s.from, members);
-                    const [toBg, toFg] = paletteFor(s.to, members);
-                    return `<div class="settle-row">
-                        <span class="settle-flow">
-                            <span class="avatar dot" style="width:26px;height:26px;border-radius:50%;background:${fromBg};color:${fromFg};display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;padding:0;">${esc(initials(s.from))}</span>
-                            ${ICONS.arrow}
-                            <span class="avatar dot" style="width:26px;height:26px;border-radius:50%;background:${toBg};color:${toFg};display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;padding:0;">${esc(initials(s.to))}</span>
-                            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(s.from)} pays ${esc(s.to)}</span>
-                        </span>
-                        <span class="settle-amt">CHF ${chf(s.amount)}</span>
-                        <a class="twint-btn" href="${esc(s.twintMockString)}">TWINT</a>
-                    </div>`;
-                }).join('');
-
-            results.innerHTML = `
-                <div class="ledger-summary">
-                    <div class="metric"><div class="m-lbl">Total spent</div><div class="m-val" id="mTotal">CHF ${chf(data.totalSpent)}</div></div>
-                    <div class="metric"><div class="m-lbl">Share per person</div><div class="m-val" id="mShare">CHF ${chf(data.perPersonShare)}</div></div>
-                </div>
-                <div class="group-lbl">Net positions</div>
-                ${netRows}
-                <div class="group-lbl">Settlement plan · ${data.settlements.length} transfer${data.settlements.length === 1 ? '' : 's'}</div>
-                ${settleRows}`;
-            countNumber(document.getElementById('mTotal'), data.totalSpent, { prefix: 'CHF ', decimals: 2 });
-            countNumber(document.getElementById('mShare'), data.perPersonShare, { prefix: 'CHF ', decimals: 2 });
-            saveState();
-        }
     }
 
     // --- Mountain passes (season-aware; each system/season defines its own ticket grid) ---
@@ -2441,14 +2284,13 @@
         const mName = RESORT_BY_ID[mId] ? RESORT_BY_ID[mId].name : mId;
         const optLabel = (scheme.options.find(o => o.id === optId) || {}).label || '';
         const catShort = (scheme.categories.find(c => c.id === catId) || {}).short || '';
-        addExpenseRow({ description: `Lift pass · ${mName} · ${optLabel} (${catShort})`, amount: String(p), payer: rosterMembers()[0], scope: 'personal' });
+        addExpenseRow({ description: `Lift pass · ${mName} · ${optLabel} (${catShort})`, amount: String(p), scope: 'personal' });
         saveState();
         const btn = document.getElementById('passAddBtn');
         const label = btn.textContent;
         btn.textContent = 'Added to trip ✓';
         btn.disabled = true;
         setTimeout(() => { btn.textContent = label; btn.disabled = false; }, 1400);
-        if (document.querySelector('#ledgerResults .ledger-summary')) settleGroupLedger();
     }
 
     // --- GEAR RENTAL ---
@@ -2742,15 +2584,15 @@
         addExpenseRow({
             description: `${GEAR_TYPES[gearId].label} · ${shop.name} · ${recState.days} day${recState.days > 1 ? 's' : ''}`,
             amount: String(amount),
-            payer: rosterMembers()[0],
             scope: document.getElementById('gearScope').value
         });
         saveState();
         const btn = document.getElementById('gearAddBtn');
-        btn.textContent = 'Added to trip ✓';
-        btn.disabled = true;
-        setTimeout(() => { recState.price = ''; updateRental(); }, 1400);
-        if (document.querySelector('#ledgerResults .ledger-summary')) settleGroupLedger();
+        if (btn) {
+            btn.textContent = 'Added to trip ✓';
+            btn.disabled = true;
+            setTimeout(() => { recState.price = ''; updateRental(); }, 1400);
+        }
     }
 
     // --- Trip dates & cost roll-up ---
