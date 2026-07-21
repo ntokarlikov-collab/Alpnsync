@@ -1013,12 +1013,12 @@
                         <option value="swiss-travel-pass">Swiss Travel Pass</option>
                     </select>
 
-                    <label for="groupSize">Expedition size</label>
+                    <label for="groupSize">Number of travellers</label>
                     <div class="stepper">
                         <button type="button" onclick="stepGroup(-1)" aria-label="Fewer travellers">−</button>
-                        <input type="number" id="groupSize" value="1" min="1" onchange="calculateTariff()">
+                        <input type="number" id="groupSize" value="4" min="1" onchange="calculateTariff()">
                         <button type="button" onclick="stepGroup(1)" aria-label="More travellers">+</button>
-                        <span style="font-size:12px; color:var(--ink-3); font-weight:600;">10+ unlocks the −30% group rate</span>
+                        <span style="font-size:12px; color:var(--ink-3); font-weight:600;">Splits shared costs · 10+ unlocks the −30% group fare</span>
                     </div>
                 </div>
                 <div id="ticketWrap">
@@ -1069,14 +1069,8 @@
         <p class="section-sub reveal">Travellers and shared costs on the left; the live per-person total on the right.</p>
         <div class="ledger-grid reveal">
             <section class="panel">
-                <label for="travellerCount">Number of travellers</label>
-                <div class="stepper">
-                    <button type="button" onclick="stepTravellers(-1)" aria-label="Fewer travellers">−</button>
-                    <input type="number" id="travellerCount" value="4" min="1" onchange="renderRoster()">
-                    <button type="button" onclick="stepTravellers(1)" aria-label="More travellers">+</button>
-                </div>
-
-                <div class="group-lbl">Shared costs</div>
+                <div class="group-lbl" style="margin-top:2px;">Shared costs</div>
+                <div style="font-size:12px; color:var(--ink-3); font-weight:600; margin:0 0 12px;">Split across all travellers; mark a line “Personal” to keep it per-person.</div>
                 <div id="expenseContainer"></div>
                 <button class="btn-secondary" onclick="addExpenseRow()">+ Add line item</button>
             </section>
@@ -1098,7 +1092,7 @@
 </main>
 
 <script>
-    const STORAGE_KEY = 'alpensync-state-v3';
+    const STORAGE_KEY = 'alpensync-state-v4';
     const DEFAULT_TRAVELLERS = 4;
     const DEFAULT_EXPENSES = [
         { description: 'Shared transport / groceries', amount: '240', payer: 'Traveller 1', scope: 'split' }
@@ -2069,20 +2063,9 @@
 
     // --- Ledger ---
 
+    // One headcount drives everything: the shared-cost split and the 10+ group fare.
     function travellerCount() {
-        return Math.max(1, parseInt(document.getElementById('travellerCount').value, 10) || 1);
-    }
-
-    function stepTravellers(delta) {
-        const input = document.getElementById('travellerCount');
-        input.value = Math.max(1, (parseInt(input.value, 10) || 1) + delta);
-        renderRoster();
-    }
-
-    // Traveller count feeds the per-person split; recompute the roll-up when it changes.
-    function renderRoster() {
-        saveState();
-        updateTripRollup();
+        return Math.max(1, parseInt(document.getElementById('groupSize').value, 10) || 1);
     }
 
     function addExpenseRow(item = {}) {
@@ -2736,7 +2719,6 @@
                 groupSize: document.getElementById('groupSize').value,
                 tripStart: document.getElementById('tripStart').value,
                 tripEnd: document.getElementById('tripEnd').value,
-                travellers: travellerCount(),
                 expenses: collectExpenses()
             }));
         } catch (e) { /* storage unavailable — run stateless */ }
@@ -2758,7 +2740,6 @@
             if (state.groupSize) document.getElementById('groupSize').value = state.groupSize;
             if (state.tripStart) document.getElementById('tripStart').value = state.tripStart;
             if (state.tripEnd) document.getElementById('tripEnd').value = state.tripEnd;
-            if (state.travellers) document.getElementById('travellerCount').value = Math.max(1, parseInt(state.travellers, 10) || DEFAULT_TRAVELLERS);
         }
         const expenses = (state?.expenses?.length) ? state.expenses : DEFAULT_EXPENSES;
         expenses.forEach(addExpenseRow);
@@ -2772,7 +2753,6 @@
         syncSegmented(document.getElementById('tripTypeSeg'), document.getElementById('tripType').value);
         renderActivities();
         renderPicker();
-        renderRoster();
         populatePassPickers();
         updatePassPrice();
         updateRental();
