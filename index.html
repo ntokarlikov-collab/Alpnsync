@@ -2350,9 +2350,19 @@
                 { village: 'gryon',   label: 'Gryon',             address: 'Route de Solalex 15, 1882', phone: '+41 24 498 16 30' },
                 { village: 'gryon',   label: 'Alpe des Chaux',    address: null, phone: null }
             ],
-            gear: ['ski', 'snowboard', 'freeride', 'mtb', 'ebike', 'ferrata'],
+            gear: ['ski', 'snowboard', 'xc', 'snowshoe', 'mtb', 'ebike', 'ferrata'],
             onlineDiscount: 10,
-            prices: null   // pending the McBoard winter + summer rate PDFs
+            // Per-person, per-day CHF from the INTERSPORT Paragon Sport rate card (online −10% rate).
+            // Ski/snowboard "sets" = economy skis/board + economy boots (poles included with skis).
+            prices: {
+                ski:       34.80,   // Ski Economy 22.35 + ski boots economy 12.45
+                snowboard: 34.80,   // Snowboard Economy 22.35 + snowboard boots economy 12.45
+                xc:        17.25,   // Nordic Set Classic
+                snowshoe:  12.00,   // Snowshoes
+                mtb:       31.67,   // Hardtail Bike (entry MTB)
+                ebike:     70.00,   // E-Hardtail Bike
+                ferrata:   25.00    // Via ferrata set (harness + lanyard + helmet)
+            }
         },
         {
             id: 'villarssports', name: 'Villars Sports Shop', url: 'https://villars.ski/en/',
@@ -2467,10 +2477,10 @@
         }).sort((a, b) => b.score - a.score);
     }
 
+    // Shops quote a flat per-day rate (rate card total = per-day × days); trip cost = rate × days.
     function rentalRate(shop, gearId, days) {
-        if (!shop || !shop.prices || !shop.prices[gearId]) return null;
-        const v = shop.prices[gearId][days - 1];
-        return (v == null) ? null : v;
+        if (!shop || !shop.prices || shop.prices[gearId] == null) return null;
+        return roundCHF(shop.prices[gearId] * days);
     }
 
     function setGearScope(v) {
