@@ -757,6 +757,7 @@
         .rec-field select, .rec-field input { min-width: 108px; }
         .rec-book .btn-primary { margin-left: auto; }
         .rec-total { font-family: var(--font-mono); font-weight: 700; font-size: 14px; color: var(--ink); align-self: flex-end; padding-bottom: 8px; }
+        .rec-nodata { font-size: 12.5px; color: var(--ink-3); font-weight: 600; line-height: 1.55; }
         .rec-alt { margin-top: 12px; }
         .rec-alt summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--ink-3); list-style: none; padding: 6px 2px; }
         .rec-alt summary::-webkit-details-marker { display: none; }
@@ -2547,10 +2548,31 @@
             : '';
 
         const rate = rentalRate(s, gearId, recState.days);
-        const amount = rate != null ? rate : parseFloat(recState.price);
         const scope = document.getElementById('gearScope').value;
         const dayOpts = Array.from({ length: RENTAL_MAX_DAYS }, (_, i) =>
             `<option value="${i + 1}" ${recState.days === i + 1 ? 'selected' : ''}>${i + 1} day${i > 0 ? 's' : ''}</option>`).join('');
+
+        // Booking (price + Add) only appears with a real rate card loaded. With no data we
+        // never invent or invite a made-up price — the recommendation stands, pricing waits.
+        const bookHtml = (rate != null)
+            ? `<div class="rec-book">
+                <div class="rec-field"><label>${esc(GEAR_TYPES[gearId].label)} · days</label>
+                    <select onchange="setRecDays(this.value)">${dayOpts}</select></div>
+                <div class="rec-field"><label>Price / person (CHF)</label>
+                    <input type="number" value="${rate}" readonly></div>
+                <div class="rec-field"><label>Cost handling</label>
+                    <div class="segmented" id="gearScopeSeg">
+                        <button type="button" class="seg-opt ${scope === 'personal' ? 'active' : ''}" data-value="personal" onclick="setGearScope('personal')">Personal</button>
+                        <button type="button" class="seg-opt ${scope === 'split' ? 'active' : ''}" data-value="split" onclick="setGearScope('split')">Split</button>
+                        <span class="seg-indicator"></span>
+                    </div></div>
+                <div class="rec-total">CHF ${chf(rate)}</div>
+                <button class="btn-primary" id="gearAddBtn" onclick="addRentalToTrip()">Add to trip</button>
+                <div class="rental-hint">From the shop’s published rate card.</div>
+            </div>`
+            : `<div class="rec-book">
+                <div class="rec-nodata">Pricing not loaded yet — ${esc(s.name)}’s real rate will appear here once their rate card is in. Until then, check the price on their site${s.url ? ' (link above)' : ''} or in person.</div>
+            </div>`;
 
         host.innerHTML = `<div class="rec">
             <div class="rec-top">
@@ -2565,26 +2587,9 @@
                 ${kitPills}
                 ${altHtml}
             </div>
-            <div class="rec-book">
-                <div class="rec-field"><label>${esc(GEAR_TYPES[gearId].label)} · days</label>
-                    <select onchange="setRecDays(this.value)">${dayOpts}</select></div>
-                <div class="rec-field"><label>Price / person (CHF)</label>
-                    <input type="number" min="0" step="0.05" placeholder="e.g. 45" value="${rate != null ? rate : esc(recState.price)}"
-                        ${rate != null ? 'readonly' : ''} oninput="setRecPrice(this.value)"></div>
-                <div class="rec-field"><label>Cost handling</label>
-                    <div class="segmented" id="gearScopeSeg">
-                        <button type="button" class="seg-opt ${scope === 'personal' ? 'active' : ''}" data-value="personal" onclick="setGearScope('personal')">Personal</button>
-                        <button type="button" class="seg-opt ${scope === 'split' ? 'active' : ''}" data-value="split" onclick="setGearScope('split')">Split</button>
-                        <span class="seg-indicator"></span>
-                    </div></div>
-                <div class="rec-total">${amount > 0 ? `CHF ${chf(amount)}` : '—'}</div>
-                <button class="btn-primary" id="gearAddBtn" onclick="addRentalToTrip()" ${amount > 0 ? '' : 'disabled'}>Add to trip</button>
-                <div class="rental-hint">${rate != null
-                    ? 'From the shop’s published rate card.'
-                    : 'No rate card on file yet — enter the price the shop quotes you.'}</div>
-            </div>
+            ${bookHtml}
         </div>`;
-        syncSegmented(document.getElementById('gearScopeSeg'), scope);
+        if (rate != null) syncSegmented(document.getElementById('gearScopeSeg'), scope);
     }
 
     function addRentalToTrip() {
