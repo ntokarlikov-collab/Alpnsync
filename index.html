@@ -768,6 +768,8 @@
         .alt-why { color: var(--ink-3); font-size: 11.5px; }
         .rental-empty { padding: 26px 18px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ink-3); border: 2px dashed var(--line); border-radius: 14px; }
         .rental-hint { font-size: 11.5px; color: var(--ink-3); font-weight: 600; margin-top: 6px; line-height: 1.45; width: 100%; }
+        .book-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 9px 15px; font-size: 12.5px; font-weight: 700; color: var(--indigo); background: rgba(36,28,78,0.05); border: 1px solid var(--line); border-radius: 10px; text-decoration: none; transition: border-color .2s var(--ease-soft), background .2s var(--ease-soft), transform .2s var(--ease-soft); }
+        .book-link:hover { border-color: var(--gold); background: rgba(227,165,68,0.12); transform: translateY(-1px); }
         /* Day-by-day itinerary timeline — built only from trip dates + live forecast */
         .itin-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; margin-bottom: 18px; }
         .itin-head .ih-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
@@ -1041,6 +1043,7 @@
                         <select id="passOption" onchange="updatePassPrice()"></select>
                         <div class="pass-price" id="passPrice">Pass: —</div>
                         <button class="btn-primary" id="passAddBtn" onclick="addPassToTrip()">Add to trip</button>
+                        <div id="passBuyLink"></div>
                     </div>
                     <div class="pass-table" id="passTable"></div>
                 </section>
@@ -1167,6 +1170,24 @@
         'bern':           { name: 'Bern', baseRailPrice: 38, lat: 46.9490, lon: 7.4390 },
         'fribourg':       { name: 'Freiburg', baseRailPrice: 34, lat: 46.8030, lon: 7.1510 }
     };
+
+    // SBB-recognised station names for the deep-link timetable (verified against sbb.ch).
+    // Glacier 3000 has no rail station — routed via Les Diablerets, matching MOUNTAIN_FARES.
+    const SBB_STATION = {
+        'geneva-airport': 'Genève-Aéroport', 'geneva': 'Genève', 'lausanne': 'Lausanne', 'bern': 'Bern', 'fribourg': 'Fribourg',
+        'villars': 'Villars-sur-Ollon', 'gryon': 'Gryon', 'diablerets': 'Les Diablerets', 'leysin': 'Leysin', 'glacier3000': 'Les Diablerets'
+    };
+
+    // Prefilled sbb.ch connection search — tested working: von/nach/datum populate the fields.
+    function sbbLink(originKey, destKey, dateStr) {
+        const von = SBB_STATION[originKey], nach = SBB_STATION[destKey];
+        if (!von || !nach) return null;
+        let datum = '';
+        if (dateStr) { const pp = dateStr.split('-'); if (pp.length === 3) datum = `${pp[2]}.${pp[1]}.${pp[0]}`; }
+        const q = `von=${encodeURIComponent(von)}&nach=${encodeURIComponent(nach)}` +
+                  (datum ? `&datum=${encodeURIComponent(datum)}` : '') + `&an=false&suche=true`;
+        return `https://www.sbb.ch/en/buying/pages/fahrplan/fahrplan.xhtml?${q}`;
+    }
 
     // Shown whenever a fare is flagged `variableRouting`.
     const VARIABLE_ROUTING_NOTE =
@@ -2030,6 +2051,9 @@
             const fareNotes =
                 (b.estimated ? `<div class="t-note warn">Estimated fare — no published SBB price on file for this route yet.</div>` : '') +
                 (b.variableRouting ? `<div class="t-note">${esc(VARIABLE_ROUTING_NOTE)}</div>` : '');
+            const sbb = sbbLink(document.getElementById('originHub').value, currentDestination, document.getElementById('tripStart').value);
+            const bookRow = sbb
+                ? `<a class="book-link" href="${esc(sbb)}" target="_blank" rel="noopener">Find this connection on SBB ↗</a>` : '';
 
             wrap.innerHTML = `
             <div class="ticket">
@@ -2054,6 +2078,7 @@
                     </div>
                     ${savings}
                     ${fareNotes}
+                    ${bookRow}
                 </div>
             </div>`;
             countUp(document.getElementById('ticketTotal'), p.totalGroupCost, 'CHF ');
@@ -2110,9 +2135,9 @@
     // --- Mountain passes (season-aware; each system/season defines its own ticket grid) ---
 
     const PASS_SYSTEMS = {
-        vgd:         { name: 'Villars–Gryon–Les Diablerets' },
-        leysin:      { name: 'Leysin–Les Mosses–La Lécherette' },
-        glacier3000: { name: 'Glacier 3000' }
+        vgd:         { name: 'Villars–Gryon–Les Diablerets', buyUrl: 'https://www.tvgd.ch/en-US/tickets/' },
+        leysin:      { name: 'Leysin–Les Mosses–La Lécherette', buyUrl: 'https://www.tlml.ch/en-US/tickets/' },
+        glacier3000: { name: 'Glacier 3000', buyUrl: 'https://www.glacier3000.ch' }
     };
     const MOUNTAIN_PASS = { villars: 'vgd', gryon: 'vgd', diablerets: 'vgd', leysin: 'leysin', glacier3000: 'glacier3000' };
 
@@ -2235,6 +2260,10 @@
     function updatePassPrice() {
         syncPassPickers();
         renderPassTable();
+        const sys = PASS_SYSTEMS[MOUNTAIN_PASS[passMountainValue()]];
+        const buyEl = document.getElementById('passBuyLink');
+        if (buyEl) buyEl.innerHTML = (sys && sys.buyUrl)
+            ? `<a class="book-link" href="${esc(sys.buyUrl)}" target="_blank" rel="noopener">Buy passes — ${esc(sys.name)} ↗</a>` : '';
         const scheme = currentPassScheme();
         const el = document.getElementById('passPrice');
         const btn = document.getElementById('passAddBtn');
