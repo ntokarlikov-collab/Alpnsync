@@ -2675,7 +2675,7 @@
     function onTripDatesChange() {
         updateTripDatesNote();
         fetchTelemetry();
-        updateTripRollup();
+        calculateTariff();   // rebuild the ticket + SBB link with the new date (also refreshes the roll-up)
         renderItinerary();
         saveState();
     }
