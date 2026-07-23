@@ -2426,8 +2426,20 @@
             note: 'At the foot of the lifts · touring + cross-country specialist · 2nd branch Les Mosses',
             serves: ['leysin'],
             branches: [{ village: 'leysin', label: 'Leysin', address: 'Route du Belvédère 3, 1854', phone: null }],
-            gear: ['ski', 'snowboard', 'touring', 'xc', 'mtb', 'alpine'],
-            specialistIn: ['touring', 'xc'], atLifts: ['leysin'], prices: null
+            gear: ['ski', 'snowboard', 'touring', 'xc', 'snowshoe', 'mtb', 'ebike', 'ferrata'],
+            specialistIn: ['touring', 'xc'], atLifts: ['leysin'],
+            // Hefti Sports rate card (Leysin · Col des Mosses): per-person totals for 1..7 days.
+            // Winter 25-26 + summer 2026. Sets = cheapest adult tier + boots where sold separately.
+            prices: {
+                ski:       [48, 89, 115, 141, 167, 193, 220],   // Ski Introduction + boots
+                snowboard: [54, 99, 135, 166, 192, 218, 244],   // Snowboard Introduction + boots
+                touring:   [69, 126, 163, 199, 235, 271, 307],  // touring skis+skins+couteaux + boots
+                xc:        [29, 54, 69, 83, 98, 113, 129],       // Nordic Classic Introduction (incl. boots)
+                snowshoe:  [19, 36, 47, 58, 69, 80, 91],         // Raquettes / snowshoes
+                mtb:       [40, 70, 95, 115, 130, 140, 150],     // Mountain Bike hardtail + helmet
+                ebike:     [69, 123, 172, 214, 251, 285, 319],   // E-Bike hardtail + helmet
+                ferrata:   [29, 38, 50, 60, 70, 80, 90]          // Set de Via Ferrata
+            }
         }
     ];
 
@@ -2482,10 +2494,17 @@
         }).sort((a, b) => b.score - a.score);
     }
 
-    // Shops quote a flat per-day rate (rate card total = per-day × days); trip cost = rate × days.
+    // Prices are either a flat per-day rate (number, e.g. INTERSPORT) or per-day-count totals
+    // (array indexed by day − 1, e.g. Hefti's tiered card). rentalRate handles both models.
     function rentalRate(shop, gearId, days) {
-        if (!shop || !shop.prices || shop.prices[gearId] == null) return null;
-        return roundCHF(shop.prices[gearId] * days);
+        if (!shop || !shop.prices) return null;
+        const p = shop.prices[gearId];
+        if (p == null) return null;
+        if (Array.isArray(p)) {
+            const v = p[Math.min(days, p.length) - 1];
+            return (v == null) ? null : v;
+        }
+        return roundCHF(p * days);
     }
 
     function setGearScope(v) {
