@@ -2339,6 +2339,20 @@
         alpine:   ['alpine']
     };
 
+    // INTERSPORT Rent's national rate card (per-person, per-day CHF, online −10% rate) — the same
+    // catalog every INTERSPORT Rent shop books through. Verified from the Paragon Sport card and
+    // shared by Paragon (Villars/Gryon) and Jacky Sports (Les Diablerets), both INTERSPORT Rent.
+    // Ski/snowboard "sets" = economy skis/board + economy boots (poles included with skis).
+    const INTERSPORT_PRICES = {
+        ski:       34.80,   // Ski Economy 22.35 + ski boots economy 12.45
+        snowboard: 34.80,   // Snowboard Economy 22.35 + snowboard boots economy 12.45
+        xc:        17.25,   // Nordic Set Classic
+        snowshoe:  12.00,   // Snowshoes
+        mtb:       31.67,   // Hardtail Bike (entry MTB)
+        ebike:     70.00,   // E-Hardtail Bike
+        ferrata:   25.00    // Via ferrata set (harness + lanyard + helmet)
+    };
+
     // `gear` lists only equipment a source explicitly confirms the shop rents.
     const RENTAL_SHOPS = [
         {
@@ -2352,17 +2366,7 @@
             ],
             gear: ['ski', 'snowboard', 'xc', 'snowshoe', 'mtb', 'ebike', 'ferrata'],
             onlineDiscount: 10,
-            // Per-person, per-day CHF from the INTERSPORT Paragon Sport rate card (online −10% rate).
-            // Ski/snowboard "sets" = economy skis/board + economy boots (poles included with skis).
-            prices: {
-                ski:       34.80,   // Ski Economy 22.35 + ski boots economy 12.45
-                snowboard: 34.80,   // Snowboard Economy 22.35 + snowboard boots economy 12.45
-                xc:        17.25,   // Nordic Set Classic
-                snowshoe:  12.00,   // Snowshoes
-                mtb:       31.67,   // Hardtail Bike (entry MTB)
-                ebike:     70.00,   // E-Hardtail Bike
-                ferrata:   25.00    // Via ferrata set (harness + lanyard + helmet)
-            }
+            prices: INTERSPORT_PRICES
         },
         {
             id: 'villarssports', name: 'Villars Sports Shop', url: 'https://villars.ski/en/',
@@ -2394,13 +2398,12 @@
         },
         {
             id: 'holidaysport', name: 'Holiday Sport', url: 'https://www.holidaysport.ch/',
-            note: 'In the village 30+ years · also runs the Glacier 3000 top-station shop',
-            serves: ['diablerets', 'glacier3000'],
+            note: 'In the village 30+ years',
+            serves: ['diablerets'],
             branches: [
-                { village: 'diablerets',  label: 'Les Diablerets', address: 'Village centre', phone: null },
-                { village: 'glacier3000', label: 'Glacier 3000',   address: 'Top station', phone: null }
+                { village: 'diablerets', label: 'Les Diablerets', address: 'Village centre', phone: null }
             ],
-            gear: ['ski', 'snowboard'], atLifts: ['glacier3000'], prices: null
+            gear: ['ski', 'snowboard'], prices: null
         },
         {
             id: 'passemontagne', name: 'Diablerets Passe Montagne', url: 'https://diablerets-pm.ch/',
@@ -2411,10 +2414,12 @@
         },
         {
             id: 'jackysports', name: 'Jacky Sports (INTERSPORT)', url: 'https://www.intersportrent.ch/skirent-les-diablerets~3949477',
-            note: null,
-            serves: ['diablerets'],
-            branches: [{ village: 'diablerets', label: 'Les Diablerets', address: null, phone: null }],
-            gear: ['ski', 'snowboard', 'mtb'], prices: null
+            note: 'INTERSPORT Rent — same national rate card as Paragon · Les Diablerets is the rental base for Glacier 3000',
+            serves: ['diablerets', 'glacier3000'],
+            branches: [{ village: 'diablerets', label: 'Les Diablerets', address: null, phone: '+41 24 492 32 18' }],
+            gear: ['ski', 'snowboard', 'xc', 'snowshoe', 'mtb', 'ebike', 'ferrata'],
+            onlineDiscount: 10,
+            prices: INTERSPORT_PRICES
         },
         {
             id: 'hefti', name: 'Hefti Sports', url: 'https://heftisports.ch/',
