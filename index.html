@@ -804,6 +804,21 @@
         .rb-row span:last-child { font-family: var(--font-mono); }
         .rb-row.total { border-top: 1px solid rgba(255,255,255,0.18); margin-top: 4px; padding-top: 9px; font-weight: 700; color: #fff; }
         .rb-row.group { color: rgba(255,255,255,0.7); }
+        /* Itemised "what you're paying for" breakdown */
+        .cs-ctx { font-size: 12.5px; font-weight: 700; color: var(--ink-2); margin-bottom: 14px; }
+        .cs-cols { display: grid; grid-template-columns: 1fr auto auto; gap: 10px 18px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+        .cs-cols span { font-size: 10px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--ink-3); }
+        .cs-cols span:nth-child(2), .cs-cols span:nth-child(3) { text-align: right; }
+        .cs-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px 18px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line); }
+        .cs-cat { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
+        .cs-detail { font-size: 12px; color: var(--ink-3); margin-top: 3px; line-height: 1.45; }
+        .cs-per { font-family: var(--font-mono); font-weight: 700; font-size: 14px; text-align: right; white-space: nowrap; }
+        .cs-grp { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-3); text-align: right; white-space: nowrap; }
+        .cs-row.total { border-bottom: none; border-top: 2px solid var(--ink); margin-top: 4px; padding-top: 15px; }
+        .cs-row.total .cs-cat { font-size: 16px; }
+        .cs-row.total .cs-per { font-size: 17px; color: var(--swiss-red); }
+        .cs-row.total .cs-grp { font-size: 14px; color: var(--ink-2); font-weight: 700; }
+        @media (max-width: 560px) { .cs-cols, .cs-row { grid-template-columns: 1fr auto; } .cs-cols span:nth-child(3), .cs-grp { display: none; } }
         @media (max-width: 680px) { .rollup-grid { grid-template-columns: 1fr; } }
         @media (max-width: 1040px) {
             .trip-grid { grid-template-columns: 1fr 1fr; }
@@ -1080,6 +1095,12 @@
             <section class="panel rollup" id="tripRollup"></section>
         </div>
 
+        <h2 class="section-title reveal">What you’re paying for</h2>
+        <p class="section-sub reveal">Every line in your trip, itemised — per person and for the whole group.</p>
+        <section class="panel reveal">
+            <div id="costSummary"></div>
+        </section>
+
     </div>
 
     <footer>
@@ -1095,7 +1116,7 @@
 </main>
 
 <script>
-    const STORAGE_KEY = 'alpensync-state-v4';
+    const STORAGE_KEY = 'alpensync-state-v5';
     const DEFAULT_TRAVELLERS = 4;
     const DEFAULT_EXPENSES = [];   // start clean — rail + pass + gear auto-fill the all-in
 
@@ -2668,28 +2689,36 @@
     }
 
     // Per-person lift-pass cost from the live pass selection (0 when no real price is loaded).
-    function currentPassAmount() {
+    function passDetail() {
         const scheme = currentPassScheme();
-        if (!scheme) return 0;
+        if (!scheme) return null;
         const catId = document.getElementById('passCategory').value;
         const optId = document.getElementById('passOption').value;
         const p = scheme.prices[optId] ? scheme.prices[optId][catId] : null;
-        return (p == null) ? 0 : roundCHF(p);
+        if (p == null) return null;
+        const sys = PASS_SYSTEMS[MOUNTAIN_PASS[passMountainValue()]];
+        const optLabel = (scheme.options.find(o => o.id === optId) || {}).label || '';
+        const catShort = (scheme.categories.find(c => c.id === catId) || {}).short || '';
+        return { amount: roundCHF(p), label: `${sys ? sys.name : ''} · ${optLabel}${catShort ? ' (' + catShort + ')' : ''}` };
     }
+    function currentPassAmount() { const d = passDetail(); return d ? d.amount : 0; }
 
-    // Per-person gear cost from the live recommendation (0 when no activity or no real price).
-    function currentGearAmount() {
-        if (!currentActivity) return 0;
+    // Live per-person gear detail from the recommendation (null when no activity or no real price).
+    function gearDetail() {
+        if (!currentActivity) return null;
         const dest = currentDestination;
         const needs = ACTIVITY_GEAR[currentActivity] || [];
         const kitChoices = needs.filter(g => gearOptionsFor(dest).includes(g));
-        if (!kitChoices.length) return 0;
+        if (!kitChoices.length) return null;
         const gearId = kitChoices.includes(recGearChoice) ? recGearChoice : kitChoices[0];
         const ranked = rankShopsFor(dest, gearId);
-        if (!ranked.length) return 0;
+        if (!ranked.length) return null;
         const rate = rentalRate(ranked[0].shop, gearId, recState.days);
-        return (rate == null) ? 0 : roundCHF(rate);
+        if (rate == null) return null;
+        const d = recState.days;
+        return { amount: roundCHF(rate), label: `${GEAR_TYPES[gearId].label} · ${ranked[0].shop.name} · ${d} day${d > 1 ? 's' : ''}` };
     }
+    function currentGearAmount() { const d = gearDetail(); return d ? d.amount : 0; }
 
     function updateTripRollup() {
         const host = document.getElementById('tripRollup');
@@ -2731,6 +2760,52 @@
                 </div>
             </div>`;
         countUp(document.getElementById('rollupPer'), allInPer, 'CHF ');
+        renderCostSummary();
+    }
+
+    // Fully itemised breakdown — every line the traveller is paying for, per person and per group.
+    function renderCostSummary() {
+        const host = document.getElementById('costSummary');
+        if (!host) return;
+        const n = travellerCount();
+        const rows = [];
+        const fare = computeTariff(
+            document.getElementById('originHub').value, currentDestination,
+            document.getElementById('swissPass').value, document.getElementById('groupSize').value,
+            document.getElementById('travelClass').value, document.getElementById('tripType').value
+        );
+        const b = fare.breakdown;
+        const railDetail = `${fare.origin} → ${fare.destinationName} · ${b.tripLabel} · ${b.classLabel}`
+            + (b.passDiscountPct ? ` · ${b.passLabel} −${b.passDiscountPct}%` : '')
+            + (b.groupDiscountApplied ? ' · group −30%' : '');
+        rows.push({ cat: 'Rail', detail: railDetail, per: fare.pricing.finalPricePerPerson });
+        const pass = passDetail();
+        if (pass) rows.push({ cat: 'Lift pass', detail: pass.label, per: pass.amount });
+        const gear = gearDetail();
+        if (gear) rows.push({ cat: 'Gear rental', detail: gear.label, per: gear.amount });
+        collectExpenses().forEach(e => {
+            const v = parseFloat(e.amount);
+            if (!(v > 0)) return;
+            if (e.scope === 'personal') rows.push({ cat: e.description || 'Personal item', detail: 'personal · each traveller', per: roundCHF(v) });
+            else rows.push({ cat: e.description || 'Shared item', detail: `shared · split ${n} way${n > 1 ? 's' : ''}`, per: roundCHF(v / n) });
+        });
+        const perTotal = roundCHF(rows.reduce((s, r) => s + r.per, 0));
+        const dateLabel = document.getElementById('tripDatesNote').textContent || '';
+        const rowsHtml = rows.map(r => `
+            <div class="cs-row">
+                <div><div class="cs-cat">${esc(r.cat)}</div><div class="cs-detail">${esc(r.detail)}</div></div>
+                <div class="cs-per">CHF ${chf(r.per)}</div>
+                <div class="cs-grp">CHF ${chf(roundCHF(r.per * n))}</div>
+            </div>`).join('');
+        host.innerHTML = `
+            <div class="cs-ctx">${esc(RESORT_BY_ID[currentDestination].name)}${dateLabel ? ' · ' + esc(dateLabel) : ''} · ${n} traveller${n > 1 ? 's' : ''}</div>
+            <div class="cs-cols"><span>Item</span><span>Per person</span><span>Group ×${n}</span></div>
+            ${rowsHtml}
+            <div class="cs-row total">
+                <div class="cs-cat">Total</div>
+                <div class="cs-per">CHF ${chf(perTotal)}</div>
+                <div class="cs-grp">CHF ${chf(roundCHF(perTotal * n))}</div>
+            </div>`;
     }
 
     // --- Persistence ---
