@@ -758,6 +758,10 @@
         .rec-field select, .rec-field input { min-width: 108px; }
         .rec-book .btn-primary { margin-left: auto; }
         .rec-total { font-family: var(--font-mono); font-weight: 700; font-size: 14px; color: var(--ink); align-self: flex-end; padding-bottom: 8px; }
+        .tier-seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: rgba(255,255,255,0.8); }
+        .tier-seg button { font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; border: 0; background: transparent; color: var(--ink-2); padding: 7px 15px; transition: all .18s var(--ease-soft); }
+        .tier-seg button:hover { color: var(--indigo); }
+        .tier-seg button.on { background: var(--indigo); color: #fff; }
         .rec-nodata { font-size: 12.5px; color: var(--ink-3); font-weight: 600; line-height: 1.55; }
         .rec-alt { margin-top: 12px; }
         .rec-alt summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--ink-3); list-style: none; padding: 6px 2px; }
@@ -2473,17 +2477,41 @@
             branches: [{ village: 'leysin', label: 'Leysin', address: 'Route du Belvédère 3, 1854', phone: null }],
             gear: ['ski', 'snowboard', 'touring', 'xc', 'snowshoe', 'mtb', 'ebike', 'ferrata'],
             specialistIn: ['touring', 'xc'], atLifts: ['leysin'],
-            // Hefti Sports rate card (Leysin · Col des Mosses): per-person totals for 1..7 days.
-            // Winter 25-26 + summer 2026. Sets = cheapest adult tier + boots where sold separately.
+            // Hefti Sports rate card (Leysin · Col des Mosses): per-person totals for 1..7 days,
+            // winter 25-26 + summer 2026. Kit sold in grades gets an { economy, premium } map;
+            // single-grade kit stays a plain array. Economy = cheapest tier + boots where sold
+            // separately; premium = the top consumer grade on the same card.
             prices: {
-                ski:       [48, 89, 115, 141, 167, 193, 220],   // Ski Introduction + boots
-                snowboard: [54, 99, 135, 166, 192, 218, 244],   // Snowboard Introduction + boots
-                touring:   [69, 126, 163, 199, 235, 271, 307],  // touring skis+skins+couteaux + boots
-                xc:        [29, 54, 69, 83, 98, 113, 129],       // Nordic Classic Introduction (incl. boots)
-                snowshoe:  [19, 36, 47, 58, 69, 80, 91],         // Raquettes / snowshoes
-                mtb:       [40, 70, 95, 115, 130, 140, 150],     // Mountain Bike hardtail + helmet
-                ebike:     [69, 123, 172, 214, 251, 285, 319],   // E-Bike hardtail + helmet
-                ferrata:   [29, 38, 50, 60, 70, 80, 90]          // Set de Via Ferrata
+                ski: {
+                    economy: [48, 89, 115, 141, 167, 193, 220],  // Introduction skis + boots
+                    premium: [72, 125, 162, 199, 236, 272, 308]  // Performance skis + boots
+                },
+                snowboard: {
+                    economy: [54, 99, 135, 166, 192, 218, 244],  // Introduction board + boots
+                    premium: [84, 150, 186, 237, 273, 309, 345]  // Test / Splitboard + boots
+                },
+                touring:   [69, 126, 163, 199, 235, 271, 307],   // touring skis+skins+couteaux + boots (one grade)
+                xc: {
+                    economy: [29, 54, 69, 83, 98, 113, 129],     // Nordic Classic Introduction (incl. boots)
+                    premium: [44, 79, 104, 124, 148, 170, 193]   // Nordic Classic / Skating Evolution (incl. boots)
+                },
+                snowshoe:  [19, 36, 47, 58, 69, 80, 91],          // Raquettes / snowshoes (one grade)
+                mtb: {
+                    economy: [40, 70, 95, 115, 130, 140, 150],   // Mountain Bike hardtail + helmet
+                    premium: [79, 141, 196, 244, 286, 325, 364]  // Mountain Bike Enduro (full-suspension) + helmet
+                },
+                ebike: {
+                    economy: [69, 123, 172, 214, 251, 285, 319], // E-Bike hardtail + helmet
+                    premium: [89, 163, 228, 288, 345, 397, 449]  // E-Bike Enduro (full-suspension) + helmet
+                },
+                ferrata:   [29, 38, 50, 60, 70, 80, 90]           // Set de Via Ferrata (one grade)
+            },
+            tierLabels: {
+                ski:       { economy: 'Introduction', premium: 'Performance' },
+                snowboard: { economy: 'Introduction', premium: 'Test / Splitboard' },
+                xc:        { economy: 'Classic Introduction', premium: 'Classic / Skating Evolution' },
+                mtb:       { economy: 'Hardtail', premium: 'Enduro · full-suspension' },
+                ebike:     { economy: 'Hardtail', premium: 'Enduro · full-suspension' }
             }
         }
     ];
@@ -2539,26 +2567,40 @@
         }).sort((a, b) => b.score - a.score);
     }
 
-    // Prices are either a flat per-day rate (number, e.g. INTERSPORT) or per-day-count totals
-    // (array indexed by day − 1, e.g. Hefti's tiered card). rentalRate handles both models.
-    function rentalRate(shop, gearId, days) {
+    // A gear price is one of three shapes: a flat per-day rate (number, e.g. INTERSPORT),
+    // per-day-count totals (array indexed by day − 1, e.g. Hefti), or a grade map
+    // { economy, premium } whose values are themselves numbers or arrays. gearTiers exposes
+    // the grades a shop offers for a kit (null when only one grade is on file).
+    function gearTiers(shop, gearId) {
+        const p = shop && shop.prices ? shop.prices[gearId] : null;
+        if (p && typeof p === 'object' && !Array.isArray(p)) return Object.keys(p);
+        return null;
+    }
+    const TIER_LABEL = { economy: 'Economy', premium: 'Premium' };
+    function tierLabel(t) { return TIER_LABEL[t] || t; }
+
+    function rentalRate(shop, gearId, days, tier) {
         if (!shop || !shop.prices) return null;
-        const p = shop.prices[gearId];
+        let p = shop.prices[gearId];
         if (p == null) return null;
+        if (p && typeof p === 'object' && !Array.isArray(p)) {
+            p = (tier && p[tier] != null) ? p[tier] : p.economy;   // pick grade, default economy
+        }
         if (Array.isArray(p)) {
             const v = p[Math.min(days, p.length) - 1];
             return (v == null) ? null : v;
         }
-        return roundCHF(p * days);
+        return (p == null) ? null : roundCHF(p * days);
     }
 
     // The activity drives everything: no gear picker, no shop list. We derive the kit
     // from the chosen activity, rank the shops, and lead with the single best one.
     let recGearChoice = null;                    // pill the user tapped (ski vs snowboard etc.)
-    let recState = { gearId: null, shopId: null, days: 1, price: '' };
+    let recState = { gearId: null, shopId: null, days: 1, tier: 'economy', price: '' };
 
     function pickRecGear(g) { recGearChoice = g; updateRental(); }
     function setRecDays(v) { recState.days = Math.max(1, parseInt(v, 10) || 1); updateRental(); }
+    function setRecTier(t) { recState.tier = t; updateRental(); }
 
     function updateRental() {
         const host = document.getElementById('rentalRec');
@@ -2588,9 +2630,13 @@
         const best = ranked[0], alts = ranked.slice(1);
         const s = best.shop;
 
-        // Reset the manual price when the recommendation itself changes.
-        if (recState.gearId !== gearId || recState.shopId !== s.id) recState.price = '';
+        // Reset the manual price / grade when the recommendation itself changes.
+        if (recState.gearId !== gearId || recState.shopId !== s.id) { recState.price = ''; recState.tier = 'economy'; }
         recState.gearId = gearId; recState.shopId = s.id;
+
+        // Grades this shop offers for this kit (null = single grade). Keep the selection valid.
+        const tiers = gearTiers(s, gearId);
+        if (tiers && !tiers.includes(recState.tier)) recState.tier = tiers[0];
 
         let branches = s.branches.filter(b => b.village === dest);
         if (!branches.length) branches = s.branches;
@@ -2610,20 +2656,33 @@
                 </div>`).join('')}</details>`
             : '';
 
-        const rate = rentalRate(s, gearId, recState.days);
+        const rate = rentalRate(s, gearId, recState.days, recState.tier);
         const dayOpts = Array.from({ length: RENTAL_MAX_DAYS }, (_, i) =>
             `<option value="${i + 1}" ${recState.days === i + 1 ? 'selected' : ''}>${i + 1} day${i > 0 ? 's' : ''}</option>`).join('');
 
-        // Booking (days + price) only appears with a real rate card loaded. The price flows
-        // straight into the per-person all-in — no "add" step. With no data we invent nothing.
+        // Grade toggle appears only when the shop lists more than one on its card.
+        const tierDesc = (s.tierLabels && s.tierLabels[gearId]) ? s.tierLabels[gearId] : null;
+        const tierToggle = tiers
+            ? `<div class="rec-field rec-tier"><label>Grade</label>
+                <div class="tier-seg">${tiers.map(t =>
+                    `<button type="button" class="${t === recState.tier ? 'on' : ''}" onclick="setRecTier('${t}')">${esc(tierLabel(t))}</button>`).join('')}</div></div>`
+            : '';
+        const tierNote = (tiers && tierDesc)
+            ? `<div class="rental-hint">${tiers.map(t => `${esc(tierLabel(t))} = ${esc(tierDesc[t] || '')}`).join(' · ')}</div>`
+            : '';
+
+        // Booking (grade + days + price) only appears with a real rate card loaded. The price
+        // flows straight into the per-person all-in — no "add" step. With no data we invent nothing.
         const bookHtml = (rate != null)
             ? `<div class="rec-book">
+                ${tierToggle}
                 <div class="rec-field"><label>${esc(GEAR_TYPES[gearId].label)} · days</label>
                     <select onchange="setRecDays(this.value)">${dayOpts}</select></div>
                 <div class="rec-field"><label>Price / person (CHF)</label>
                     <input type="number" value="${rate}" readonly></div>
                 <div class="rec-total">CHF ${chf(rate)}</div>
                 <div class="rental-hint">From the shop’s published rate card — counted in your all-in below.</div>
+                ${tierNote}
             </div>`
             : `<div class="rec-book">
                 <div class="rec-nodata">Pricing not loaded yet — ${esc(s.name)}’s real rate will appear here once their rate card is in. Until then, check the price on their site${s.url ? ' (link above)' : ''} or in person.</div>
@@ -2762,10 +2821,14 @@
         const gearId = kitChoices.includes(recGearChoice) ? recGearChoice : kitChoices[0];
         const ranked = rankShopsFor(dest, gearId);
         if (!ranked.length) return null;
-        const rate = rentalRate(ranked[0].shop, gearId, recState.days);
+        const shop = ranked[0].shop;
+        const tiers = gearTiers(shop, gearId);
+        const tier = (tiers && tiers.includes(recState.tier)) ? recState.tier : (tiers ? tiers[0] : null);
+        const rate = rentalRate(shop, gearId, recState.days, tier);
         if (rate == null) return null;
         const d = recState.days;
-        return { amount: roundCHF(rate), label: `${GEAR_TYPES[gearId].label} · ${ranked[0].shop.name} · ${d} day${d > 1 ? 's' : ''}` };
+        const grade = tier ? ` · ${tierLabel(tier)}` : '';
+        return { amount: roundCHF(rate), label: `${GEAR_TYPES[gearId].label}${grade} · ${shop.name} · ${d} day${d > 1 ? 's' : ''}` };
     }
     function currentGearAmount() { const d = gearDetail(); return d ? d.amount : 0; }
 
