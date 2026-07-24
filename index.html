@@ -2190,7 +2190,56 @@
             summer: null
         },
         vgd: {
-            winter: null,
+            // Villars–Gryon–Les Diablerets · winter 2025-26 (tvgd.ch rate card, Sept 2025).
+            // Duration ladder: 1–2 days use the cheaper VGD-local pass; 3+ days switch to the
+            // regional "Alpes Vaudoises" pass (adds Glacier 3000 + Leysin) — the only multi-day
+            // product sold and the cheapest valid pass at each length. Half-day, beginners'
+            // and night rows are the genuine VGD-local extras. Kids born 2021+ ski free.
+            winter: {
+                categories: WINTER_AGE_CATS,
+                options: [
+                    { id: 'd1',    label: '1 day (VGD)' },
+                    { id: 'd2',    label: '2 days (VGD)' },
+                    { id: 'd3',    label: '3 days (Alpes Vaudoises)' },
+                    { id: 'd4',    label: '4 days (Alpes Vaudoises)' },
+                    { id: 'd5',    label: '5 days (Alpes Vaudoises)' },
+                    { id: 'd6',    label: '6 days (Alpes Vaudoises)' },
+                    { id: 'd7',    label: '7 days (Alpes Vaudoises)' },
+                    { id: 'd8',    label: '8 days (Alpes Vaudoises)' },
+                    { id: 'd9',    label: '9 days (Alpes Vaudoises)' },
+                    { id: 'd10',   label: '10 days (Alpes Vaudoises)' },
+                    { id: 'd11',   label: '11 days (Alpes Vaudoises)' },
+                    { id: 'd12',   label: '12 days (Alpes Vaudoises)' },
+                    { id: 'd13',   label: '13 days (Alpes Vaudoises)' },
+                    { id: 'd14',   label: '14 days (Alpes Vaudoises)' },
+                    { id: 'd15',   label: '15 days (Alpes Vaudoises)' },
+                    { id: 'half',  label: '½-day from 12h (VGD)' },
+                    { id: 'beg1',  label: 'Beginners’ pass — 1 day' },
+                    { id: 'beg2',  label: 'Beginners’ pass — 2 days' },
+                    { id: 'night', label: 'Night skiing — Diablerets' }
+                ],
+                prices: {
+                    d1:    { adult: 75,  youthsenior: 68,  child: 49 },
+                    d2:    { adult: 135, youthsenior: 122, child: 88 },
+                    d3:    { adult: 219, youthsenior: 198, child: 143 },
+                    d4:    { adult: 279, youthsenior: 252, child: 182 },
+                    d5:    { adult: 329, youthsenior: 297, child: 214 },
+                    d6:    { adult: 379, youthsenior: 342, child: 247 },
+                    d7:    { adult: 419, youthsenior: 378, child: 273 },
+                    d8:    { adult: 469, youthsenior: 423, child: 305 },
+                    d9:    { adult: 519, youthsenior: 468, child: 338 },
+                    d10:   { adult: 569, youthsenior: 513, child: 370 },
+                    d11:   { adult: 619, youthsenior: 558, child: 403 },
+                    d12:   { adult: 669, youthsenior: 603, child: 435 },
+                    d13:   { adult: 719, youthsenior: 648, child: 468 },
+                    d14:   { adult: 769, youthsenior: 693, child: 500 },
+                    d15:   { adult: 819, youthsenior: 738, child: 533 },
+                    half:  { adult: 56,  youthsenior: 51,  child: 37 },
+                    beg1:  { adult: 45,  youthsenior: 40,  child: 30 },
+                    beg2:  { adult: 90,  youthsenior: 80,  child: 60 },
+                    night: { adult: 25,  youthsenior: 25,  child: 15 }
+                }
+            },
             summer: {
                 categories: [
                     { id: 'adult',   label: 'Adult',                                       short: 'Adult' },
