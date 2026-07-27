@@ -2186,19 +2186,60 @@
     // Set a season to null until its official rate sheet is loaded.
     const PASS_SCHEMES = {
         glacier3000: {
-            winter: buildDayScheme(WINTER_AGE_CATS, {
-                adult:       [89, 159, 219, 279, 329, 379, 419, 469, 519, 569, 619, 669, 719, 769, 819],
-                youthsenior: [81, 144, 198, 252, 297, 342, 378, 423, 468, 513, 558, 603, 648, 693, 738],
-                child:       [58, 104, 143, 182, 214, 247, 273, 305, 338, 370, 403, 435, 468, 500, 533]
-            }, 15),
+            // Official Glacier 3000 / Alpes Vaudoises winter card (glacier3000.ch, 8 Nov 2025 –
+            // 30 Apr 2026). Two products: the Glacier 3000-only 1–2 day pass, and the regional
+            // Alpes Vaudoises pass (Diablerets · Villars · Leysin · Les Mosses), 1–15 days.
+            // Individual (non-group) rates; columns Adulte / Jeune-Sénior / Enfant map to our
+            // Adult / Youth-Senior / Child. This is the app's canonical Alpes Vaudoises source.
+            winter: {
+                categories: WINTER_AGE_CATS,
+                options: [
+                    { id: 'g1',  label: 'Glacier 3000 · 1 day' },
+                    { id: 'g2',  label: 'Glacier 3000 · 2 days' },
+                    { id: 'd1',  label: 'Alpes Vaudoises · 1 day' },
+                    { id: 'd2',  label: 'Alpes Vaudoises · 2 days' },
+                    { id: 'd3',  label: 'Alpes Vaudoises · 3 days' },
+                    { id: 'd4',  label: 'Alpes Vaudoises · 4 days' },
+                    { id: 'd5',  label: 'Alpes Vaudoises · 5 days' },
+                    { id: 'd6',  label: 'Alpes Vaudoises · 6 days' },
+                    { id: 'd7',  label: 'Alpes Vaudoises · 7 days' },
+                    { id: 'd8',  label: 'Alpes Vaudoises · 8 days' },
+                    { id: 'd9',  label: 'Alpes Vaudoises · 9 days' },
+                    { id: 'd10', label: 'Alpes Vaudoises · 10 days' },
+                    { id: 'd11', label: 'Alpes Vaudoises · 11 days' },
+                    { id: 'd12', label: 'Alpes Vaudoises · 12 days' },
+                    { id: 'd13', label: 'Alpes Vaudoises · 13 days' },
+                    { id: 'd14', label: 'Alpes Vaudoises · 14 days' },
+                    { id: 'd15', label: 'Alpes Vaudoises · 15 days' }
+                ],
+                prices: {
+                    g1:  { adult: 79,  youthsenior: 71,  child: 51 },
+                    g2:  { adult: 139, youthsenior: 125, child: 90 },
+                    d1:  { adult: 84,  youthsenior: 76,  child: 55 },
+                    d2:  { adult: 145, youthsenior: 131, child: 94 },
+                    d3:  { adult: 205, youthsenior: 185, child: 133 },
+                    d4:  { adult: 265, youthsenior: 239, child: 172 },
+                    d5:  { adult: 320, youthsenior: 288, child: 208 },
+                    d6:  { adult: 349, youthsenior: 314, child: 227 },
+                    d7:  { adult: 389, youthsenior: 350, child: 253 },
+                    d8:  { adult: 429, youthsenior: 386, child: 279 },
+                    d9:  { adult: 469, youthsenior: 422, child: 305 },
+                    d10: { adult: 509, youthsenior: 458, child: 331 },
+                    d11: { adult: 549, youthsenior: 494, child: 357 },
+                    d12: { adult: 589, youthsenior: 530, child: 383 },
+                    d13: { adult: 629, youthsenior: 566, child: 409 },
+                    d14: { adult: 669, youthsenior: 602, child: 435 },
+                    d15: { adult: 709, youthsenior: 638, child: 461 }
+                }
+            },
             summer: null
         },
         vgd: {
-            // Villars–Gryon–Les Diablerets · winter 2025-26 (tvgd.ch rate card, Sept 2025).
-            // Duration ladder: 1–2 days use the cheaper VGD-local pass; 3+ days switch to the
-            // regional "Alpes Vaudoises" pass (adds Glacier 3000 + Leysin) — the only multi-day
-            // product sold and the cheapest valid pass at each length. Half-day, beginners'
-            // and night rows are the genuine VGD-local extras. Kids born 2021+ ski free.
+            // Villars–Gryon–Les Diablerets · winter 2025-26. 1–2 day / half-day / beginners /
+            // night rows are the VGD-local pass (tvgd.ch, Sept 2025). 3+ days switch to the
+            // regional "Alpes Vaudoises" pass — the only multi-day product sold — whose rates come
+            // from the official Glacier 3000 / Alpes Vaudoises card so the regional pass is one
+            // consistent price app-wide. Cheapest valid pass at each length. Kids born 2021+ ski free.
             winter: {
                 categories: WINTER_AGE_CATS,
                 options: [
@@ -2225,19 +2266,19 @@
                 prices: {
                     d1:    { adult: 75,  youthsenior: 68,  child: 49 },
                     d2:    { adult: 135, youthsenior: 122, child: 88 },
-                    d3:    { adult: 219, youthsenior: 198, child: 143 },
-                    d4:    { adult: 279, youthsenior: 252, child: 182 },
-                    d5:    { adult: 329, youthsenior: 297, child: 214 },
-                    d6:    { adult: 379, youthsenior: 342, child: 247 },
-                    d7:    { adult: 419, youthsenior: 378, child: 273 },
-                    d8:    { adult: 469, youthsenior: 423, child: 305 },
-                    d9:    { adult: 519, youthsenior: 468, child: 338 },
-                    d10:   { adult: 569, youthsenior: 513, child: 370 },
-                    d11:   { adult: 619, youthsenior: 558, child: 403 },
-                    d12:   { adult: 669, youthsenior: 603, child: 435 },
-                    d13:   { adult: 719, youthsenior: 648, child: 468 },
-                    d14:   { adult: 769, youthsenior: 693, child: 500 },
-                    d15:   { adult: 819, youthsenior: 738, child: 533 },
+                    d3:    { adult: 205, youthsenior: 185, child: 133 },
+                    d4:    { adult: 265, youthsenior: 239, child: 172 },
+                    d5:    { adult: 320, youthsenior: 288, child: 208 },
+                    d6:    { adult: 349, youthsenior: 314, child: 227 },
+                    d7:    { adult: 389, youthsenior: 350, child: 253 },
+                    d8:    { adult: 429, youthsenior: 386, child: 279 },
+                    d9:    { adult: 469, youthsenior: 422, child: 305 },
+                    d10:   { adult: 509, youthsenior: 458, child: 331 },
+                    d11:   { adult: 549, youthsenior: 494, child: 357 },
+                    d12:   { adult: 589, youthsenior: 530, child: 383 },
+                    d13:   { adult: 629, youthsenior: 566, child: 409 },
+                    d14:   { adult: 669, youthsenior: 602, child: 435 },
+                    d15:   { adult: 709, youthsenior: 638, child: 461 },
                     half:  { adult: 56,  youthsenior: 51,  child: 37 },
                     beg1:  { adult: 45,  youthsenior: 40,  child: 30 },
                     beg2:  { adult: 90,  youthsenior: 80,  child: 60 },
@@ -2262,7 +2303,17 @@
                 }
             }
         },
-        leysin: { winter: null, summer: null }
+        leysin: {
+            winter: null,
+            // Leysin (tlml.ch) summer: only the adult round-trip fare is confirmed so far
+            // (booking flow, 24 Jul 2026 = CHF 89). Youth/senior + child stay null → shown as
+            // "—" and excluded from the all-in until their real figures are in. Nothing invented.
+            summer: {
+                categories: WINTER_AGE_CATS,
+                options: [ { id: 'rt', label: 'Round trip (aller-retour)' } ],
+                prices: { rt: { adult: 89, youthsenior: null, child: null } }
+            }
+        }
     };
 
     let passSchemeKey = null;
