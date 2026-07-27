@@ -2305,20 +2305,44 @@
         },
         leysin: {
             winter: null,
-            // Leysin (tlml.ch) summer: only the adult round-trip fare is confirmed so far
-            // (booking flow, 24 Jul 2026 = CHF 89). Youth/senior + child stay null → shown as
-            // "—" and excluded from the all-in until their real figures are in. Nothing invented.
+            // Leysin summer access. Round-trip fare (CHF 89 adult) from the tlml.ch booking flow.
+            // The four forfaits are Leysin's published été-2026 packages — each bundles the lift
+            // with the activity's gear (so a forfait replaces the separate rental for that kit).
+            // Only the figures the sheet prints are stored; unknown age bands stay null → "—".
             summer: {
                 categories: WINTER_AGE_CATS,
-                options: [ { id: 'rt', label: 'Round trip (aller-retour)' } ],
-                prices: { rt: { adult: 89, youthsenior: null, child: null } }
+                options: [
+                    { id: 'rt',    label: 'Round trip (aller-retour)' },
+                    { id: 'vf',    label: 'Via ferrata forfait · set + 1-way lift' },
+                    { id: 'vfvtt', label: 'Via ferrata + MTB forfait · +1 lift' },
+                    { id: 'dh',    label: 'Télé Bike DH forfait · DH bike + day lift' },
+                    { id: 'scoot', label: 'Dirt scoot forfait · scooter + 1-way lift' }
+                ],
+                prices: {
+                    rt:    { adult: 89,  youthsenior: null, child: null },
+                    vf:    { adult: 42,  youthsenior: null, child: 35.5 },  // 35.50 up to 15 (born 2010+)
+                    vfvtt: { adult: 62,  youthsenior: null, child: null },
+                    dh:    { adult: 129, youthsenior: null, child: null },
+                    scoot: { adult: 35,  youthsenior: null, child: null }   // CHF 20 with Magic Pass
+                }
             }
         }
     };
 
-    // Glacier 3000 runs the same forfait year-round (per operator), so summer mirrors the
-    // winter card rather than sitting blank.
-    PASS_SCHEMES.glacier3000.summer = PASS_SCHEMES.glacier3000.winter;
+    // Glacier 3000 runs year-round at the same rate, but summer sells only the glacier's own
+    // access — the regional Alpes Vaudoises ski ladder is a winter product — so summer keeps
+    // just the Glacier 3000 rows, reusing the winter prices (no invention).
+    PASS_SCHEMES.glacier3000.summer = {
+        categories: WINTER_AGE_CATS,
+        options: [
+            { id: 'g1', label: 'Glacier 3000 · 1 day' },
+            { id: 'g2', label: 'Glacier 3000 · 2 days' }
+        ],
+        prices: {
+            g1: PASS_SCHEMES.glacier3000.winter.prices.g1,
+            g2: PASS_SCHEMES.glacier3000.winter.prices.g2
+        }
+    };
 
     let passSchemeKey = null;
 
@@ -2368,7 +2392,8 @@
             `<tr class="${o.id === selOpt ? 'sel' : ''}"><td>${esc(o.label)}</td>` +
             scheme.categories.map(c => {
                 const v = scheme.prices[o.id] ? scheme.prices[o.id][c.id] : null;
-                return `<td>${v != null ? v + '.-' : '—'}</td>`;
+                const txt = v == null ? '—' : (Number.isInteger(v) ? v + '.-' : v.toFixed(2));
+                return `<td>${txt}</td>`;
             }).join('') + `</tr>`).join('');
         host.innerHTML =
             `<div class="pass-ref-head">${esc(sys.name)} · ${season} rates</div>` +
