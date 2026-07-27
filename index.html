@@ -2316,6 +2316,10 @@
         }
     };
 
+    // Glacier 3000 runs the same forfait year-round (per operator), so summer mirrors the
+    // winter card rather than sitting blank.
+    PASS_SCHEMES.glacier3000.summer = PASS_SCHEMES.glacier3000.winter;
+
     let passSchemeKey = null;
 
     function passMountainValue() { return document.getElementById('passMountain').value; }
