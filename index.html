@@ -889,11 +889,16 @@
 <nav id="topNav">
     <div class="nav-brand"><span class="mini-flag"></span>AlpenSync OS</div>
     <div class="nav-spacer"></div>
-    <div class="nav-cost" id="navCost" title="Per person, all in"></div>
-    <div class="engine-status"><span class="status-dot" id="engineDot"></span><span id="engineLabel">ENGINE: LINKING...</span></div>
+    <div class="nav-cost" id="navCost" data-i18n-title="nav.perPerson" title="Par personne, tout compris"></div>
+    <div class="engine-status"><span class="status-dot" id="engineDot"></span><span id="engineLabel">MOTEUR : CONNEXION…</span></div>
     <div class="segmented season-seg" id="seasonSeg" aria-label="Season">
-        <button type="button" class="seg-opt active" data-value="WINTER" onclick="setSeason('WINTER')">Winter</button>
-        <button type="button" class="seg-opt" data-value="SUMMER" onclick="setSeason('SUMMER')">Summer</button>
+        <button type="button" class="seg-opt active" data-value="WINTER" data-i18n="season.winter" onclick="setSeason('WINTER')">Hiver</button>
+        <button type="button" class="seg-opt" data-value="SUMMER" data-i18n="season.summer" onclick="setSeason('SUMMER')">Été</button>
+        <span class="seg-indicator"></span>
+    </div>
+    <div class="segmented lang-seg" id="langSeg" aria-label="Language">
+        <button type="button" class="seg-opt active" data-value="fr" onclick="setLang('fr')">FR</button>
+        <button type="button" class="seg-opt" data-value="en" onclick="setLang('en')">EN</button>
         <span class="seg-indicator"></span>
     </div>
 </nav>
@@ -961,13 +966,13 @@
     <div class="hero-content" id="heroContent">
         <div class="swiss-flag" aria-hidden="true"></div>
         <h1>AlpenSync OS</h1>
-        <p class="tagline">Your entire Vaud Alps trip — rail, lift passes, and gear — synced into one honest, all-in price.</p>
+        <p class="tagline" data-i18n="hero.tagline">Tout votre séjour dans les Alpes vaudoises — train, forfaits et matériel — réuni en un seul prix, tout compris.</p>
         <p class="sectors">Villars · Gryon · Les Diablerets · Leysin · Glacier 3000</p>
-        <p class="hero-proof">Live SBB fares · real operator rate cards · nothing invented</p>
-        <button class="hero-cta" onclick="enterDashboard()">Begin Expedition</button>
+        <p class="hero-proof" data-i18n="hero.proof">Tarifs CFF en direct · barèmes officiels des exploitants · rien d’inventé</p>
+        <button class="hero-cta" data-i18n="hero.cta" onclick="enterDashboard()">Commencer l’expédition</button>
     </div>
 
-    <div class="scroll-indicator" onclick="enterDashboard()" title="Scroll to dashboard">▾</div>
+    <div class="scroll-indicator" onclick="enterDashboard()" data-i18n-title="hero.scroll" title="Aller au tableau de bord">▾</div>
 </section>
 
 <!-- ================= WORKING DASHBOARD ================= -->
@@ -983,7 +988,7 @@
 
     <div class="container">
 
-        <h2 class="section-title reveal">Choose your sector</h2>
+        <h2 class="section-title reveal" data-i18n="sec.sector">Choisissez votre secteur</h2>
         <p class="section-sub reveal">Pick what you want to do — we surface the resorts that fit, and the map, weather and fare follow.</p>
         <section class="panel reveal">
             <div class="trip-grid">
@@ -1004,12 +1009,12 @@
 
         <div class="dash-pair">
             <div>
-                <h2 class="section-title reveal">Plan the journey</h2>
+                <h2 class="section-title reveal" data-i18n="sec.journey">Planifiez le trajet</h2>
                 <p class="section-sub reveal">SBB fares — the ticket updates live as you change anything.</p>
                 <section class="panel reveal">
                     <div class="planner-grid">
                         <div>
-                            <label for="tripStart">Trip dates</label>
+                            <label for="tripStart" data-i18n="lbl.tripDates">Dates du séjour</label>
                             <div class="date-row">
                                 <input type="date" id="tripStart" onchange="onTripDatesChange()" aria-label="Arrival date">
                                 <span class="date-arrow">→</span>
@@ -1017,10 +1022,10 @@
                             </div>
                             <div class="date-note" id="tripDatesNote"></div>
 
-                            <label for="originHub">Departure hub</label>
+                            <label for="originHub" data-i18n="lbl.departureHub">Gare de départ</label>
                     <select id="originHub" onchange="onOriginChange()"></select>
 
-                    <label for="classSeg">Travel class</label>
+                    <label for="classSeg" data-i18n="lbl.travelClass">Classe</label>
                     <input type="hidden" id="travelClass" value="second">
                     <div class="segmented seg-full" id="classSeg" aria-label="Travel class">
                         <button type="button" class="seg-opt active" data-value="second" onclick="setTravelClass('second')">2nd class</button>
@@ -1028,7 +1033,7 @@
                         <span class="seg-indicator"></span>
                     </div>
 
-                    <label for="tripTypeSeg">Ticket</label>
+                    <label for="tripTypeSeg" data-i18n="lbl.ticket">Billet</label>
                     <input type="hidden" id="tripType" value="roundTrip">
                     <div class="segmented seg-full" id="tripTypeSeg" aria-label="Ticket type">
                         <button type="button" class="seg-opt" data-value="oneWay" onclick="setTripType('oneWay')">One way</button>
@@ -1036,7 +1041,7 @@
                         <span class="seg-indicator"></span>
                     </div>
 
-                    <label for="swissPass">SwissPass profile</label>
+                    <label for="swissPass" data-i18n="lbl.swissPass">Profil SwissPass</label>
                     <select id="swissPass" onchange="calculateTariff()">
                         <option value="none">Standard fare (no subscription)</option>
                         <option value="halbtax">Half-Fare Card (Halbtax)</option>
@@ -1044,7 +1049,7 @@
                         <option value="swiss-travel-pass">Swiss Travel Pass</option>
                     </select>
 
-                    <label for="groupSize">Number of travellers</label>
+                    <label for="groupSize" data-i18n="lbl.travellers">Nombre de voyageurs</label>
                     <div class="stepper">
                         <button type="button" onclick="stepGroup(-1)" aria-label="Fewer travellers">−</button>
                         <input type="number" id="groupSize" value="4" min="1" onchange="calculateTariff()">
@@ -1060,15 +1065,15 @@
             </div>
             <div>
                 <div class="eyebrow reveal">Get to the slopes</div>
-                <h2 class="section-title reveal" style="margin-top:3px;">Mountain passes</h2>
+                <h2 class="section-title reveal" style="margin-top:3px;" data-i18n="sec.passes">Forfaits de remontées</h2>
                 <p class="section-sub reveal">Multi-day lift passes for the Vaud Alps ski systems — prices follow the season.</p>
                 <section class="panel reveal">
                     <div class="pass-picker">
-                        <label for="passMountain">Select mountain</label>
+                        <label for="passMountain" data-i18n="lbl.selectMountain">Domaine skiable</label>
                         <select id="passMountain" onchange="updatePassPrice()"></select>
-                        <label for="passCategory">Ticket type</label>
+                        <label for="passCategory" data-i18n="lbl.ticketType">Type de forfait</label>
                         <select id="passCategory" onchange="updatePassPrice()"></select>
-                        <label for="passOption">Duration / option</label>
+                        <label for="passOption" data-i18n="lbl.durationOption">Durée / option</label>
                         <select id="passOption" onchange="updatePassPrice()"></select>
                         <div class="pass-price" id="passPrice">Pass: —</div>
                         <div id="passBuyLink"></div>
@@ -1080,14 +1085,14 @@
 
         <div class="dash-pair">
             <div>
-                <h2 class="section-title reveal">Rent your gear</h2>
+                <h2 class="section-title reveal" data-i18n="sec.gear">Louez votre matériel</h2>
                 <p class="section-sub reveal">Your activity tells us what you need — here’s the best place to get it.</p>
                 <section class="panel reveal">
                     <div id="rentalRec"></div>
                 </section>
             </div>
             <div>
-                <h2 class="section-title reveal">Your itinerary</h2>
+                <h2 class="section-title reveal" data-i18n="sec.itinerary">Votre itinéraire</h2>
                 <p class="section-sub reveal">Each day with its live forecast — save the big outing for the best one.</p>
                 <section class="panel reveal">
                     <div id="itinerary"></div>
@@ -1095,7 +1100,7 @@
             </div>
         </div>
 
-        <h2 class="section-title reveal">Your trip, all in</h2>
+        <h2 class="section-title reveal" data-i18n="sec.allin">Votre séjour, tout compris</h2>
         <p class="section-sub reveal">Travellers and shared costs on the left; the live per-person total on the right.</p>
         <div class="ledger-grid reveal">
             <section class="panel">
@@ -1107,7 +1112,7 @@
             <section class="panel rollup" id="tripRollup"></section>
         </div>
 
-        <h2 class="section-title reveal">What you’re paying for</h2>
+        <h2 class="section-title reveal" data-i18n="sec.paying">Le détail de votre facture</h2>
         <p class="section-sub reveal">Every line in your trip, itemised — per person and for the whole group.</p>
         <section class="panel reveal">
             <div id="costSummary"></div>
@@ -1121,8 +1126,8 @@
         </svg>
         <div class="footer-inner">
             <div class="footer-brand"><span class="mini-flag"></span>AlpenSync OS</div>
-            <div>Vaud Alps routes · Villars — Gryon — Les Diablerets — Leysin — Glacier 3000</div>
-            <div style="opacity:0.55;">Weather: Open-Meteo · Fares: demo SBB matrix</div>
+            <div data-i18n="foot.routes">Itinéraires des Alpes vaudoises · Villars — Gryon — Les Diablerets — Leysin — Glacier 3000</div>
+            <div style="opacity:0.55;" data-i18n="foot.sources">Météo : Open-Meteo · Tarifs : matrice CFF de démonstration</div>
         </div>
     </footer>
 </main>
@@ -1131,6 +1136,98 @@
     const STORAGE_KEY = 'alpensync-state-v5';
     const DEFAULT_TRAVELLERS = 4;
     const DEFAULT_EXPENSES = [];   // start clean — rail + pass + gear auto-fill the all-in
+
+    // ---- i18n · French-first for the Alpes Vaudoises (Romandie), English on toggle ----
+    const LANG_KEY = 'alpensync-lang';
+    let LANG = 'fr';
+    const I18N = {
+        fr: {
+            'hero.tagline': 'Tout votre séjour dans les Alpes vaudoises — train, forfaits et matériel — réuni en un seul prix, tout compris.',
+            'hero.proof': 'Tarifs CFF en direct · barèmes officiels des exploitants · rien d’inventé',
+            'hero.cta': 'Commencer l’expédition',
+            'hero.scroll': 'Aller au tableau de bord',
+            'nav.perPerson': 'Par personne, tout compris',
+            'season.winter': 'Hiver',
+            'season.summer': 'Été',
+            'sec.sector': 'Choisissez votre secteur',
+            'sec.journey': 'Planifiez le trajet',
+            'sec.passes': 'Forfaits de remontées',
+            'sec.gear': 'Louez votre matériel',
+            'sec.itinerary': 'Votre itinéraire',
+            'sec.allin': 'Votre séjour, tout compris',
+            'sec.paying': 'Le détail de votre facture',
+            'lbl.tripDates': 'Dates du séjour',
+            'lbl.departureHub': 'Gare de départ',
+            'lbl.travelClass': 'Classe',
+            'lbl.ticket': 'Billet',
+            'lbl.swissPass': 'Profil SwissPass',
+            'lbl.travellers': 'Nombre de voyageurs',
+            'lbl.selectMountain': 'Domaine skiable',
+            'lbl.ticketType': 'Type de forfait',
+            'lbl.durationOption': 'Durée / option',
+            'foot.routes': 'Itinéraires des Alpes vaudoises · Villars — Gryon — Les Diablerets — Leysin — Glacier 3000',
+            'foot.sources': 'Météo : Open-Meteo · Tarifs : matrice CFF de démonstration'
+        },
+        en: {
+            'hero.tagline': 'Your entire Vaud Alps trip — rail, lift passes, and gear — synced into one honest, all-in price.',
+            'hero.proof': 'Live SBB fares · real operator rate cards · nothing invented',
+            'hero.cta': 'Begin Expedition',
+            'hero.scroll': 'Scroll to dashboard',
+            'nav.perPerson': 'Per person, all in',
+            'season.winter': 'Winter',
+            'season.summer': 'Summer',
+            'sec.sector': 'Choose your sector',
+            'sec.journey': 'Plan the journey',
+            'sec.passes': 'Mountain passes',
+            'sec.gear': 'Rent your gear',
+            'sec.itinerary': 'Your itinerary',
+            'sec.allin': 'Your trip, all in',
+            'sec.paying': 'What you’re paying for',
+            'lbl.tripDates': 'Trip dates',
+            'lbl.departureHub': 'Departure hub',
+            'lbl.travelClass': 'Travel class',
+            'lbl.ticket': 'Ticket',
+            'lbl.swissPass': 'SwissPass profile',
+            'lbl.travellers': 'Number of travellers',
+            'lbl.selectMountain': 'Select mountain',
+            'lbl.ticketType': 'Ticket type',
+            'lbl.durationOption': 'Duration / option',
+            'foot.routes': 'Vaud Alps routes · Villars — Gryon — Les Diablerets — Leysin — Glacier 3000',
+            'foot.sources': 'Weather: Open-Meteo · Fares: demo SBB matrix'
+        }
+    };
+    function t(k) {
+        const d = I18N[LANG] || I18N.en;
+        if (d && d[k] != null) return d[k];
+        if (I18N.en[k] != null) return I18N.en[k];
+        return k;
+    }
+    function applyI18n(root) {
+        const r = root || document;
+        r.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+        r.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.getAttribute('data-i18n-title')); });
+        r.querySelectorAll('[data-i18n-ph]').forEach(el => { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
+        document.documentElement.lang = LANG;
+    }
+    function rerenderDynamic() {
+        const calls = ['renderActivities', 'renderPicker', 'updatePassPrice', 'updateRental',
+                       'calculateTariff', 'updateTripRollup', 'renderItinerary'];
+        if (typeof passSchemeKey !== 'undefined') passSchemeKey = null;   // force picker rebuild
+        calls.forEach(fn => { try { window[fn] && window[fn](); } catch (e) {} });
+    }
+    function syncLangSeg() {
+        const seg = document.getElementById('langSeg');
+        if (!seg) return;
+        seg.querySelectorAll('.seg-opt').forEach(b => b.classList.toggle('active', b.dataset.value === LANG));
+        if (typeof positionAllSegmented === 'function') positionAllSegmented();
+    }
+    function setLang(l) {
+        LANG = (l === 'en') ? 'en' : 'fr';
+        try { localStorage.setItem(LANG_KEY, LANG); } catch (e) {}
+        applyI18n();
+        syncLangSeg();
+        rerenderDynamic();
+    }
 
     const RESORTS = [
         { id: 'villars', name: 'Villars', region: 'Vaud Alps', elev: 1300, lat: 46.2977, lon: 7.0553, baseTariff: 34,
@@ -3049,6 +3146,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+        try { const sl = localStorage.getItem(LANG_KEY); if (sl === 'en' || sl === 'fr') LANG = sl; } catch (e) {}
         populateOrigins();
         loadState();
         applySeason();
@@ -3067,6 +3165,8 @@
         calculateTariff();
         updateTripRollup();
         renderItinerary();
+        applyI18n();
+        syncLangSeg();
         requestAnimationFrame(positionAllSegmented);
         setTimeout(positionAllSegmented, 450);
     });
