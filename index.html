@@ -1272,6 +1272,7 @@
         'rec.noGear': '{act} ne nécessite aucune location — vous êtes déjà équipé.',
         'rec.noShop': 'Aucun magasin recensé ne loue de {gear} à {dest}. Essayez un autre secteur pour cette activité.',
         'rec.grade': 'Gamme', 'rec.daysLabel': '{gear} · jours', 'rec.pricePerson': 'Prix / personne (CHF)',
+        'rec.bundled': 'Compris dans votre forfait Leysin — non compté séparément.',
         'rec.fromRateCard': 'D’après le barème officiel du magasin — inclus dans votre total ci-dessous.',
         'rec.noData': 'Tarifs pas encore chargés — le vrai tarif de {shop} apparaîtra ici dès que son barème sera intégré. En attendant, vérifiez le prix sur leur site ou sur place.',
         'why.only': 'seul magasin recensé pour cette location ici', 'why.specialist': 'en fait sa spécialité',
@@ -1314,6 +1315,7 @@
         'rec.noGear': '{act} needs no rental gear — you’re already set.',
         'rec.noShop': 'No shop on file rents {gear} at {dest}. Try another sector for this activity.',
         'rec.grade': 'Grade', 'rec.daysLabel': '{gear} · days', 'rec.pricePerson': 'Price / person (CHF)',
+        'rec.bundled': 'Included in your Leysin forfait — not counted separately.',
         'rec.fromRateCard': 'From the shop’s published rate card — counted in your all-in below.',
         'rec.noData': 'Pricing not loaded yet — {shop}’s real rate will appear here once their rate card is in. Until then, check the price on their site or in person.',
         'why.only': 'the only shop on file renting this here', 'why.specialist': 'declares this its specialism',
@@ -2735,6 +2737,7 @@
         } else {
             el.innerHTML = '—';
         }
+        updateRental();      // a bundled forfait may change what the gear card shows / counts
         updateTripRollup();
     }
 
@@ -3039,6 +3042,7 @@
             : '';
 
         const rate = rentalRate(s, gearId, recState.days, recState.tier);
+        const isBundled = bundledGearIds().includes(gearId);
         const dayOpts = Array.from({ length: RENTAL_MAX_DAYS }, (_, i) =>
             `<option value="${i + 1}" ${recState.days === i + 1 ? 'selected' : ''}>${esc(t(i > 0 ? 'cost.days' : 'cost.day', { n: i + 1 }))}</option>`).join('');
 
@@ -3055,7 +3059,9 @@
 
         // Booking (grade + days + price) only appears with a real rate card loaded. The price
         // flows straight into the per-person all-in — no "add" step. With no data we invent nothing.
-        const bookHtml = (rate != null)
+        const bookHtml = isBundled
+            ? `<div class="rec-book"><div class="rec-nodata">${esc(t('rec.bundled'))}</div></div>`
+            : (rate != null)
             ? `<div class="rec-book">
                 ${tierToggle}
                 <div class="rec-field"><label>${esc(t('rec.daysLabel', { gear: gearLabel(gearId) }))}</label>
@@ -3194,6 +3200,18 @@
     function currentPassAmount() { const d = passDetail(); return d ? d.amount : 0; }
 
     // Live per-person gear detail from the recommendation (null when no activity or no real price).
+    // Some passes bundle the lift WITH gear (Leysin summer forfaits), so that gear must not be
+    // charged again by the rental line. Map: "system|season" → { passOptionId: [coveredGearIds] }.
+    const PASS_BUNDLED_GEAR = {
+        'leysin|summer': { vf: ['ferrata'], vfvtt: ['ferrata', 'mtb'], dh: ['mtb', 'ebike'], scoot: [] }
+    };
+    function bundledGearIds() {
+        const sysId = MOUNTAIN_PASS[passMountainValue()];
+        const map = PASS_BUNDLED_GEAR[sysId + '|' + currentSeason.toLowerCase()];
+        if (!map) return [];
+        return map[(document.getElementById('passOption') || {}).value] || [];
+    }
+
     function gearDetail() {
         if (!currentActivity) return null;
         const dest = currentDestination;
@@ -3201,6 +3219,7 @@
         const kitChoices = needs.filter(g => gearOptionsFor(dest).includes(g));
         if (!kitChoices.length) return null;
         const gearId = kitChoices.includes(recGearChoice) ? recGearChoice : kitChoices[0];
+        if (bundledGearIds().includes(gearId)) return null;   // already inside the chosen forfait
         const ranked = rankShopsFor(dest, gearId);
         if (!ranked.length) return null;
         const shop = ranked[0].shop;
