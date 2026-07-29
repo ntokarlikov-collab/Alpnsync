@@ -1028,25 +1028,25 @@
                     <label for="classSeg" data-i18n="lbl.travelClass">Classe</label>
                     <input type="hidden" id="travelClass" value="second">
                     <div class="segmented seg-full" id="classSeg" aria-label="Travel class">
-                        <button type="button" class="seg-opt active" data-value="second" onclick="setTravelClass('second')">2nd class</button>
-                        <button type="button" class="seg-opt" data-value="first" onclick="setTravelClass('first')">1st class</button>
+                        <button type="button" class="seg-opt active" data-value="second" data-i18n="class.second" onclick="setTravelClass('second')">2e classe</button>
+                        <button type="button" class="seg-opt" data-value="first" data-i18n="class.first" onclick="setTravelClass('first')">1re classe</button>
                         <span class="seg-indicator"></span>
                     </div>
 
                     <label for="tripTypeSeg" data-i18n="lbl.ticket">Billet</label>
                     <input type="hidden" id="tripType" value="roundTrip">
                     <div class="segmented seg-full" id="tripTypeSeg" aria-label="Ticket type">
-                        <button type="button" class="seg-opt" data-value="oneWay" onclick="setTripType('oneWay')">One way</button>
-                        <button type="button" class="seg-opt active" data-value="roundTrip" onclick="setTripType('roundTrip')">Round trip</button>
+                        <button type="button" class="seg-opt" data-value="oneWay" data-i18n="trip.oneWay" onclick="setTripType('oneWay')">Aller simple</button>
+                        <button type="button" class="seg-opt active" data-value="roundTrip" data-i18n="trip.round" onclick="setTripType('roundTrip')">Aller-retour</button>
                         <span class="seg-indicator"></span>
                     </div>
 
                     <label for="swissPass" data-i18n="lbl.swissPass">Profil SwissPass</label>
                     <select id="swissPass" onchange="calculateTariff()">
-                        <option value="none">Standard fare (no subscription)</option>
-                        <option value="halbtax">Half-Fare Card (Halbtax)</option>
-                        <option value="generalabonnement">GA Travelcard (Generalabonnement)</option>
-                        <option value="swiss-travel-pass">Swiss Travel Pass</option>
+                        <option value="none" data-i18n="opt.profile.none">Plein tarif (sans abonnement)</option>
+                        <option value="halbtax" data-i18n="opt.profile.halbtax">Demi-tarif (Halbtax)</option>
+                        <option value="generalabonnement" data-i18n="opt.profile.ga">Abonnement général (AG)</option>
+                        <option value="swiss-travel-pass" data-i18n="opt.profile.stp">Swiss Travel Pass</option>
                     </select>
 
                     <label for="groupSize" data-i18n="lbl.travellers">Nombre de voyageurs</label>
@@ -1105,9 +1105,9 @@
         <div class="ledger-grid reveal">
             <section class="panel">
                 <div class="group-lbl" style="margin-top:2px;">Shared costs</div>
-                <div style="font-size:12px; color:var(--ink-3); font-weight:600; margin:0 0 12px;">Split across all travellers; mark a line “Personal” to keep it per-person.</div>
+                <div style="font-size:12px; color:var(--ink-3); font-weight:600; margin:0 0 12px;" data-i18n="exp.helper">Réparti entre tous les voyageurs ; cochez « Personnel » pour garder une ligne par personne.</div>
                 <div id="expenseContainer"></div>
-                <button class="btn-secondary" onclick="addExpenseRow()">+ Add line item</button>
+                <button class="btn-secondary" onclick="addExpenseRow()" data-i18n="exp.addLine">+ Ajouter une ligne</button>
             </section>
             <section class="panel rollup" id="tripRollup"></section>
         </div>
@@ -1218,9 +1218,11 @@
     }
     function rerenderDynamic() {
         const calls = ['renderActivities', 'renderPicker', 'updatePassPrice', 'updateRental',
-                       'calculateTariff', 'updateTripRollup', 'renderItinerary'];
+                       'updateTripDatesNote', 'calculateTariff', 'updateTripRollup', 'renderItinerary'];
         if (typeof passSchemeKey !== 'undefined') passSchemeKey = null;   // force picker rebuild
         calls.forEach(fn => { try { window[fn] && window[fn](); } catch (e) {} });
+        // Weather panel re-renders from the last payload in the new language (no re-fetch).
+        try { if (typeof lastWeatherData !== 'undefined' && lastWeatherData) renderWeather(lastWeatherData); } catch (e) {}
     }
     function syncLangSeg() {
         const seg = document.getElementById('langSeg');
@@ -1321,6 +1323,107 @@
         'pass.notLoaded': '{name} — {season} pricing not loaded yet.', 'pass.buy': 'Buy passes — {name} ↗',
         'pass.ratesHead': '{name} · {season} rates', 'pass.ratesCol': 'Rates', 'pass.perPerson': '/ person'
     });
+
+    // ---- Pass 2b vocabulary: rail/tariff, dropdowns, itinerary, weather ----
+    Object.assign(I18N.fr, {
+        'class.second': '2e classe', 'class.first': '1re classe',
+        'classShort.second': '2E CLASSE', 'classShort.first': '1RE CLASSE',
+        'trip.oneWay': 'Aller simple', 'trip.round': 'Aller-retour',
+        'tripShort.oneWay': 'ALLER', 'tripShort.round': 'A/R',
+        'profile.none': 'Plein tarif', 'profile.halbtax': 'Demi-tarif (Halbtax)',
+        'profile.generalabonnement': 'Abonnement général (AG)', 'profile.swiss-travel-pass': 'Swiss Travel Pass',
+        'opt.profile.none': 'Plein tarif (sans abonnement)', 'opt.profile.halbtax': 'Demi-tarif (Halbtax)',
+        'opt.profile.ga': 'Abonnement général (AG)', 'opt.profile.stp': 'Swiss Travel Pass',
+        'rail.departureHub': 'GARE DE DÉPART', 'rail.alpineSector': 'SECTEUR ALPIN', 'rail.perPassenger': 'Par passager',
+        'rail.groupRate': 'Tarif groupe (10+)', 'rail.groupApplied': '−30% appliqué',
+        'rail.groupSaves': 'Le groupe économise CHF {amt} vs plein tarif',
+        'rail.estimated': 'Tarif estimé — pas encore de prix CFF publié pour cet itinéraire.',
+        'rail.findConnection': 'Voir cette liaison sur CFF ↗',
+        'rail.routingNote': 'Le prix varie selon le nombre de correspondances, la rapidité de l’itinéraire et les travaux CFF en cours. Le tarif affiché correspond à l’option la plus rapide / avec le moins de correspondances.',
+        'exp.split': 'Partagé', 'exp.personal': 'Personnel', 'exp.placeholder': 'Poste',
+        'exp.helper': 'Réparti entre tous les voyageurs ; cochez « Personnel » pour garder une ligne par personne.',
+        'exp.addLine': '+ Ajouter une ligne',
+        'itin.setDates': 'Renseignez vos dates dans « Planifiez le trajet » pour voir le programme jour par jour.',
+        'itin.dayTrip': 'Excursion · {o} → {r}', 'itin.arrival': 'Arrivée · {o} → {r}', 'itin.departure': 'Départ · {r} → {o}',
+        'itin.actAt': '{act} à {r}', 'itin.onMountain': 'En montagne · {r}',
+        'itin.fetching': 'Chargement des prévisions…', 'itin.beyond': 'Au-delà de la fenêtre de prévision (16 j)',
+        'itin.snow': '{n} cm de neige', 'itin.rain': '{n} mm de pluie',
+        'itin.bestBadge': '★ Meilleures conditions', 'itin.bestNote': ' · le meilleur jour semble être {day}',
+        'itin.headTitle': '{days} à {r}', 'itin.trip': 'Séjour',
+        'weather.reasonClear': 'ciel le plus dégagé de la période', 'weather.reasonDry': 'jour le plus sec de la période',
+        'weather.cached': 'en cache depuis {s} s', 'weather.live': 'flux en direct', 'weather.topLift': 'sommet {m} m',
+        'weather.pistes': '{n} km de pistes', 'weather.bestDay': 'meilleur jour : {reason}', 'weather.bestDayTag': '★ meilleur jour',
+        'weather.station': 'station {m} m'
+    });
+    Object.assign(I18N.en, {
+        'class.second': '2nd class', 'class.first': '1st class',
+        'classShort.second': '2ND CLASS', 'classShort.first': '1ST CLASS',
+        'trip.oneWay': 'One way', 'trip.round': 'Round trip',
+        'tripShort.oneWay': 'ONE WAY', 'tripShort.round': 'RETURN',
+        'profile.none': 'Standard Fare', 'profile.halbtax': 'Half-Fare Card (Halbtax)',
+        'profile.generalabonnement': 'GA Travelcard', 'profile.swiss-travel-pass': 'Swiss Travel Pass',
+        'opt.profile.none': 'Standard fare (no subscription)', 'opt.profile.halbtax': 'Half-Fare Card (Halbtax)',
+        'opt.profile.ga': 'GA Travelcard (Generalabonnement)', 'opt.profile.stp': 'Swiss Travel Pass',
+        'rail.departureHub': 'DEPARTURE HUB', 'rail.alpineSector': 'ALPINE SECTOR', 'rail.perPassenger': 'Per passenger',
+        'rail.groupRate': 'Group rate (10+)', 'rail.groupApplied': '−30% applied',
+        'rail.groupSaves': 'Group saves CHF {amt} vs standard fare',
+        'rail.estimated': 'Estimated fare — no published SBB price on file for this route yet.',
+        'rail.findConnection': 'Find this connection on SBB ↗',
+        'rail.routingNote': 'Price varies with the number of connections, the speed of the route taken, and current SBB construction work. Shown fare is the fastest / fewest-connection option.',
+        'exp.split': 'Split', 'exp.personal': 'Personal', 'exp.placeholder': 'Item',
+        'exp.helper': 'Split across all travellers; mark a line “Personal” to keep it per-person.',
+        'exp.addLine': '+ Add line item',
+        'itin.setDates': 'Set your trip dates in “Plan the journey” to see a day-by-day plan.',
+        'itin.dayTrip': 'Day trip · {o} → {r}', 'itin.arrival': 'Arrival · {o} → {r}', 'itin.departure': 'Departure · {r} → {o}',
+        'itin.actAt': '{act} at {r}', 'itin.onMountain': 'On the mountain · {r}',
+        'itin.fetching': 'Fetching forecast…', 'itin.beyond': 'Beyond the 16-day forecast window',
+        'itin.snow': '{n} cm snow', 'itin.rain': '{n} mm rain',
+        'itin.bestBadge': '★ Best conditions', 'itin.bestNote': ' · best day looks like {day}',
+        'itin.headTitle': '{days} in {r}', 'itin.trip': 'Trip',
+        'weather.reasonClear': 'clearest skies in the window', 'weather.reasonDry': 'driest day in the window',
+        'weather.cached': 'cached {s}s ago', 'weather.live': 'live feed', 'weather.topLift': 'top lift {m} m',
+        'weather.pistes': '{n} km pistes', 'weather.bestDay': 'best day: {reason}', 'weather.bestDayTag': '★ best day',
+        'weather.station': 'station {m} m'
+    });
+    // Weather conditions (WMO codes) — fr labels; en falls back to WMO_CONDITIONS.
+    Object.assign(I18N.fr, {
+        'wmo.0': 'Ciel dégagé', 'wmo.1': 'Plutôt dégagé', 'wmo.2': 'Partiellement nuageux', 'wmo.3': 'Couvert',
+        'wmo.45': 'Brouillard', 'wmo.48': 'Brouillard givrant',
+        'wmo.51': 'Bruine légère', 'wmo.53': 'Bruine', 'wmo.55': 'Bruine dense',
+        'wmo.56': 'Bruine verglaçante', 'wmo.57': 'Bruine verglaçante dense',
+        'wmo.61': 'Pluie légère', 'wmo.63': 'Pluie', 'wmo.65': 'Forte pluie',
+        'wmo.66': 'Pluie verglaçante', 'wmo.67': 'Forte pluie verglaçante',
+        'wmo.71': 'Neige légère', 'wmo.73': 'Neige', 'wmo.75': 'Fortes chutes de neige', 'wmo.77': 'Grains de neige',
+        'wmo.80': 'Averses légères', 'wmo.81': 'Averses', 'wmo.82': 'Averses violentes',
+        'wmo.85': 'Averses de neige légères', 'wmo.86': 'Fortes averses de neige',
+        'wmo.95': 'Orage', 'wmo.96': 'Orage avec grêle', 'wmo.99': 'Orage avec forte grêle'
+    });
+    function wmoLabel(code) {
+        if (LANG === 'fr' && I18N.fr['wmo.' + code]) return I18N.fr['wmo.' + code];
+        return WMO_CONDITIONS[code] || '—';
+    }
+    function dateLocale() { return LANG === 'fr' ? 'fr-CH' : 'en-CH'; }
+
+    // Pass-option labels live in the scheme data (English). Bespoke ones translate exactly;
+    // the rest just need "N day(s)" → "N jour(s)" (scope names like Alpes Vaudoises stay).
+    const PASS_OPT_FR = {
+        '½-day from 12h (VGD)': '½-journée dès 12h (VGD)',
+        'Beginners’ pass — 1 day': 'Forfait débutant — 1 jour',
+        'Beginners’ pass — 2 days': 'Forfait débutant — 2 jours',
+        'Night skiing — Diablerets': 'Ski nocturne — Les Diablerets',
+        '1 section': '1 tronçon', '2 sections': '2 tronçons', 'Day card': 'Carte journalière',
+        'Round trip (aller-retour)': 'Aller-retour',
+        'Via ferrata forfait · set + 1-way lift': 'Forfait via ferrata · matériel + montée',
+        'Via ferrata + MTB forfait · +1 lift': 'Forfait via ferrata + VTT · +1 montée',
+        'Télé Bike DH forfait · DH bike + day lift': 'Forfait Télé Bike DH · vélo DH + forfait jour',
+        'Dirt scoot forfait · scooter + 1-way lift': 'Forfait trottinette · trottinette + montée'
+    };
+    function passOptLabel(o) {
+        const en = (o && o.label) || '';
+        if (LANG !== 'fr') return en;
+        if (PASS_OPT_FR[en]) return PASS_OPT_FR[en];
+        return en.replace(/(\d+)\s+days?/i, (m, n) => n + (n === '1' ? ' jour' : ' jours'));
+    }
 
     const RESORTS = [
         { id: 'villars', name: 'Villars', region: 'Vaud Alps', elev: 1300, lat: 46.2977, lon: 7.0553, baseTariff: 34,
@@ -1545,7 +1648,7 @@
         });
         return {
             date: outlook[bestIndex].date,
-            reason: (outlook[bestIndex].precipitationMm || 0) < 1 ? 'clearest skies in the window' : 'driest day in the window'
+            reasonKey: (outlook[bestIndex].precipitationMm || 0) < 1 ? 'weather.reasonClear' : 'weather.reasonDry'
         };
     }
 
@@ -1950,17 +2053,17 @@
 
     function outlookCard(day, best) {
         const date = new Date(`${day.date}T12:00:00`);
-        const label = date.toLocaleDateString('en-CH', { weekday: 'short' });
+        const label = date.toLocaleDateString(dateLocale(), { weekday: 'short' });
         const isBest = best && best.date === day.date;
         const precip = currentSeason === 'WINTER'
-            ? `${chf(day.snowfallCm || 0)} cm snow`
-            : `${chf(day.precipitationMm || 0)} mm rain`;
+            ? t('itin.snow', { n: chf(day.snowfallCm || 0) })
+            : t('itin.rain', { n: chf(day.precipitationMm || 0) });
         return `<div class="outlook-card ${isBest ? 'best' : ''}">
             <div class="o-day">${label}</div>
             <div class="o-icon">${iconForCode(day.weathercode)}</div>
             <div class="o-temp">${Math.round(day.tempMax)}° / ${Math.round(day.tempMin)}°</div>
             <div class="o-precip">${precip}</div>
-            ${isBest ? '<div class="o-best-tag">★ best day</div>' : ''}
+            ${isBest ? `<div class="o-best-tag">${esc(t('weather.bestDayTag'))}</div>` : ''}
         </div>`;
     }
 
@@ -1969,7 +2072,7 @@
             ? `${ICONS.flake}<span>${data.snowfallNext12h ?? 0} cm / 12 h</span>`
             : `${ICONS.rain}<span>${data.precipitationNext12h ?? 0} mm / 12 h</span>`;
         const facts = data.facts || {};
-        const freshness = data.cacheAgeSeconds > 0 ? `cached ${data.cacheAgeSeconds}s ago` : 'live feed';
+        const freshness = data.cacheAgeSeconds > 0 ? t('weather.cached', { s: data.cacheAgeSeconds }) : t('weather.live');
 
         document.getElementById('weatherBody').innerHTML = `
             <div class="weather-grid">
@@ -1978,20 +2081,20 @@
                         <div class="w-icon">${iconForCode(data.current.weathercode)}</div>
                         <div>
                             <div class="w-temp" id="wTemp">${Math.round(data.current.temperature)}°</div>
-                            <div class="w-cond">${esc(data.current.condition)}</div>
-                            <div class="w-place">${esc(data.destination)} · ${esc(data.region)} · station ${data.stationElevation} m</div>
+                            <div class="w-cond">${esc(wmoLabel(data.current.weathercode))}</div>
+                            <div class="w-place">${esc(data.destination)} · ${esc(data.region)} · ${esc(t('weather.station', { m: data.stationElevation }))}</div>
                             ${currentResortActs()}
                         </div>
                     </div>
                     <div class="stat-chips">
                         <span class="chip">${ICONS.wind}<span>${data.current.windspeed} km/h</span></span>
                         <span class="chip">${accum}</span>
-                        ${facts.topLift ? `<span class="chip">${ICONS.lift}<span>top lift ${facts.topLift} m</span></span>` : ''}
-                        ${facts.pistesKm ? `<span class="chip">${ICONS.piste}<span>${facts.pistesKm} km pistes</span></span>` : ''}
+                        ${facts.topLift ? `<span class="chip">${ICONS.lift}<span>${esc(t('weather.topLift', { m: facts.topLift }))}</span></span>` : ''}
+                        ${facts.pistesKm ? `<span class="chip">${ICONS.piste}<span>${esc(t('weather.pistes', { n: facts.pistesKm }))}</span></span>` : ''}
                     </div>
                     <p style="font-size:12px; color:var(--ink-3); margin:14px 0 0; font-weight:500;">
                         ${facts.signature ? esc(facts.signature) + ' · ' : ''}<span class="freshness">${freshness}</span>
-                        ${data.bestDay ? ` · best day: ${esc(data.bestDay.reason)}` : ''}
+                        ${data.bestDay ? ' · ' + esc(t('weather.bestDay', { reason: t(data.bestDay.reasonKey) })) : ''}
                     </p>
                 </div>
                 <div>
@@ -2013,14 +2116,14 @@
         const sVal = document.getElementById('tripStart').value;
         const eVal = document.getElementById('tripEnd').value;
         if (!sVal || !eVal) {
-            host.innerHTML = `<div class="empty-hint">Set your trip dates in “Plan the journey” to see a day-by-day plan.</div>`;
+            host.innerHTML = `<div class="empty-hint">${esc(t('itin.setDates'))}</div>`;
             return;
         }
         const start = parseDate(sVal);
         const dayCount = tripDayCount();
         const resort = RESORT_BY_ID[currentDestination].name;
         const origin = ORIGINS[document.getElementById('originHub').value].name;
-        const actLabel = currentActivity ? ACT_LABEL[currentActivity] : null;
+        const actLbl = currentActivity ? actLabel(currentActivity) : null;
 
         const byDate = {};
         ((lastWeatherData && lastWeatherData.outlook) || []).forEach(d => { byDate[d.date] = d; });
@@ -2044,26 +2147,26 @@
             const isFirst = i === 0, isLast = i === dayCount - 1, single = dayCount === 1;
 
             let role, cls = '';
-            if (single) { role = `Day trip · ${esc(origin)} → ${esc(resort)}`; cls = 'travel'; }
-            else if (isFirst) { role = `Arrival · ${esc(origin)} → ${esc(resort)}`; cls = 'travel'; }
-            else if (isLast) { role = `Departure · ${esc(resort)} → ${esc(origin)}`; cls = 'travel'; }
-            else { role = actLabel ? `${esc(actLabel)} at ${esc(resort)}` : `On the mountain · ${esc(resort)}`; }
+            if (single) { role = t('itin.dayTrip', { o: esc(origin), r: esc(resort) }); cls = 'travel'; }
+            else if (isFirst) { role = t('itin.arrival', { o: esc(origin), r: esc(resort) }); cls = 'travel'; }
+            else if (isLast) { role = t('itin.departure', { o: esc(origin), r: esc(resort) }); cls = 'travel'; }
+            else { role = actLbl ? t('itin.actAt', { act: esc(actLbl), r: esc(resort) }) : t('itin.onMountain', { r: esc(resort) }); }
 
             const isBest = key === bestKey;
             if (isBest) cls += ' best';
 
             let wxHtml;
             if (!lastWeatherData) {
-                wxHtml = `<div class="itin-none">Fetching forecast…</div>`;
+                wxHtml = `<div class="itin-none">${esc(t('itin.fetching'))}</div>`;
             } else if (!wx) {
-                wxHtml = `<div class="itin-none">Beyond the 16-day forecast window</div>`;
+                wxHtml = `<div class="itin-none">${esc(t('itin.beyond'))}</div>`;
             } else {
                 const precip = currentSeason === 'WINTER'
-                    ? `${chf(wx.snowfallCm || 0)} cm snow`
-                    : `${chf(wx.precipitationMm || 0)} mm rain`;
+                    ? t('itin.snow', { n: chf(wx.snowfallCm || 0) })
+                    : t('itin.rain', { n: chf(wx.precipitationMm || 0) });
                 wxHtml = `<div class="itin-wx">
                     <span class="iw-ic">${iconForCode(wx.weathercode)}</span>
-                    <span>${esc(WMO_CONDITIONS[wx.weathercode] || '—')}</span>
+                    <span>${esc(wmoLabel(wx.weathercode))}</span>
                     <span class="iw-sep">·</span>
                     <span class="iw-temp">${Math.round(wx.tempMax)}° / ${Math.round(wx.tempMin)}°</span>
                     <span class="iw-sep">·</span>
@@ -2072,9 +2175,9 @@
             }
 
             const d = new Date(`${key}T12:00:00`);
-            const dow = d.toLocaleDateString('en-CH', { weekday: 'short' });
-            const dnum = d.toLocaleDateString('en-CH', { day: 'numeric', month: 'short' });
-            const badge = isBest ? `<span class="itin-badge">★ Best conditions</span>` : '';
+            const dow = d.toLocaleDateString(dateLocale(), { weekday: 'short' });
+            const dnum = d.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short' });
+            const badge = isBest ? `<span class="itin-badge">${esc(t('itin.bestBadge'))}</span>` : '';
 
             return `<div class="itin-day ${cls}">
                 <div class="itin-date"><div class="itin-dow">${esc(dow)}</div><div class="itin-dnum">${esc(dnum)}</div></div>
@@ -2086,11 +2189,11 @@
         }).join('');
 
         const bestNote = bestKey
-            ? ` · best day looks like ${new Date(`${bestKey}T12:00:00`).toLocaleDateString('en-CH', { weekday: 'long' })}`
+            ? t('itin.bestNote', { day: new Date(`${bestKey}T12:00:00`).toLocaleDateString(dateLocale(), { weekday: 'long' }) })
             : '';
         host.innerHTML = `<div class="itin-head">
-                <span class="ih-title">${dayCount} day${dayCount > 1 ? 's' : ''} in ${esc(resort)}</span>
-                <span class="ih-sub">${actLabel ? esc(actLabel) : 'Trip'}${bestNote}</span>
+                <span class="ih-title">${esc(t('itin.headTitle', { days: t(dayCount > 1 ? 'cost.days' : 'cost.day', { n: dayCount }), r: resort }))}</span>
+                <span class="ih-sub">${actLbl ? esc(actLbl) : esc(t('itin.trip'))}${esc(bestNote)}</span>
             </div>${dayCards}`;
     }
 
@@ -2235,11 +2338,11 @@
                 fareTier: fare ? fare.tier : null,
                 estimated: !fare,
                 variableRouting: fare ? fare.variableRouting : false,
-                classLabel: cls.label,
-                classShort: cls.short,
-                tripLabel: roundTrip ? 'Round trip' : 'One way',
-                tripShort: roundTrip ? 'RETURN' : 'ONE WAY',
-                passLabel: pass.label,
+                classLabel: t(travelClass === 'first' ? 'class.first' : 'class.second'),
+                classShort: t(travelClass === 'first' ? 'classShort.first' : 'classShort.second'),
+                tripLabel: t(roundTrip ? 'trip.round' : 'trip.oneWay'),
+                tripShort: t(roundTrip ? 'tripShort.round' : 'tripShort.oneWay'),
+                passLabel: t('profile.' + (PASS_PROFILES[passType] ? passType : 'none')),
                 passDiscountPct: Math.round((1 - pass.modifier) * 100),
                 groupDiscountApplied: groupDiscountApplied
             },
@@ -2268,15 +2371,15 @@
             const b = data.breakdown;
             const p = data.pricing;
             const groupLine = b.groupDiscountApplied
-                ? `<div class="t-row"><span>Group rate (10+)</span><span class="pos">−30% applied</span></div>` : '';
+                ? `<div class="t-row"><span>${esc(t('rail.groupRate'))}</span><span class="pos">${esc(t('rail.groupApplied'))}</span></div>` : '';
             const savings = p.savingsPerPerson > 0
-                ? `<span class="savings-badge">Group saves CHF ${chf(p.savingsPerPerson * p.groupSize)} vs standard fare</span>` : '';
+                ? `<span class="savings-badge">${esc(t('rail.groupSaves', { amt: chf(p.savingsPerPerson * p.groupSize) }))}</span>` : '';
             const fareNotes =
-                (b.estimated ? `<div class="t-note warn">Estimated fare — no published SBB price on file for this route yet.</div>` : '') +
-                (b.variableRouting ? `<div class="t-note">${esc(VARIABLE_ROUTING_NOTE)}</div>` : '');
+                (b.estimated ? `<div class="t-note warn">${esc(t('rail.estimated'))}</div>` : '') +
+                (b.variableRouting ? `<div class="t-note">${esc(t('rail.routingNote'))}</div>` : '');
             const sbb = sbbLink(document.getElementById('originHub').value, currentDestination, document.getElementById('tripStart').value);
             const bookRow = sbb
-                ? `<a class="book-link" href="${esc(sbb)}" target="_blank" rel="noopener">Find this connection on SBB ↗</a>` : '';
+                ? `<a class="book-link" href="${esc(sbb)}" target="_blank" rel="noopener">${esc(t('rail.findConnection'))}</a>` : '';
 
             wrap.innerHTML = `
             <div class="ticket">
@@ -2285,9 +2388,9 @@
                     <span class="t-class">${b.classShort} · ${b.tripShort} · ${p.groupSize} PAX</span>
                 </div>
                 <div class="ticket-route">
-                    <div class="t-stop">${esc(data.origin)}<small>DEPARTURE HUB</small></div>
+                    <div class="t-stop">${esc(data.origin)}<small>${esc(t('rail.departureHub'))}</small></div>
                     <div class="t-line"><span class="t-train">${ICONS.train}</span></div>
-                    <div class="t-stop" style="text-align:right;">${esc(data.destinationName)}<small>ALPINE SECTOR</small></div>
+                    <div class="t-stop" style="text-align:right;">${esc(data.destinationName)}<small>${esc(t('rail.alpineSector'))}</small></div>
                 </div>
                 <div class="ticket-perf"></div>
                 <div class="ticket-body">
@@ -2295,10 +2398,10 @@
                     <div class="t-row"><span>${esc(b.passLabel)}</span><span class="pos">−${b.passDiscountPct}%</span></div>
                     ${groupLine}
                     <div class="t-total">
-                        <span class="lbl">Per passenger</span>
+                        <span class="lbl">${esc(t('rail.perPassenger'))}</span>
                         <span class="amt" id="ticketTotal">CHF 0.00</span>
                     </div>
-                    <div class="t-row" style="padding-top:8px;"><span>Group of ${p.groupSize}</span><span>CHF ${chf(p.totalGroupCost)}</span></div>
+                    <div class="t-row" style="padding-top:8px;"><span>${esc(t('cost.group', { n: p.groupSize }))}</span><span>CHF ${chf(p.totalGroupCost)}</span></div>
                     ${savings}
                     ${fareNotes}
                     ${bookRow}
@@ -2322,7 +2425,7 @@
         div.className = 'expense-item';
 
         const desc = document.createElement('input');
-        desc.type = 'text'; desc.placeholder = 'Item'; desc.className = 'exp-desc';
+        desc.type = 'text'; desc.placeholder = t('exp.placeholder'); desc.className = 'exp-desc';
         desc.value = item.description || '';
 
         const amount = document.createElement('input');
@@ -2333,7 +2436,7 @@
         // Split = divided across the group. Personal = each traveller’s own (gear, passes).
         const scope = document.createElement('select');
         scope.className = 'exp-scope';
-        scope.innerHTML = '<option value="split">Split</option><option value="personal">Personal</option>';
+        scope.innerHTML = `<option value="split">${esc(t('exp.split'))}</option><option value="personal">${esc(t('exp.personal'))}</option>`;
         scope.value = item.scope === 'personal' ? 'personal' : 'split';
         scope.onchange = () => { saveState(); updateTripRollup(); };
 
@@ -2572,7 +2675,7 @@
         const prevCat = catSel.value, prevOpt = optSel.value;
         catSel.innerHTML = scheme.categories.map(c => `<option value="${c.id}">${esc(catLabel(c.id))}</option>`).join('');
         if (scheme.categories.some(c => c.id === prevCat)) catSel.value = prevCat;
-        optSel.innerHTML = scheme.options.map(o => `<option value="${o.id}">${esc(o.label)}</option>`).join('');
+        optSel.innerHTML = scheme.options.map(o => `<option value="${o.id}">${esc(passOptLabel(o))}</option>`).join('');
         if (scheme.options.some(o => o.id === prevOpt)) optSel.value = prevOpt;
     }
 
@@ -2589,7 +2692,7 @@
         }
         const selOpt = document.getElementById('passOption').value;
         const rows = scheme.options.map(o =>
-            `<tr class="${o.id === selOpt ? 'sel' : ''}"><td>${esc(o.label)}</td>` +
+            `<tr class="${o.id === selOpt ? 'sel' : ''}"><td>${esc(passOptLabel(o))}</td>` +
             scheme.categories.map(c => {
                 const v = scheme.prices[o.id] ? scheme.prices[o.id][c.id] : null;
                 const txt = v == null ? '—' : (Number.isInteger(v) ? v + '.-' : v.toFixed(2));
@@ -2627,8 +2730,8 @@
         const optId = document.getElementById('passOption').value;
         const p = scheme.prices[optId] ? scheme.prices[optId][catId] : null;
         if (p != null) {
-            const optLabel = (scheme.options.find(o => o.id === optId) || {}).label || '';
-            el.innerHTML = `${esc(optLabel)}: <span class="amt">CHF ${p}.- ${esc(t('pass.perPerson'))}</span><span class="pass-incl">${esc(t('pass.counted'))}</span>`;
+            const optLbl = passOptLabel(scheme.options.find(o => o.id === optId));
+            el.innerHTML = `${esc(optLbl)}: <span class="amt">CHF ${p}.- ${esc(t('pass.perPerson'))}</span><span class="pass-incl">${esc(t('pass.counted'))}</span>`;
         } else {
             el.innerHTML = '—';
         }
@@ -3007,9 +3110,9 @@
         if (parseDate(eEl.value) < parseDate(sEl.value)) eEl.value = sEl.value;
         const days = tripDayCount();
         const opts = { weekday: 'short', day: 'numeric', month: 'short' };
-        const sTxt = parseDate(sEl.value).toLocaleDateString('en-CH', opts);
-        const eTxt = parseDate(eEl.value).toLocaleDateString('en-CH', opts);
-        note.textContent = `${days} day${days > 1 ? 's' : ''} · ${sTxt} – ${eTxt}`;
+        const sTxt = parseDate(sEl.value).toLocaleDateString(dateLocale(), opts);
+        const eTxt = parseDate(eEl.value).toLocaleDateString(dateLocale(), opts);
+        note.textContent = `${t(days > 1 ? 'cost.days' : 'cost.day', { n: days })} · ${sTxt} – ${eTxt}`;
     }
 
     function initTripDates() {
@@ -3084,9 +3187,9 @@
         const p = scheme.prices[optId] ? scheme.prices[optId][catId] : null;
         if (p == null) return null;
         const sys = PASS_SYSTEMS[MOUNTAIN_PASS[passMountainValue()]];
-        const optLabel = (scheme.options.find(o => o.id === optId) || {}).label || '';
-        const catShort = (scheme.categories.find(c => c.id === catId) || {}).short || '';
-        return { amount: roundCHF(p), label: `${sys ? sys.name : ''} · ${optLabel}${catShort ? ' (' + catShort + ')' : ''}` };
+        const optLbl = passOptLabel(scheme.options.find(o => o.id === optId));
+        const catSh = catShort(catId);
+        return { amount: roundCHF(p), label: `${sys ? sys.name : ''} · ${optLbl}${catSh ? ' (' + catSh + ')' : ''}` };
     }
     function currentPassAmount() { const d = passDetail(); return d ? d.amount : 0; }
 
