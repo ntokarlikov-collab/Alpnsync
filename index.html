@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpineSwiss — Vaud Alps Expedition Gateway</title>
+    <title>Sommio — Vaud Alps Expedition Gateway</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -887,7 +887,7 @@
 </defs></svg>
 
 <nav id="topNav">
-    <div class="nav-brand"><span class="mini-flag"></span>AlpineSwiss</div>
+    <div class="nav-brand"><span class="mini-flag"></span>Sommio</div>
     <div class="nav-spacer"></div>
     <div class="nav-cost" id="navCost" data-i18n-title="nav.perPerson" title="Par personne, tout compris"></div>
     <div class="engine-status"><span class="status-dot" id="engineDot"></span><span id="engineLabel">MOTEUR : CONNEXION…</span></div>
@@ -965,7 +965,7 @@
 
     <div class="hero-content" id="heroContent">
         <div class="swiss-flag" aria-hidden="true"></div>
-        <h1>AlpineSwiss</h1>
+        <h1>Sommio</h1>
         <p class="tagline" data-i18n="hero.tagline">Tout votre séjour dans les Alpes vaudoises — train, forfaits et matériel — réuni en un seul prix, tout compris.</p>
         <p class="sectors">Villars · Gryon · Les Diablerets · Leysin · Glacier 3000</p>
         <p class="hero-proof" data-i18n="hero.proof">Tarifs CFF en direct · barèmes officiels des exploitants · rien d’inventé</p>
@@ -1125,7 +1125,7 @@
             <polygon fill="#14202B" points="0,70 0,52 120,26 250,48 390,18 520,44 660,12 800,40 930,20 1080,46 1220,24 1340,44 1440,30 1440,70"/>
         </svg>
         <div class="footer-inner">
-            <div class="footer-brand"><span class="mini-flag"></span>AlpineSwiss</div>
+            <div class="footer-brand"><span class="mini-flag"></span>Sommio</div>
             <div data-i18n="foot.routes">Itinéraires des Alpes vaudoises · Villars — Gryon — Les Diablerets — Leysin — Glacier 3000</div>
             <div style="opacity:0.55;" data-i18n="foot.sources">Météo : Open-Meteo · Tarifs : matrice CFF de démonstration</div>
         </div>
@@ -1133,12 +1133,12 @@
 </main>
 
 <script>
-    const STORAGE_KEY = 'alpineswiss-state-v1';
+    const STORAGE_KEY = 'sommio-state-v1';
     const DEFAULT_TRAVELLERS = 4;
     const DEFAULT_EXPENSES = [];   // start clean — rail + pass + gear auto-fill the all-in
 
     // ---- i18n · French-first for the Alpes Vaudoises (Romandie), English on toggle ----
-    const LANG_KEY = 'alpineswiss-lang';
+    const LANG_KEY = 'sommio-lang';
     let LANG = 'fr';
     const I18N = {
         fr: {
@@ -2386,7 +2386,7 @@
             wrap.innerHTML = `
             <div class="ticket">
                 <div class="ticket-head">
-                    <span class="t-brand"><span class="mini-flag" style="width:16px;height:16px;border-radius:3px;"></span>ALPINESWISS RAIL</span>
+                    <span class="t-brand"><span class="mini-flag" style="width:16px;height:16px;border-radius:3px;"></span>SOMMIO RAIL</span>
                     <span class="t-class">${b.classShort} · ${b.tripShort} · ${p.groupSize} PAX</span>
                 </div>
                 <div class="ticket-route">
