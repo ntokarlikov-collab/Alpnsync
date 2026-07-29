@@ -1196,12 +1196,19 @@
             'foot.sources': 'Weather: Open-Meteo · Fares: demo SBB matrix'
         }
     };
-    function t(k) {
+    function t(k, p) {
         const d = I18N[LANG] || I18N.en;
-        if (d && d[k] != null) return d[k];
-        if (I18N.en[k] != null) return I18N.en[k];
-        return k;
+        let s = (d && d[k] != null) ? d[k] : (I18N.en[k] != null ? I18N.en[k] : k);
+        if (p) Object.keys(p).forEach(key => { s = s.split('{' + key + '}').join(p[key]); });
+        return s;
     }
+    // Data-label helpers — route every id-keyed label through i18n (fallback: the id).
+    function actLabel(id)     { return t('act.' + id); }
+    function gearLabel(id)    { return t('gear.' + id); }
+    function gearIncludes(id) { return t('gearinc.' + id); }
+    function catLabel(id)     { return t('cat.' + id); }
+    function catShort(id)     { return t('catshort.' + id); }
+    function seasonWord()     { return t('season.' + currentSeason.toLowerCase() + 'Lc'); }
     function applyI18n(root) {
         const r = root || document;
         r.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
@@ -1228,6 +1235,92 @@
         syncLangSeg();
         rerenderDynamic();
     }
+
+    // ---- Pass 2 vocabulary (dynamic / data-driven strings) ----
+    Object.assign(I18N.fr, {
+        'season.winterLc': 'hiver', 'season.summerLc': 'été',
+        'engine.linking': 'MOTEUR : CONNEXION…', 'engine.live': 'MOTEUR : EN LIGNE', 'engine.demo': 'MOTEUR : DÉMO', 'engine.ready': 'PRÊT',
+        'act.ski': 'Ski', 'act.freeride': 'Freeride', 'act.touring': 'Ski de randonnée', 'act.xc': 'Ski de fond',
+        'act.iceclimb': 'Cascade de glace', 'act.snowshoe': 'Raquettes', 'act.hike': 'Randonnée',
+        'act.mtb': 'VTT', 'act.ferrata': 'Via ferrata', 'act.trail': 'Trail', 'act.alpine': 'Alpinisme', 'act.paraglide': 'Parapente',
+        'gear.ski': 'Pack ski', 'gear.snowboard': 'Pack snowboard', 'gear.freeride': 'Pack freeride',
+        'gear.touring': 'Pack ski de rando', 'gear.xc': 'Pack ski de fond', 'gear.snowshoe': 'Raquettes',
+        'gear.mtb': 'VTT', 'gear.ebike': 'VTT électrique', 'gear.ferrata': 'Kit via ferrata', 'gear.alpine': 'Kit d’alpinisme',
+        'gearinc.ski': 'Skis · chaussures · bâtons', 'gearinc.snowboard': 'Planche · chaussures',
+        'gearinc.freeride': 'Skis larges · chaussures · bâtons', 'gearinc.touring': 'Skis de rando · peaux · chaussures · bâtons',
+        'gearinc.xc': 'Skis de fond · chaussures · bâtons', 'gearinc.snowshoe': 'Raquettes · bâtons',
+        'gearinc.mtb': 'VTT · casque', 'gearinc.ebike': 'VTT électrique · casque · batterie',
+        'gearinc.ferrata': 'Baudrier · longe · casque', 'gearinc.alpine': 'Baudrier · crampons · piolet',
+        'cat.adult': 'Adulte', 'cat.youthsenior': 'Jeune / Sénior', 'cat.child': 'Enfant',
+        'cat.reduced': 'Réduit — AG/½ SwissPass · enfant 2011–2020', 'cat.loyalty': 'Avec carte Loyalty / Welcome',
+        'catshort.adult': 'Adulte', 'catshort.youthsenior': 'Jeune/Sén.', 'catshort.child': 'Enfant',
+        'catshort.reduced': 'Réduit', 'catshort.loyalty': 'Loyalty',
+        'tier.economy': 'Éco', 'tier.premium': 'Premium',
+        'ui.goodFor': 'Idéal pour', 'ui.topPick': 'meilleur choix', 'ui.bestFor': 'Idéal pour',
+        'ui.noMatchAct': 'Aucune station {act} ne correspond à « {q} ».', 'ui.noMatch': 'Aucune station ne correspond à « {q} ».',
+        'cost.perPersonAllIn': 'Par personne, tout compris', 'cost.item': 'Poste', 'cost.perPerson': 'Par personne',
+        'cost.total': 'Total', 'cost.rail': 'Train', 'cost.liftPass': 'Forfait', 'cost.gearRental': 'Location matériel',
+        'cost.group': 'Groupe de {n}', 'cost.travellers': '{n} voyageurs', 'cost.days': '{n} jours', 'cost.day': '{n} jour',
+        'cost.railFarePer': 'Tarif train / pers.', 'cost.liftPassPer': 'Forfait / pers.', 'cost.gearRentalPer': 'Location / pers.',
+        'cost.sharedPer': 'Frais partagés / pers.', 'cost.otherPer': 'Autres frais perso / pers.', 'cost.allInPer': 'Tout compris / pers.',
+        'cost.groupCol': 'Groupe ×{n}', 'cost.personalItem': 'Poste personnel', 'cost.sharedItem': 'Poste partagé',
+        'cost.personalDetail': 'personnel · par voyageur', 'cost.sharedDetail': 'partagé · réparti sur {n}', 'cost.railGroup': 'groupe −30%',
+        'rec.website': 'site web', 'rec.otherOptions': 'autre option à {dest}', 'rec.otherOptionsPl': '{n} autres options à {dest}',
+        'rec.pickActivity': 'Choisissez une activité ci-dessus — la recommandation de matériel en découle.',
+        'rec.noGear': '{act} ne nécessite aucune location — vous êtes déjà équipé.',
+        'rec.noShop': 'Aucun magasin recensé ne loue de {gear} à {dest}. Essayez un autre secteur pour cette activité.',
+        'rec.grade': 'Gamme', 'rec.daysLabel': '{gear} · jours', 'rec.pricePerson': 'Prix / personne (CHF)',
+        'rec.fromRateCard': 'D’après le barème officiel du magasin — inclus dans votre total ci-dessous.',
+        'rec.noData': 'Tarifs pas encore chargés — le vrai tarif de {shop} apparaîtra ici dès que son barème sera intégré. En attendant, vérifiez le prix sur leur site ou sur place.',
+        'why.only': 'seul magasin recensé pour cette location ici', 'why.specialist': 'en fait sa spécialité',
+        'why.atLifts': 'au pied des pistes', 'why.branchHere': 'succursale sur place', 'why.rateCard': 'barème officiel publié',
+        'why.service': 'réglages, bootfitting et casiers', 'why.online': '−{d}% en réservant en ligne', 'why.area': 'dans le secteur',
+        'pass.counted': 'inclus dans votre total ci-dessous', 'pass.comingSoon': 'Tarifs d’{season} bientôt disponibles',
+        'pass.notLoaded': '{name} — tarifs d’{season} pas encore chargés.', 'pass.buy': 'Acheter les forfaits — {name} ↗',
+        'pass.ratesHead': '{name} · tarifs d’{season}', 'pass.ratesCol': 'Tarifs', 'pass.perPerson': '/ personne'
+    });
+    Object.assign(I18N.en, {
+        'season.winterLc': 'winter', 'season.summerLc': 'summer',
+        'engine.linking': 'ENGINE: LINKING…', 'engine.live': 'ENGINE: LIVE', 'engine.demo': 'ENGINE: DEMO', 'engine.ready': 'READY',
+        'act.ski': 'Skiing', 'act.freeride': 'Freeride', 'act.touring': 'Ski touring', 'act.xc': 'Cross-country',
+        'act.iceclimb': 'Ice climbing', 'act.snowshoe': 'Snowshoeing', 'act.hike': 'Hiking',
+        'act.mtb': 'Mountain biking', 'act.ferrata': 'Via ferrata', 'act.trail': 'Trail running', 'act.alpine': 'Mountaineering', 'act.paraglide': 'Paragliding',
+        'gear.ski': 'Ski set', 'gear.snowboard': 'Snowboard set', 'gear.freeride': 'Freeride set',
+        'gear.touring': 'Ski touring set', 'gear.xc': 'Cross-country set', 'gear.snowshoe': 'Snowshoes',
+        'gear.mtb': 'Mountain bike', 'gear.ebike': 'E-bike', 'gear.ferrata': 'Via ferrata kit', 'gear.alpine': 'Mountaineering kit',
+        'gearinc.ski': 'Skis · boots · poles', 'gearinc.snowboard': 'Board · boots',
+        'gearinc.freeride': 'Wide skis · boots · poles', 'gearinc.touring': 'Touring skis · skins · boots · poles',
+        'gearinc.xc': 'XC skis · boots · poles', 'gearinc.snowshoe': 'Snowshoes · poles',
+        'gearinc.mtb': 'MTB · helmet', 'gearinc.ebike': 'E-MTB · helmet · battery',
+        'gearinc.ferrata': 'Harness · lanyard · helmet', 'gearinc.alpine': 'Harness · crampons · axe',
+        'cat.adult': 'Adult', 'cat.youthsenior': 'Youth / Senior', 'cat.child': 'Child',
+        'cat.reduced': 'Reduced — SwissPass ½/GA · child 2011–2020', 'cat.loyalty': 'With Loyalty / Welcome card',
+        'catshort.adult': 'Adult', 'catshort.youthsenior': 'Youth/Senior', 'catshort.child': 'Child',
+        'catshort.reduced': 'Reduced', 'catshort.loyalty': 'Loyalty',
+        'tier.economy': 'Economy', 'tier.premium': 'Premium',
+        'ui.goodFor': 'Good for', 'ui.topPick': 'top pick', 'ui.bestFor': 'Best for',
+        'ui.noMatchAct': 'No {act} resort matches “{q}”.', 'ui.noMatch': 'No resort matches “{q}”.',
+        'cost.perPersonAllIn': 'Per person, all in', 'cost.item': 'Item', 'cost.perPerson': 'Per person',
+        'cost.total': 'Total', 'cost.rail': 'Rail', 'cost.liftPass': 'Lift pass', 'cost.gearRental': 'Gear rental',
+        'cost.group': 'Group of {n}', 'cost.travellers': '{n} travellers', 'cost.days': '{n} days', 'cost.day': '{n} day',
+        'cost.railFarePer': 'Rail fare / person', 'cost.liftPassPer': 'Lift pass / person', 'cost.gearRentalPer': 'Gear rental / person',
+        'cost.sharedPer': 'Shared costs / person', 'cost.otherPer': 'Other personal / person', 'cost.allInPer': 'All in / person',
+        'cost.groupCol': 'Group ×{n}', 'cost.personalItem': 'Personal item', 'cost.sharedItem': 'Shared item',
+        'cost.personalDetail': 'personal · each traveller', 'cost.sharedDetail': 'shared · split {n} ways', 'cost.railGroup': 'group −30%',
+        'rec.website': 'website', 'rec.otherOptions': 'other option in {dest}', 'rec.otherOptionsPl': '{n} other options in {dest}',
+        'rec.pickActivity': 'Pick an activity above — the gear recommendation follows from it.',
+        'rec.noGear': '{act} needs no rental gear — you’re already set.',
+        'rec.noShop': 'No shop on file rents {gear} at {dest}. Try another sector for this activity.',
+        'rec.grade': 'Grade', 'rec.daysLabel': '{gear} · days', 'rec.pricePerson': 'Price / person (CHF)',
+        'rec.fromRateCard': 'From the shop’s published rate card — counted in your all-in below.',
+        'rec.noData': 'Pricing not loaded yet — {shop}’s real rate will appear here once their rate card is in. Until then, check the price on their site or in person.',
+        'why.only': 'the only shop on file renting this here', 'why.specialist': 'declares this its specialism',
+        'why.atLifts': 'at the lifts', 'why.branchHere': 'has a branch here', 'why.rateCard': 'published rate card',
+        'why.service': 'tuning, bootfitting and lockers', 'why.online': '−{d}% booking online', 'why.area': 'in the area',
+        'pass.counted': 'counted in your all-in below', 'pass.comingSoon': '{season} pricing coming soon',
+        'pass.notLoaded': '{name} — {season} pricing not loaded yet.', 'pass.buy': 'Buy passes — {name} ↗',
+        'pass.ratesHead': '{name} · {season} rates', 'pass.ratesCol': 'Rates', 'pass.perPerson': '/ person'
+    });
 
     const RESORTS = [
         { id: 'villars', name: 'Villars', region: 'Vaud Alps', elev: 1300, lat: 46.2977, lon: 7.0553, baseTariff: 34,
@@ -1624,7 +1717,9 @@
 
     function markReady() {
         document.getElementById('engineDot').className = 'status-dot online';
-        document.getElementById('engineLabel').innerText = 'READY';
+        const el = document.getElementById('engineLabel');
+        el.setAttribute('data-i18n', 'engine.ready');
+        el.textContent = t('engine.ready');
     }
 
     // --- Departure hub dropdown ---
@@ -1646,15 +1741,15 @@
     function resortActivityIcons(id) {
         const acts = RESORT_ACTIVITIES[id]?.[currentSeason.toLowerCase()] || [];
         return acts.map(a =>
-            `<span class="rr-act ${a === currentActivity ? 'on' : ''}" title="${esc(ACT_LABEL[a] || a)}">${ACT_ICONS[a] || ''}</span>`
+            `<span class="rr-act ${a === currentActivity ? 'on' : ''}" title="${esc(actLabel(a))}">${ACT_ICONS[a] || ''}</span>`
         ).join('');
     }
 
     function currentResortActs() {
         const acts = RESORT_ACTIVITIES[currentDestination]?.[currentSeason.toLowerCase()] || [];
         if (!acts.length) return '';
-        return `<div class="w-acts"><span class="lbl">Good for</span>${acts.map(a =>
-            `<span class="rr-act ${a === currentActivity ? 'on' : ''}" title="${esc(ACT_LABEL[a] || a)}">${ACT_ICONS[a] || ''}</span>`
+        return `<div class="w-acts"><span class="lbl">${esc(t('ui.goodFor'))}</span>${acts.map(a =>
+            `<span class="rr-act ${a === currentActivity ? 'on' : ''}" title="${esc(actLabel(a))}">${ACT_ICONS[a] || ''}</span>`
         ).join('')}</div>`;
     }
 
@@ -1678,17 +1773,17 @@
         if (currentActivity) {
             const matched = matchingResorts().map(id => RESORT_BY_ID[id]).filter(match);
             if (!matched.length) {
-                list.innerHTML = `<div class="hint" style="padding:10px;">No ${esc(ACT_LABEL[currentActivity])} resort matches “${esc(q)}”.</div>`;
+                list.innerHTML = `<div class="hint" style="padding:10px;">${esc(t('ui.noMatchAct', { act: actLabel(currentActivity), q }))}</div>`;
                 return;
             }
-            list.innerHTML = `<div class="region-head">Best for ${esc(ACT_LABEL[currentActivity])} · ${matched.length}</div>` +
-                matched.map((r, i) => resortRowHTML(r, i === 0 ? 'top pick' : '')).join('');
+            list.innerHTML = `<div class="region-head">${esc(t('ui.bestFor'))} ${esc(actLabel(currentActivity))} · ${matched.length}</div>` +
+                matched.map((r, i) => resortRowHTML(r, i === 0 ? t('ui.topPick') : '')).join('');
         } else {
             const groups = {};
             RESORTS.forEach(r => { if (match(r)) (groups[r.region] = groups[r.region] || []).push(r); });
             const regions = REGION_ORDER.filter(rg => groups[rg]);
             if (!regions.length) {
-                list.innerHTML = `<div class="hint" style="padding:10px;">No resort matches “${esc(q)}”.</div>`;
+                list.innerHTML = `<div class="hint" style="padding:10px;">${esc(t('ui.noMatch', { q }))}</div>`;
                 return;
             }
             list.innerHTML = regions.map(rg =>
@@ -1713,7 +1808,7 @@
             RESORTS.some(r => (RESORT_ACTIVITIES[r.id]?.[seasonKey] || []).includes(a.id))
         );
         el.innerHTML = acts.map(a =>
-            `<button type="button" class="region-chip ${a.id === currentActivity ? 'active' : ''}" onclick="setActivity('${a.id}')">${ACT_ICONS[a.id] || ''}<span>${esc(a.label)}</span></button>`
+            `<button type="button" class="region-chip ${a.id === currentActivity ? 'active' : ''}" onclick="setActivity('${a.id}')">${ACT_ICONS[a.id] || ''}<span>${esc(actLabel(a.id))}</span></button>`
         ).join('');
     }
 
@@ -2475,7 +2570,7 @@
         }
         catSel.disabled = false; optSel.disabled = false;
         const prevCat = catSel.value, prevOpt = optSel.value;
-        catSel.innerHTML = scheme.categories.map(c => `<option value="${c.id}">${esc(c.label)}</option>`).join('');
+        catSel.innerHTML = scheme.categories.map(c => `<option value="${c.id}">${esc(catLabel(c.id))}</option>`).join('');
         if (scheme.categories.some(c => c.id === prevCat)) catSel.value = prevCat;
         optSel.innerHTML = scheme.options.map(o => `<option value="${o.id}">${esc(o.label)}</option>`).join('');
         if (scheme.options.some(o => o.id === prevOpt)) optSel.value = prevOpt;
@@ -2489,7 +2584,7 @@
         if (!sys) { host.innerHTML = ''; return; }
         const scheme = currentPassScheme();
         if (!scheme) {
-            host.innerHTML = `<div class="pass-empty">${esc(sys.name)} — ${season} pricing not loaded yet.</div>`;
+            host.innerHTML = `<div class="pass-empty">${esc(t('pass.notLoaded', { name: sys.name, season: seasonWord() }))}</div>`;
             return;
         }
         const selOpt = document.getElementById('passOption').value;
@@ -2501,9 +2596,9 @@
                 return `<td>${txt}</td>`;
             }).join('') + `</tr>`).join('');
         host.innerHTML =
-            `<div class="pass-ref-head">${esc(sys.name)} · ${season} rates</div>` +
-            `<div class="pass-ref-wrap"><table class="pass-ref"><thead><tr><th>Rates</th>` +
-            scheme.categories.map(c => `<th>${esc(c.short)}</th>`).join('') +
+            `<div class="pass-ref-head">${esc(t('pass.ratesHead', { name: sys.name, season: seasonWord() }))}</div>` +
+            `<div class="pass-ref-wrap"><table class="pass-ref"><thead><tr><th>${esc(t('pass.ratesCol'))}</th>` +
+            scheme.categories.map(c => `<th>${esc(catShort(c.id))}</th>`).join('') +
             `</tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
@@ -2520,11 +2615,11 @@
         const sys = PASS_SYSTEMS[MOUNTAIN_PASS[passMountainValue()]];
         const buyEl = document.getElementById('passBuyLink');
         if (buyEl) buyEl.innerHTML = (sys && sys.buyUrl)
-            ? `<a class="book-link" href="${esc(sys.buyUrl)}" target="_blank" rel="noopener">Buy passes — ${esc(sys.name)} ↗</a>` : '';
+            ? `<a class="book-link" href="${esc(sys.buyUrl)}" target="_blank" rel="noopener">${esc(t('pass.buy', { name: sys.name }))}</a>` : '';
         const scheme = currentPassScheme();
         const el = document.getElementById('passPrice');
         if (!scheme) {
-            el.innerHTML = `<span style="color:var(--ink-3);">${currentSeason === 'SUMMER' ? 'Summer' : 'Winter'} pricing coming soon</span>`;
+            el.innerHTML = `<span style="color:var(--ink-3);">${esc(t('pass.comingSoon', { season: seasonWord() }))}</span>`;
             updateTripRollup();
             return;
         }
@@ -2533,7 +2628,7 @@
         const p = scheme.prices[optId] ? scheme.prices[optId][catId] : null;
         if (p != null) {
             const optLabel = (scheme.options.find(o => o.id === optId) || {}).label || '';
-            el.innerHTML = `${esc(optLabel)}: <span class="amt">CHF ${p}.- / person</span><span class="pass-incl">counted in your all-in below</span>`;
+            el.innerHTML = `${esc(optLabel)}: <span class="amt">CHF ${p}.- ${esc(t('pass.perPerson'))}</span><span class="pass-incl">${esc(t('pass.counted'))}</span>`;
         } else {
             el.innerHTML = '—';
         }
@@ -2729,7 +2824,7 @@
         if (!needed.length) return null;
         const available = gearOptionsFor(destId);
         if (needed.some(g => available.includes(g))) return null;
-        return GEAR_TYPES[needed[0]] ? GEAR_TYPES[needed[0]].label : needed[0];
+        return GEAR_TYPES[needed[0]] ? gearLabel(needed[0]) : needed[0];
     }
 
     // Ranks the shops that rent `gearId` at `destId`, best first.
@@ -2740,13 +2835,13 @@
         const sole = shops.length === 1;
         return shops.map(s => {
             let score = 0; const why = [];
-            if (sole) { score += 5; why.push('the only shop on file renting this here'); }
-            if ((s.specialistIn || []).includes(gearId)) { score += 4; why.push('declares this its specialism'); }
-            if ((s.atLifts || []).includes(destId)) { score += 3; why.push('at the lifts'); }
-            if (s.branches.some(b => b.village === destId)) { score += 2; why.push('has a branch here'); }
-            if (s.prices) { score += 2; why.push('published rate card'); }
-            if (s.service) { score += 1; why.push('tuning, bootfitting and lockers'); }
-            if (s.onlineDiscount) { score += 1; why.push(`−${s.onlineDiscount}% booking online`); }
+            if (sole) { score += 5; why.push(t('why.only')); }
+            if ((s.specialistIn || []).includes(gearId)) { score += 4; why.push(t('why.specialist')); }
+            if ((s.atLifts || []).includes(destId)) { score += 3; why.push(t('why.atLifts')); }
+            if (s.branches.some(b => b.village === destId)) { score += 2; why.push(t('why.branchHere')); }
+            if (s.prices) { score += 2; why.push(t('why.rateCard')); }
+            if (s.service) { score += 1; why.push(t('why.service')); }
+            if (s.onlineDiscount) { score += 1; why.push(t('why.online', { d: s.onlineDiscount })); }
             score += s.gear.length * 0.1;   // breadth, as a tiebreak only
             return { shop: s, score, why };
         }).sort((a, b) => b.score - a.score);
@@ -2761,8 +2856,7 @@
         if (p && typeof p === 'object' && !Array.isArray(p)) return Object.keys(p);
         return null;
     }
-    const TIER_LABEL = { economy: 'Economy', premium: 'Premium' };
-    function tierLabel(t) { return TIER_LABEL[t] || t; }
+    function tierLabel(x) { return t('tier.' + x); }
 
     function rentalRate(shop, gearId, days, tier) {
         if (!shop || !shop.prices) return null;
@@ -2795,19 +2889,19 @@
         const empty = msg => `<div class="rental-empty">${msg}</div>`;
 
         if (!currentActivity) {
-            host.innerHTML = empty('Pick an activity above — the gear recommendation follows from it.');
+            host.innerHTML = empty(esc(t('rec.pickActivity')));
             return;
         }
         const needs = ACTIVITY_GEAR[currentActivity] || [];
         if (!needs.length) {
-            host.innerHTML = empty(`${esc(ACT_LABEL[currentActivity])} needs no rental gear — you’re already set.`);
+            host.innerHTML = empty(esc(t('rec.noGear', { act: actLabel(currentActivity) })));
             return;
         }
         // Kit the activity calls for that someone here actually stocks, in preference order.
         const stocked = gearOptionsFor(dest);
         const kitChoices = needs.filter(g => stocked.includes(g));
         if (!kitChoices.length) {
-            host.innerHTML = empty(`No shop on file rents ${esc(GEAR_TYPES[needs[0]].label)} at ${esc(destName)}. Try another sector for this activity.`);
+            host.innerHTML = empty(esc(t('rec.noShop', { gear: gearLabel(needs[0]), dest: destName })));
             return;
         }
         const gearId = kitChoices.includes(recGearChoice) ? recGearChoice : kitChoices[0];
@@ -2830,25 +2924,25 @@
 
         const kitPills = kitChoices.length > 1
             ? `<div class="rec-kit">${kitChoices.map(g =>
-                `<button type="button" class="${g === gearId ? 'on' : ''}" onclick="pickRecGear('${g}')">${esc(GEAR_TYPES[g].label)}</button>`).join('')}</div>`
+                `<button type="button" class="${g === gearId ? 'on' : ''}" onclick="pickRecGear('${g}')">${esc(gearLabel(g))}</button>`).join('')}</div>`
             : '';
 
         const altHtml = alts.length
-            ? `<details class="rec-alt"><summary>${alts.length} other option${alts.length > 1 ? 's' : ''} in ${esc(destName)}</summary>
+            ? `<details class="rec-alt"><summary>${esc(alts.length > 1 ? t('rec.otherOptionsPl', { n: alts.length, dest: destName }) : t('rec.otherOptions', { dest: destName }))}</summary>
                 ${alts.map(r => `<div class="alt-row">
-                    <span><span class="alt-name">${esc(r.shop.name)}</span> <span class="alt-why">· ${esc(r.why.join(' · ') || 'in the area')}</span></span>
-                    ${r.shop.url ? `<a class="rec-link" href="${esc(r.shop.url)}" target="_blank" rel="noopener">website ↗</a>` : ''}
+                    <span><span class="alt-name">${esc(r.shop.name)}</span> <span class="alt-why">· ${esc(r.why.join(' · ') || t('why.area'))}</span></span>
+                    ${r.shop.url ? `<a class="rec-link" href="${esc(r.shop.url)}" target="_blank" rel="noopener">${esc(t('rec.website'))} ↗</a>` : ''}
                 </div>`).join('')}</details>`
             : '';
 
         const rate = rentalRate(s, gearId, recState.days, recState.tier);
         const dayOpts = Array.from({ length: RENTAL_MAX_DAYS }, (_, i) =>
-            `<option value="${i + 1}" ${recState.days === i + 1 ? 'selected' : ''}>${i + 1} day${i > 0 ? 's' : ''}</option>`).join('');
+            `<option value="${i + 1}" ${recState.days === i + 1 ? 'selected' : ''}>${esc(t(i > 0 ? 'cost.days' : 'cost.day', { n: i + 1 }))}</option>`).join('');
 
         // Grade toggle appears only when the shop lists more than one on its card.
         const tierDesc = (s.tierLabels && s.tierLabels[gearId]) ? s.tierLabels[gearId] : null;
         const tierToggle = tiers
-            ? `<div class="rec-field rec-tier"><label>Grade</label>
+            ? `<div class="rec-field rec-tier"><label>${esc(t('rec.grade'))}</label>
                 <div class="tier-seg">${tiers.map(t =>
                     `<button type="button" class="${t === recState.tier ? 'on' : ''}" onclick="setRecTier('${t}')">${esc(tierLabel(t))}</button>`).join('')}</div></div>`
             : '';
@@ -2861,24 +2955,24 @@
         const bookHtml = (rate != null)
             ? `<div class="rec-book">
                 ${tierToggle}
-                <div class="rec-field"><label>${esc(GEAR_TYPES[gearId].label)} · days</label>
+                <div class="rec-field"><label>${esc(t('rec.daysLabel', { gear: gearLabel(gearId) }))}</label>
                     <select onchange="setRecDays(this.value)">${dayOpts}</select></div>
-                <div class="rec-field"><label>Price / person (CHF)</label>
+                <div class="rec-field"><label>${esc(t('rec.pricePerson'))}</label>
                     <input type="number" value="${rate}" readonly></div>
                 <div class="rec-total">CHF ${chf(rate)}</div>
-                <div class="rental-hint">From the shop’s published rate card — counted in your all-in below.</div>
+                <div class="rental-hint">${esc(t('rec.fromRateCard'))}</div>
                 ${tierNote}
             </div>`
             : `<div class="rec-book">
-                <div class="rec-nodata">Pricing not loaded yet — ${esc(s.name)}’s real rate will appear here once their rate card is in. Until then, check the price on their site${s.url ? ' (link above)' : ''} or in person.</div>
+                <div class="rec-nodata">${esc(t('rec.noData', { shop: s.name }))}</div>
             </div>`;
 
         host.innerHTML = `<div class="rec">
             <div class="rec-top">
-                <div class="rec-for">Best for ${esc(ACT_LABEL[currentActivity])} · ${esc(destName)}</div>
+                <div class="rec-for">${esc(t('ui.bestFor'))} ${esc(actLabel(currentActivity))} · ${esc(destName)}</div>
                 <div class="rec-head">
                     <span class="rec-name">${esc(s.name)}</span>
-                    ${s.url ? `<a class="rec-link" href="${esc(s.url)}" target="_blank" rel="noopener">website ↗</a>` : ''}
+                    ${s.url ? `<a class="rec-link" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(t('rec.website'))} ↗</a>` : ''}
                 </div>
                 <div class="rec-where">${where}</div>
                 <div class="rec-why">${best.why.map(w => `<span>${esc(w)}</span>`).join('')}</div>
@@ -3013,7 +3107,7 @@
         if (rate == null) return null;
         const d = recState.days;
         const grade = tier ? ` · ${tierLabel(tier)}` : '';
-        return { amount: roundCHF(rate), label: `${GEAR_TYPES[gearId].label}${grade} · ${shop.name} · ${d} day${d > 1 ? 's' : ''}` };
+        return { amount: roundCHF(rate), label: `${gearLabel(gearId)}${grade} · ${shop.name} · ${t(d > 1 ? 'cost.days' : 'cost.day', { n: d })}` };
     }
     function currentGearAmount() { const d = gearDetail(); return d ? d.amount : 0; }
 
@@ -3035,25 +3129,25 @@
         const allInPer = roundCHF(railPer + passPer + gearPer + shared.per + shared.personalPer);
         const groupTotal = roundCHF(allInPer * shared.n);
         const navCost = document.getElementById('navCost');
-        if (navCost) navCost.textContent = `CHF ${chf(allInPer)} / person`;
+        if (navCost) navCost.textContent = `CHF ${chf(allInPer)} ${t('pass.perPerson')}`;
         const dest = RESORT_BY_ID[currentDestination].name;
         const dateLabel = document.getElementById('tripDatesNote').textContent || '';
         const row = (lbl, val) => `<div class="rb-row"><span>${lbl}</span><span>CHF ${chf(val)}</span></div>`;
         host.innerHTML =
             `<div class="rollup-grid">
                 <div class="rollup-main">
-                    <div class="rollup-lbl">Per person, all in</div>
+                    <div class="rollup-lbl">${esc(t('cost.perPersonAllIn'))}</div>
                     <div class="rollup-amt" id="rollupPer">CHF ${chf(allInPer)}</div>
                     <div class="rollup-ctx">${esc(dest)}${dateLabel ? ' · ' + esc(dateLabel) : ''}</div>
                 </div>
                 <div class="rollup-break">
-                    ${row('Rail fare / passenger', railPer)}
-                    ${passPer > 0 ? row('Lift pass / person', passPer) : ''}
-                    ${gearPer > 0 ? row('Gear rental / person', gearPer) : ''}
-                    ${shared.per > 0 ? row('Shared costs / person', shared.per) : ''}
-                    ${shared.personalPer > 0 ? row('Other personal / person', shared.personalPer) : ''}
-                    <div class="rb-row total"><span>All in / person</span><span>CHF ${chf(allInPer)}</span></div>
-                    <div class="rb-row group"><span>Group of ${shared.n}</span><span>CHF ${chf(groupTotal)}</span></div>
+                    ${row(t('cost.railFarePer'), railPer)}
+                    ${passPer > 0 ? row(t('cost.liftPassPer'), passPer) : ''}
+                    ${gearPer > 0 ? row(t('cost.gearRentalPer'), gearPer) : ''}
+                    ${shared.per > 0 ? row(t('cost.sharedPer'), shared.per) : ''}
+                    ${shared.personalPer > 0 ? row(t('cost.otherPer'), shared.personalPer) : ''}
+                    <div class="rb-row total"><span>${esc(t('cost.allInPer'))}</span><span>CHF ${chf(allInPer)}</span></div>
+                    <div class="rb-row group"><span>${esc(t('cost.group', { n: shared.n }))}</span><span>CHF ${chf(groupTotal)}</span></div>
                 </div>
             </div>`;
         countUp(document.getElementById('rollupPer'), allInPer, 'CHF ');
@@ -3074,17 +3168,17 @@
         const b = fare.breakdown;
         const railDetail = `${fare.origin} → ${fare.destinationName} · ${b.tripLabel} · ${b.classLabel}`
             + (b.passDiscountPct ? ` · ${b.passLabel} −${b.passDiscountPct}%` : '')
-            + (b.groupDiscountApplied ? ' · group −30%' : '');
-        rows.push({ cat: 'Rail', detail: railDetail, per: fare.pricing.finalPricePerPerson });
+            + (b.groupDiscountApplied ? ' · ' + t('cost.railGroup') : '');
+        rows.push({ cat: t('cost.rail'), detail: railDetail, per: fare.pricing.finalPricePerPerson });
         const pass = passDetail();
-        if (pass) rows.push({ cat: 'Lift pass', detail: pass.label, per: pass.amount });
+        if (pass) rows.push({ cat: t('cost.liftPass'), detail: pass.label, per: pass.amount });
         const gear = gearDetail();
-        if (gear) rows.push({ cat: 'Gear rental', detail: gear.label, per: gear.amount });
+        if (gear) rows.push({ cat: t('cost.gearRental'), detail: gear.label, per: gear.amount });
         collectExpenses().forEach(e => {
             const v = parseFloat(e.amount);
             if (!(v > 0)) return;
-            if (e.scope === 'personal') rows.push({ cat: e.description || 'Personal item', detail: 'personal · each traveller', per: roundCHF(v) });
-            else rows.push({ cat: e.description || 'Shared item', detail: `shared · split ${n} way${n > 1 ? 's' : ''}`, per: roundCHF(v / n) });
+            if (e.scope === 'personal') rows.push({ cat: e.description || t('cost.personalItem'), detail: t('cost.personalDetail'), per: roundCHF(v) });
+            else rows.push({ cat: e.description || t('cost.sharedItem'), detail: t('cost.sharedDetail', { n }), per: roundCHF(v / n) });
         });
         const perTotal = roundCHF(rows.reduce((s, r) => s + r.per, 0));
         const dateLabel = document.getElementById('tripDatesNote').textContent || '';
@@ -3095,11 +3189,11 @@
                 <div class="cs-grp">CHF ${chf(roundCHF(r.per * n))}</div>
             </div>`).join('');
         host.innerHTML = `
-            <div class="cs-ctx">${esc(RESORT_BY_ID[currentDestination].name)}${dateLabel ? ' · ' + esc(dateLabel) : ''} · ${n} traveller${n > 1 ? 's' : ''}</div>
-            <div class="cs-cols"><span>Item</span><span>Per person</span><span>Group ×${n}</span></div>
+            <div class="cs-ctx">${esc(RESORT_BY_ID[currentDestination].name)}${dateLabel ? ' · ' + esc(dateLabel) : ''} · ${esc(t('cost.travellers', { n }))}</div>
+            <div class="cs-cols"><span>${esc(t('cost.item'))}</span><span>${esc(t('cost.perPerson'))}</span><span>${esc(t('cost.groupCol', { n }))}</span></div>
             ${rowsHtml}
             <div class="cs-row total">
-                <div class="cs-cat">Total</div>
+                <div class="cs-cat">${esc(t('cost.total'))}</div>
                 <div class="cs-per">CHF ${chf(perTotal)}</div>
                 <div class="cs-grp">CHF ${chf(roundCHF(perTotal * n))}</div>
             </div>`;
