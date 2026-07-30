@@ -950,12 +950,12 @@
     <div class="container">
 
         <h2 class="section-title reveal" data-i18n="sec.sector">Choisissez votre secteur</h2>
-        <p class="section-sub reveal">Pick what you want to do — we surface the resorts that fit, and the map, weather and fare follow.</p>
+        <p class="section-sub reveal" data-i18n="intro.sector">Dites-nous ce que vous voulez faire — on fait remonter les stations qui collent, puis la carte, la météo et le tarif suivent.</p>
         <section class="panel reveal">
             <div class="trip-grid">
                 <div class="tg-picker">
                     <div class="region-chips" id="activityChips"></div>
-                    <input type="text" id="resortSearch" class="resort-search" placeholder="…or search resort, region or landmark" oninput="renderPicker()" onkeydown="onSearchKey(event)" aria-label="Search resorts">
+                    <input type="text" id="resortSearch" class="resort-search" data-i18n-ph="search.placeholder" placeholder="…ou cherchez une station, une région ou un lieu" oninput="renderPicker()" onkeydown="onSearchKey(event)" aria-label="Search resorts">
                     <div class="resort-list" id="resortList"></div>
                 </div>
                 <div class="tg-map">
@@ -971,7 +971,7 @@
         <div class="dash-pair">
             <div>
                 <h2 class="section-title reveal" data-i18n="sec.journey">Planifiez le trajet</h2>
-                <p class="section-sub reveal">SBB fares — the ticket updates live as you change anything.</p>
+                <p class="section-sub reveal" data-i18n="intro.journey">Tarifs CFF — le billet se met à jour en direct à chaque changement.</p>
                 <section class="panel reveal">
                     <div class="planner-grid">
                         <div>
@@ -1027,7 +1027,7 @@
             <div>
                 <div class="eyebrow reveal">Get to the slopes</div>
                 <h2 class="section-title reveal" style="margin-top:3px;" data-i18n="sec.passes">Forfaits de remontées</h2>
-                <p class="section-sub reveal">Multi-day lift passes for the Vaud Alps ski systems — prices follow the season.</p>
+                <p class="section-sub reveal" data-i18n="intro.passes">Forfaits plusieurs jours pour les domaines des Alpes vaudoises — les prix suivent la saison.</p>
                 <section class="panel reveal">
                     <div class="pass-picker">
                         <label for="passMountain" data-i18n="lbl.selectMountain">Domaine skiable</label>
@@ -1047,14 +1047,14 @@
         <div class="dash-pair">
             <div>
                 <h2 class="section-title reveal" data-i18n="sec.gear">Louez votre matériel</h2>
-                <p class="section-sub reveal">Your activity tells us what you need — here’s the best place to get it.</p>
+                <p class="section-sub reveal" data-i18n="intro.gear">Votre activité indique ce qu’il vous faut — voici où le trouver au mieux.</p>
                 <section class="panel reveal">
                     <div id="rentalRec"></div>
                 </section>
             </div>
             <div>
                 <h2 class="section-title reveal" data-i18n="sec.itinerary">Votre itinéraire</h2>
-                <p class="section-sub reveal">Each day with its live forecast — save the big outing for the best one.</p>
+                <p class="section-sub reveal" data-i18n="intro.itinerary">Chaque jour avec sa météo en direct — gardez la grande sortie pour le meilleur.</p>
                 <section class="panel reveal">
                     <div id="itinerary"></div>
                 </section>
@@ -1062,7 +1062,7 @@
         </div>
 
         <h2 class="section-title reveal" data-i18n="sec.allin">Votre séjour, tout compris</h2>
-        <p class="section-sub reveal">Travellers and shared costs on the left; the live per-person total on the right.</p>
+        <p class="section-sub reveal" data-i18n="intro.allin">Voyageurs et frais partagés à gauche ; le total par personne en direct à droite.</p>
         <div class="ledger-grid reveal">
             <section class="panel">
                 <div class="group-lbl" style="margin-top:2px;">Shared costs</div>
@@ -1074,7 +1074,7 @@
         </div>
 
         <h2 class="section-title reveal" data-i18n="sec.paying">Le détail de votre facture</h2>
-        <p class="section-sub reveal">Every line in your trip, itemised — per person and for the whole group.</p>
+        <p class="section-sub reveal" data-i18n="intro.paying">Chaque ligne de votre séjour, détaillée — par personne et pour tout le groupe.</p>
         <section class="panel reveal">
             <div id="costSummary"></div>
         </section>
@@ -1377,6 +1377,38 @@
         'origin.lausanne': 'Lausanne', 'origin.bern': 'Bern', 'origin.fribourg': 'Fribourg'
     });
     function originName(key) { return t('origin.' + key); }
+
+    // Section intros, search, resort one-liners, region label, map tooltip.
+    Object.assign(I18N.fr, {
+        'intro.sector': 'Dites-nous ce que vous voulez faire — on fait remonter les stations qui collent, puis la carte, la météo et le tarif suivent.',
+        'intro.journey': 'Tarifs CFF — le billet se met à jour en direct à chaque changement.',
+        'intro.passes': 'Forfaits plusieurs jours pour les domaines des Alpes vaudoises — les prix suivent la saison.',
+        'intro.gear': 'Votre activité indique ce qu’il vous faut — voici où le trouver au mieux.',
+        'intro.itinerary': 'Chaque jour avec sa météo en direct — gardez la grande sortie pour le meilleur.',
+        'intro.allin': 'Voyageurs et frais partagés à gauche ; le total par personne en direct à droite.',
+        'intro.paying': 'Chaque ligne de votre séjour, détaillée — par personne et pour tout le groupe.',
+        'search.placeholder': '…ou cherchez une station, une région ou un lieu',
+        'sig.villars': 'Domaine Villars–Gryon', 'sig.gryon': 'Relié à Villars · pistes familiales',
+        'sig.diablerets': 'Isenau · pistes de Meilleret', 'sig.leysin': 'Restaurant tournant de la Berneuse',
+        'sig.glacier3000': 'Peak Walk · ski sur glacier',
+        'region.Vaud Alps': 'Alpes vaudoises', 'map.depart': 'Départ'
+    });
+    Object.assign(I18N.en, {
+        'intro.sector': 'Pick what you want to do — we surface the resorts that fit, and the map, weather and fare follow.',
+        'intro.journey': 'SBB fares — the ticket updates live as you change anything.',
+        'intro.passes': 'Multi-day lift passes for the Vaud Alps ski systems — prices follow the season.',
+        'intro.gear': 'Your activity tells us what you need — here’s the best place to get it.',
+        'intro.itinerary': 'Each day with its live forecast — save the big outing for the best one.',
+        'intro.allin': 'Travellers and shared costs on the left; the live per-person total on the right.',
+        'intro.paying': 'Every line in your trip, itemised — per person and for the whole group.',
+        'search.placeholder': '…or search resort, region or landmark',
+        'sig.villars': 'Villars–Gryon domain', 'sig.gryon': 'Linked to Villars · family slopes',
+        'sig.diablerets': 'Isenau · Meilleret slopes', 'sig.leysin': 'Berneuse revolving restaurant',
+        'sig.glacier3000': 'Peak Walk · glacier skiing',
+        'region.Vaud Alps': 'Vaud Alps', 'map.depart': 'Depart'
+    });
+    function resortSig(id) { return t('sig.' + id); }
+    function regionLabel(r) { return t('region.' + r); }
 
     // Pass-option labels live in the scheme data (English). Bespoke ones translate exactly;
     // the rest just need "N day(s)" → "N jour(s)" (scope names like Alpes Vaudoises stay).
@@ -1837,7 +1869,7 @@
                      role="button" tabindex="0" aria-label="Select ${esc(r.name)}">
                     <div>
                         <div class="rr-name">${esc(r.name)}${tag ? ` <span class="rr-tag">${esc(tag)}</span>` : ''}</div>
-                        <div class="rr-meta">${esc(r.facts.signature)}</div>
+                        <div class="rr-meta">${esc(resortSig(r.id))}</div>
                         <div class="rr-acts">${resortActivityIcons(r.id)}</div>
                     </div>
                     <div class="rr-elev">${r.elev} m</div>
@@ -1866,7 +1898,7 @@
                 return;
             }
             list.innerHTML = regions.map(rg =>
-                `<div class="region-group"><div class="region-head">${esc(rg)}</div>` +
+                `<div class="region-group"><div class="region-head">${esc(regionLabel(rg))}</div>` +
                 groups[rg].map(r => resortRowHTML(r, '')).join('') + `</div>`).join('');
         }
 
@@ -1996,7 +2028,7 @@
             } else {
                 originMarker.setLatLng(oll);
             }
-            originMarker.bindTooltip(`Depart · ${origin.name}`, { direction: 'top' });
+            originMarker.bindTooltip(`${t('map.depart')} · ${originName(document.getElementById('originHub').value)}`, { direction: 'top' });
         }
 
         if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
@@ -2069,7 +2101,7 @@
                         ${facts.pistesKm ? `<span class="chip">${ICONS.piste}<span>${esc(t('weather.pistes', { n: facts.pistesKm }))}</span></span>` : ''}
                     </div>
                     <p style="font-size:12px; color:var(--ink-3); margin:14px 0 0; font-weight:500;">
-                        ${facts.signature ? esc(facts.signature) + ' · ' : ''}<span class="freshness">${freshness}</span>
+                        ${facts.signature ? esc(resortSig(currentDestination)) + ' · ' : ''}<span class="freshness">${freshness}</span>
                         ${data.bestDay ? ' · ' + esc(t('weather.bestDay', { reason: t(data.bestDay.reasonKey) })) : ''}
                     </p>
                 </div>
@@ -2621,6 +2653,14 @@
             g1: PASS_SCHEMES.glacier3000.winter.prices.g1,
             g2: PASS_SCHEMES.glacier3000.winter.prices.g2
         }
+    };
+
+    // Leysin winter skiing is covered by the regional Alpes Vaudoises pass (no separate
+    // Leysin-only winter card on file), so reuse that ladder instead of showing "coming soon".
+    PASS_SCHEMES.leysin.winter = {
+        categories: WINTER_AGE_CATS,
+        options: PASS_SCHEMES.glacier3000.winter.options.filter(o => o.id[0] === 'd'),
+        prices: PASS_SCHEMES.glacier3000.winter.prices
     };
 
     let passSchemeKey = null;
