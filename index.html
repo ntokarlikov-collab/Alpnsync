@@ -1217,7 +1217,7 @@
         document.documentElement.lang = LANG;
     }
     function rerenderDynamic() {
-        const calls = ['renderActivities', 'renderPicker', 'updatePassPrice', 'updateRental',
+        const calls = ['populateOrigins', 'renderActivities', 'renderPicker', 'updatePassPrice', 'updateRental',
                        'updateTripDatesNote', 'calculateTariff', 'updateTripRollup', 'renderItinerary'];
         if (typeof passSchemeKey !== 'undefined') passSchemeKey = null;   // force picker rebuild
         calls.forEach(fn => { try { window[fn] && window[fn](); } catch (e) {} });
@@ -1406,6 +1406,17 @@
     }
     function dateLocale() { return LANG === 'fr' ? 'fr-CH' : 'en-CH'; }
 
+    // Departure-station display names, bilingual (proper Swiss forms in fr).
+    Object.assign(I18N.fr, {
+        'origin.geneva-airport': 'Genève-Aéroport', 'origin.geneva': 'Genève (Cornavin)',
+        'origin.lausanne': 'Lausanne', 'origin.bern': 'Berne', 'origin.fribourg': 'Fribourg'
+    });
+    Object.assign(I18N.en, {
+        'origin.geneva-airport': 'Geneva Airport', 'origin.geneva': 'Geneva (Cornavin)',
+        'origin.lausanne': 'Lausanne', 'origin.bern': 'Bern', 'origin.fribourg': 'Fribourg'
+    });
+    function originName(key) { return t('origin.' + key); }
+
     // Pass-option labels live in the scheme data (English). Bespoke ones translate exactly;
     // the rest just need "N day(s)" → "N jour(s)" (scope names like Alpes Vaudoises stay).
     const PASS_OPT_FR = {
@@ -1494,7 +1505,7 @@
         'geneva':         { name: 'Geneva (Cornavin)', baseRailPrice: 40, lat: 46.2102, lon: 6.1424 },
         'lausanne':       { name: 'Lausanne', baseRailPrice: 28, lat: 46.5170, lon: 6.6290 },
         'bern':           { name: 'Bern', baseRailPrice: 38, lat: 46.9490, lon: 7.4390 },
-        'fribourg':       { name: 'Freiburg', baseRailPrice: 34, lat: 46.8030, lon: 7.1510 }
+        'fribourg':       { name: 'Fribourg', baseRailPrice: 34, lat: 46.8030, lon: 7.1510 }
     };
 
     // SBB-recognised station names for the deep-link timetable (verified against sbb.ch).
@@ -1831,8 +1842,10 @@
 
     function populateOrigins() {
         const sel = document.getElementById('originHub');
-        sel.innerHTML = Object.entries(ORIGINS)
-            .map(([k, o]) => `<option value="${k}">${esc(o.name)}</option>`).join('');
+        const prev = sel.value;
+        sel.innerHTML = Object.keys(ORIGINS)
+            .map(k => `<option value="${k}">${esc(originName(k))}</option>`).join('');
+        if (prev && ORIGINS[prev]) sel.value = prev;
     }
 
     function onOriginChange() {
@@ -2124,7 +2137,7 @@
         const start = parseDate(sVal);
         const dayCount = tripDayCount();
         const resort = RESORT_BY_ID[currentDestination].name;
-        const origin = ORIGINS[document.getElementById('originHub').value].name;
+        const origin = originName(document.getElementById('originHub').value);
         const actLbl = currentActivity ? actLabel(currentActivity) : null;
 
         const byDate = {};
@@ -2332,8 +2345,8 @@
 
         const pricePerPerson = roundCHF(standardTicket * modifier);
         return {
-            route: `${fromLoc.name} ➔ ${toLoc.name}`,
-            origin: fromLoc.name,
+            route: `${originName(originKey)} ➔ ${toLoc.name}`,
+            origin: originName(originKey),
             destinationName: toLoc.name,
             breakdown: {
                 standardTicket: standardTicket,
