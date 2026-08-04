@@ -1410,6 +1410,37 @@
     function resortSig(id) { return t('sig.' + id); }
     function regionLabel(r) { return t('region.' + r); }
 
+    // Weather coverage note + shop notes.
+    Object.assign(I18N.fr, {
+        'weather.covPartial': 'Météo pour la partie de votre séjour dans la fenêtre',
+        'weather.covTrip': 'Météo pour vos dates de séjour',
+        'weather.covOutside': 'Séjour hors de la fenêtre de prévision (16 j) — 3 prochains jours',
+        'note.mcboard': '−10% en réservant en ligne via INTERSPORT Rent · magasin familial depuis 1983',
+        'note.villarssports': 'Boutique de l’École de ski de Villars',
+        'note.daetwyler': 'En face de la gare de Villars · réglages, bootfitting, casiers · 3 succursales',
+        'note.sportshouse': 'Été + hiver · location et vente de vélos électriques',
+        'note.happyskis': 'Formules happybasic → happypro · casque CHF 6/jour',
+        'note.holidaysport': 'Au village depuis plus de 30 ans',
+        'note.passemontagne': 'DPM Pro Shop',
+        'note.jackysports': 'INTERSPORT Rent — même barème national que Paragon · Les Diablerets est la base de location pour Glacier 3000',
+        'note.hefti': 'Au pied des remontées · spécialiste rando + ski de fond · 2e succursale aux Mosses'
+    });
+    Object.assign(I18N.en, {
+        'weather.covPartial': 'Forecast for the in-range part of your trip',
+        'weather.covTrip': 'Forecast for your trip dates',
+        'weather.covOutside': 'Trip is outside the 16-day forecast window — showing the next 3 days',
+        'note.mcboard': '−10% booking online via INTERSPORT Rent · family shop since 1983',
+        'note.villarssports': 'Villars Ski School shop',
+        'note.daetwyler': 'Opposite Villars station · tuning, bootfitting, lockers · 3 branches',
+        'note.sportshouse': 'Summer + winter · e-bike hire and sales',
+        'note.happyskis': 'Packages happybasic → happypro · helmet CHF 6/day',
+        'note.holidaysport': 'In the village 30+ years',
+        'note.passemontagne': 'DPM Pro Shop',
+        'note.jackysports': 'INTERSPORT Rent — same national rate card as Paragon · Les Diablerets is the rental base for Glacier 3000',
+        'note.hefti': 'At the foot of the lifts · touring + cross-country specialist · 2nd branch Les Mosses'
+    });
+    function shopNote(s) { const k = 'note.' + s.id, v = t(k); return v === k ? (s.note || '') : v; }
+
     // Pass-option labels live in the scheme data (English). Bespoke ones translate exactly;
     // the rest just need "N day(s)" → "N jour(s)" (scope names like Alpes Vaudoises stay).
     const PASS_OPT_FR = {
@@ -2090,7 +2121,7 @@
                         <div>
                             <div class="w-temp" id="wTemp">${Math.round(data.current.temperature)}°</div>
                             <div class="w-cond">${esc(wmoLabel(data.current.weathercode))}</div>
-                            <div class="w-place">${esc(data.destination)} · ${esc(data.region)} · ${esc(t('weather.station', { m: data.stationElevation }))}</div>
+                            <div class="w-place">${esc(data.destination)} · ${esc(regionLabel(data.region))} · ${esc(t('weather.station', { m: data.stationElevation }))}</div>
                             ${currentResortActs()}
                         </div>
                     </div>
@@ -2106,7 +2137,7 @@
                     </p>
                 </div>
                 <div>
-                    ${data.coverage ? `<div class="w-coverage">${esc(data.coverage)}</div>` : ''}
+                    ${data.coverageKey ? `<div class="w-coverage">${esc(t(data.coverageKey))}</div>` : ''}
                     <div class="outlook-row">
                         ${(data.outlook || []).map(d => outlookCard(d, data.bestDay)).join('')}
                     </div>
@@ -2263,7 +2294,7 @@
             if (!data.current_weather) throw new Error('Missing current_weather block');
 
             const payload = buildWeatherPayload(loc, data);
-            payload.coverage = fp.coverage;
+            payload.coverageKey = fp.coverageKey;
             weatherCache.set(cacheKey, { fetchedAt: Date.now(), payload });
             lastWeatherData = payload;
             renderWeather(payload);
@@ -3099,7 +3130,7 @@
                 </div>
                 <div class="rec-where">${where}</div>
                 <div class="rec-why">${best.why.map(w => `<span>${esc(w)}</span>`).join('')}</div>
-                ${s.note ? `<div class="rec-note">${esc(s.note)}</div>` : ''}
+                ${s.note ? `<div class="rec-note">${esc(shopNote(s))}</div>` : ''}
                 ${kitPills}
                 ${altHtml}
             </div>
@@ -3165,12 +3196,12 @@
                 return {
                     key: `${fmtDate(cs)}_${fmtDate(ce)}`,
                     query: `&start_date=${fmtDate(cs)}&end_date=${fmtDate(ce)}`,
-                    coverage: clamped ? 'Forecast for the in-range part of your trip' : 'Forecast for your trip dates'
+                    coverageKey: clamped ? 'weather.covPartial' : 'weather.covTrip'
                 };
             }
-            return { key: 'live', query: '&forecast_days=3', coverage: 'Trip is outside the 16-day forecast window — showing the next 3 days' };
+            return { key: 'live', query: '&forecast_days=3', coverageKey: 'weather.covOutside' };
         }
-        return { key: 'live', query: '&forecast_days=3', coverage: '' };
+        return { key: 'live', query: '&forecast_days=3', coverageKey: null };
     }
 
     function onTripDatesChange() {
