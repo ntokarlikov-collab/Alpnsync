@@ -960,7 +960,7 @@
                 </div>
                 <div class="tg-map">
                     <div id="map" aria-label="Map of Vaud Alps routes"></div>
-                    <p class="hint" style="margin-top:8px;">Red dashed line traces the rail route from your departure hub.</p>
+                    <p class="hint" style="margin-top:8px;" data-i18n="ui.mapLegend">La ligne rouge en pointillés trace l’itinéraire ferroviaire depuis votre gare de départ.</p>
                 </div>
                 <div class="tg-weather" id="weatherPanel">
                     <div id="weatherBody"></div>
@@ -1015,17 +1015,17 @@
                         <button type="button" onclick="stepGroup(-1)" aria-label="Fewer travellers">−</button>
                         <input type="number" id="groupSize" value="4" min="1" onchange="calculateTariff()">
                         <button type="button" onclick="stepGroup(1)" aria-label="More travellers">+</button>
-                        <span style="font-size:12px; color:var(--ink-3); font-weight:600;">Splits shared costs · 10+ unlocks the −30% group fare</span>
+                        <span style="font-size:12px; color:var(--ink-3); font-weight:600;" data-i18n="ui.groupHelper">Répartit les frais partagés · dès 10 pers., tarif groupe −30%</span>
                     </div>
                 </div>
                 <div id="ticketWrap">
-                    <div class="empty-hint">Your SBB-style ticket renders here once the fare engine runs.</div>
+                    <div class="empty-hint" data-i18n="ui.ticketPlaceholder">Votre billet façon CFF s’affiche ici dès que le moteur tarifaire tourne.</div>
                 </div>
             </div>
                 </section>
             </div>
             <div>
-                <div class="eyebrow reveal">Get to the slopes</div>
+                <div class="eyebrow reveal" data-i18n="ui.eyebrowPasses">Rejoindre les pistes</div>
                 <h2 class="section-title reveal" style="margin-top:3px;" data-i18n="sec.passes">Forfaits de remontées</h2>
                 <p class="section-sub reveal" data-i18n="intro.passes">Forfaits plusieurs jours pour les domaines des Alpes vaudoises — les prix suivent la saison.</p>
                 <section class="panel reveal">
@@ -1065,7 +1065,7 @@
         <p class="section-sub reveal" data-i18n="intro.allin">Voyageurs et frais partagés à gauche ; le total par personne en direct à droite.</p>
         <div class="ledger-grid reveal">
             <section class="panel">
-                <div class="group-lbl" style="margin-top:2px;">Shared costs</div>
+                <div class="group-lbl" style="margin-top:2px;" data-i18n="ui.sharedCosts">Frais partagés</div>
                 <div style="font-size:12px; color:var(--ink-3); font-weight:600; margin:0 0 12px;" data-i18n="exp.helper">Réparti entre tous les voyageurs ; cochez « Personnel » pour garder une ligne par personne.</div>
                 <div id="expenseContainer"></div>
                 <button class="btn-secondary" onclick="addExpenseRow()" data-i18n="exp.addLine">+ Ajouter une ligne</button>
@@ -1440,6 +1440,22 @@
         'note.hefti': 'At the foot of the lifts · touring + cross-country specialist · 2nd branch Les Mosses'
     });
     function shopNote(s) { const k = 'note.' + s.id, v = t(k); return v === k ? (s.note || '') : v; }
+    Object.assign(I18N.fr, {
+        'ui.groupHelper': 'Répartit les frais partagés · dès 10 pers., tarif groupe −30%',
+        'ui.eyebrowPasses': 'Rejoindre les pistes', 'ui.sharedCosts': 'Frais partagés',
+        'ui.ticketPlaceholder': 'Votre billet façon CFF s’affiche ici dès que le moteur tarifaire tourne.',
+        'ui.mapLegend': 'La ligne rouge en pointillés trace l’itinéraire ferroviaire depuis votre gare de départ.',
+        'ui.mapUnavailable': 'Carte indisponible — la liste de recherche fonctionne toujours.',
+        'weather.error': 'Impossible de joindre le service météo Open-Meteo. Vérifiez votre connexion et réessayez.'
+    });
+    Object.assign(I18N.en, {
+        'ui.groupHelper': 'Splits shared costs · 10+ unlocks the −30% group fare',
+        'ui.eyebrowPasses': 'Get to the slopes', 'ui.sharedCosts': 'Shared costs',
+        'ui.ticketPlaceholder': 'Your SBB-style ticket renders here once the fare engine runs.',
+        'ui.mapLegend': 'Red dashed line traces the rail route from your departure hub.',
+        'ui.mapUnavailable': 'Map unavailable — the search list still works.',
+        'weather.error': 'Couldn’t reach the Open-Meteo weather service. Check your connection and try again.'
+    });
 
     // Pass-option labels live in the scheme data (English). Bespoke ones translate exactly;
     // the rest just need "N day(s)" → "N jour(s)" (scope names like Alpes Vaudoises stay).
@@ -2027,7 +2043,7 @@
         const el = document.getElementById('map');
         if (typeof L === 'undefined') {
             el.style.height = 'auto';
-            el.innerHTML = '<div class="hint" style="padding:16px;">Map unavailable — the search list still works.</div>';
+            el.innerHTML = `<div class="hint" style="padding:16px;">${esc(t('ui.mapUnavailable'))}</div>`;
             return;
         }
         map = L.map(el, { scrollWheelZoom: false }).setView([46.33, 7.10], 10);
@@ -2299,7 +2315,7 @@
             lastWeatherData = payload;
             renderWeather(payload);
         } catch (e) {
-            body.innerHTML = `<div class="error-banner">Couldn't reach the Open-Meteo weather service. Check your connection and try again.</div>`;
+            body.innerHTML = `<div class="error-banner">${esc(t('weather.error'))}</div>`;
         }
     }
 
