@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sommio — Vaud Alps Expedition Gateway</title>
+    <title>Sommio — Alpes vaudoises, tout compris</title>
+    <meta name="description" content="Le coût réel de votre séjour dans les Alpes vaudoises — train, forfaits et matériel réunis en un seul prix. Tarifs CFF en direct, barèmes officiels, rien d'inventé.">
+    <meta name="theme-color" content="#F8FAFC">
+    <link rel="canonical" href="https://sommio.ch/">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23EB0000'/%3E%3Crect x='13' y='7' width='6' height='18' fill='white'/%3E%3Crect x='7' y='13' width='18' height='6' fill='white'/%3E%3C/svg%3E">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Sommio">
+    <meta property="og:title" content="Sommio — Alpes vaudoises, tout compris">
+    <meta property="og:description" content="Train, forfaits et matériel réunis en un seul prix. Tarifs CFF en direct, barèmes officiels des exploitants, rien d'inventé.">
+    <meta property="og:url" content="https://sommio.ch/">
+    <meta property="og:locale" content="fr_CH">
+    <meta name="twitter:card" content="summary">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -955,11 +966,11 @@
             <div class="trip-grid">
                 <div class="tg-picker">
                     <div class="region-chips" id="activityChips"></div>
-                    <input type="text" id="resortSearch" class="resort-search" data-i18n-ph="search.placeholder" placeholder="…ou cherchez une station, une région ou un lieu" oninput="renderPicker()" onkeydown="onSearchKey(event)" aria-label="Search resorts">
+                    <input type="text" id="resortSearch" class="resort-search" data-i18n-ph="search.placeholder" placeholder="…ou cherchez une station, une région ou un lieu" oninput="renderPicker()" onkeydown="onSearchKey(event)" data-i18n-aria="aria.searchResorts" aria-label="Rechercher une station">
                     <div class="resort-list" id="resortList"></div>
                 </div>
                 <div class="tg-map">
-                    <div id="map" aria-label="Map of Vaud Alps routes"></div>
+                    <div id="map" data-i18n-aria="aria.map" aria-label="Carte des itinéraires des Alpes vaudoises"></div>
                     <p class="hint" style="margin-top:8px;" data-i18n="ui.mapLegend">La ligne rouge en pointillés trace l’itinéraire ferroviaire depuis votre gare de départ.</p>
                 </div>
                 <div class="tg-weather" id="weatherPanel">
@@ -977,9 +988,9 @@
                         <div>
                             <label for="tripStart" data-i18n="lbl.tripDates">Dates du séjour</label>
                             <div class="date-row">
-                                <input type="date" id="tripStart" onchange="onTripDatesChange()" aria-label="Arrival date">
+                                <input type="date" id="tripStart" onchange="onTripDatesChange()" data-i18n-aria="aria.arrivalDate" aria-label="Date d’arrivée">
                                 <span class="date-arrow">→</span>
-                                <input type="date" id="tripEnd" onchange="onTripDatesChange()" aria-label="Departure date">
+                                <input type="date" id="tripEnd" onchange="onTripDatesChange()" data-i18n-aria="aria.departureDate" aria-label="Date de départ">
                             </div>
                             <div class="date-note" id="tripDatesNote"></div>
 
@@ -988,7 +999,7 @@
 
                     <label for="classSeg" data-i18n="lbl.travelClass">Classe</label>
                     <input type="hidden" id="travelClass" value="second">
-                    <div class="segmented seg-full" id="classSeg" aria-label="Travel class">
+                    <div class="segmented seg-full" id="classSeg" data-i18n-aria="aria.travelClass" aria-label="Classe">
                         <button type="button" class="seg-opt active" data-value="second" data-i18n="class.second" onclick="setTravelClass('second')">2e classe</button>
                         <button type="button" class="seg-opt" data-value="first" data-i18n="class.first" onclick="setTravelClass('first')">1re classe</button>
                         <span class="seg-indicator"></span>
@@ -996,7 +1007,7 @@
 
                     <label for="tripTypeSeg" data-i18n="lbl.ticket">Billet</label>
                     <input type="hidden" id="tripType" value="roundTrip">
-                    <div class="segmented seg-full" id="tripTypeSeg" aria-label="Ticket type">
+                    <div class="segmented seg-full" id="tripTypeSeg" data-i18n-aria="aria.ticketType" aria-label="Type de billet">
                         <button type="button" class="seg-opt" data-value="oneWay" data-i18n="trip.oneWay" onclick="setTripType('oneWay')">Aller simple</button>
                         <button type="button" class="seg-opt active" data-value="roundTrip" data-i18n="trip.round" onclick="setTripType('roundTrip')">Aller-retour</button>
                         <span class="seg-indicator"></span>
@@ -1012,9 +1023,9 @@
 
                     <label for="groupSize" data-i18n="lbl.travellers">Nombre de voyageurs</label>
                     <div class="stepper">
-                        <button type="button" onclick="stepGroup(-1)" aria-label="Fewer travellers">−</button>
+                        <button type="button" onclick="stepGroup(-1)" data-i18n-aria="aria.fewer" aria-label="Moins de voyageurs">−</button>
                         <input type="number" id="groupSize" value="4" min="1" onchange="calculateTariff()">
-                        <button type="button" onclick="stepGroup(1)" aria-label="More travellers">+</button>
+                        <button type="button" onclick="stepGroup(1)" data-i18n-aria="aria.more" aria-label="Plus de voyageurs">+</button>
                         <span style="font-size:12px; color:var(--ink-3); font-weight:600;" data-i18n="ui.groupHelper">Répartit les frais partagés · dès 10 pers., tarif groupe −30%</span>
                     </div>
                 </div>
@@ -1175,6 +1186,7 @@
         r.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
         r.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.getAttribute('data-i18n-title')); });
         r.querySelectorAll('[data-i18n-ph]').forEach(el => { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
+        r.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))); });
         document.documentElement.lang = LANG;
     }
     function rerenderDynamic() {
@@ -1446,7 +1458,11 @@
         'ui.ticketPlaceholder': 'Votre billet façon CFF s’affiche ici dès que le moteur tarifaire tourne.',
         'ui.mapLegend': 'La ligne rouge en pointillés trace l’itinéraire ferroviaire depuis votre gare de départ.',
         'ui.mapUnavailable': 'Carte indisponible — la liste de recherche fonctionne toujours.',
-        'weather.error': 'Impossible de joindre le service météo Open-Meteo. Vérifiez votre connexion et réessayez.'
+        'weather.error': 'Impossible de joindre le service météo Open-Meteo. Vérifiez votre connexion et réessayez.',
+        'aria.searchResorts': 'Rechercher une station', 'aria.map': 'Carte des itinéraires des Alpes vaudoises',
+        'aria.arrivalDate': 'Date d’arrivée', 'aria.departureDate': 'Date de départ',
+        'aria.travelClass': 'Classe', 'aria.ticketType': 'Type de billet',
+        'aria.fewer': 'Moins de voyageurs', 'aria.more': 'Plus de voyageurs', 'aria.select': 'Choisir {name}'
     });
     Object.assign(I18N.en, {
         'ui.groupHelper': 'Splits shared costs · 10+ unlocks the −30% group fare',
@@ -1454,7 +1470,11 @@
         'ui.ticketPlaceholder': 'Your SBB-style ticket renders here once the fare engine runs.',
         'ui.mapLegend': 'Red dashed line traces the rail route from your departure hub.',
         'ui.mapUnavailable': 'Map unavailable — the search list still works.',
-        'weather.error': 'Couldn’t reach the Open-Meteo weather service. Check your connection and try again.'
+        'weather.error': 'Couldn’t reach the Open-Meteo weather service. Check your connection and try again.',
+        'aria.searchResorts': 'Search resorts', 'aria.map': 'Map of Vaud Alps routes',
+        'aria.arrivalDate': 'Arrival date', 'aria.departureDate': 'Departure date',
+        'aria.travelClass': 'Travel class', 'aria.ticketType': 'Ticket type',
+        'aria.fewer': 'Fewer travellers', 'aria.more': 'More travellers', 'aria.select': 'Select {name}'
     });
 
     // Pass-option labels live in the scheme data (English). Bespoke ones translate exactly;
@@ -1913,7 +1933,7 @@
 
     function resortRowHTML(r, tag) {
         return `<div class="resort-row ${r.id === currentDestination ? 'selected' : ''}" data-id="${r.id}"
-                     role="button" tabindex="0" aria-label="Select ${esc(r.name)}">
+                     role="button" tabindex="0" aria-label="${esc(t('aria.select', { name: r.name }))}">
                     <div>
                         <div class="rr-name">${esc(r.name)}${tag ? ` <span class="rr-tag">${esc(tag)}</span>` : ''}</div>
                         <div class="rr-meta">${esc(resortSig(r.id))}</div>
