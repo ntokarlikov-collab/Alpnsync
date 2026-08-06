@@ -88,6 +88,29 @@
         .mini-flag::before { width: 12px; height: 3.5px; }
         .mini-flag::after  { width: 3.5px; height: 12px; }
         .engine-status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--ink-3); }
+        /* Share / QR */
+        .nav-share { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9px; border: 1px solid rgba(226,232,240,0.9); background: #fff; color: var(--ink-2); cursor: pointer; flex: none; padding: 0; transition: background .15s, border-color .15s, color .15s; }
+        .nav-share svg { width: 19px; height: 19px; }
+        .nav-share:hover { background: var(--swiss-red); border-color: var(--swiss-red); color: #fff; }
+        .share-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .share-modal[hidden] { display: none; }
+        .share-backdrop { position: absolute; inset: 0; background: rgba(15,23,42,0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+        .share-card { position: relative; z-index: 1; width: 100%; max-width: 340px; background: #fff; border-radius: 20px; padding: 30px 28px 26px; text-align: center; box-shadow: 0 24px 70px rgba(15,23,42,0.35); animation: shareIn .28s cubic-bezier(.16,1,.3,1); }
+        @keyframes shareIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+        .share-close { position: absolute; top: 12px; right: 14px; width: 30px; height: 30px; border: none; background: transparent; font-size: 24px; line-height: 1; color: var(--ink-3); cursor: pointer; border-radius: 8px; }
+        .share-close:hover { background: rgba(148,163,184,0.18); color: var(--ink); }
+        .share-flag { width: 30px; height: 30px; margin: 0 auto 12px; background: var(--swiss-red); border-radius: 7px; position: relative; }
+        .share-flag::before, .share-flag::after { content: ''; position: absolute; background: #fff; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+        .share-flag::before { width: 17px; height: 5px; }
+        .share-flag::after  { width: 5px; height: 17px; }
+        .share-card h3 { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: var(--ink); margin: 0 0 6px; letter-spacing: -0.3px; }
+        .share-sub { font-size: 13px; color: var(--ink-3); margin: 0 0 18px; line-height: 1.45; }
+        .share-qr { width: 100%; max-width: 210px; margin: 0 auto 16px; padding: 12px; background: #fff; border: 1px solid rgba(226,232,240,0.9); border-radius: 14px; }
+        .share-qr svg { width: 100%; height: auto; display: block; }
+        .share-url { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: 0.02em; margin-bottom: 14px; }
+        .share-copy { width: 100%; padding: 12px; border-radius: 11px; border: none; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s; }
+        .share-copy:hover { background: #000; }
+        .share-copy.done { background: #0F7A4A; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #94A3B8; flex: none; }
         .status-dot.online { background: #16A34A; }
         .status-dot.offline { background: var(--swiss-red); }
@@ -745,6 +768,36 @@
         .pass-ref tbody tr.sel td { background: #FFF1EC; }
         .pass-ref tbody tr.sel td:first-child { color: var(--swiss-red); }
         .pass-empty { padding: 22px 16px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ink-3); border: 2px dashed var(--line); border-radius: 12px; }
+        /* Pass optimizer */
+        .opt-wrap { margin-top: 46px; }
+        .opt-grid { display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); gap: 26px; align-items: start; }
+        @media (max-width: 860px) { .opt-grid { grid-template-columns: 1fr; gap: 20px; } }
+        .opt-block-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px; }
+        .opt-sub-head { margin-top: 20px; }
+        .opt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+        .opt-row:last-child { border-bottom: none; }
+        .opt-row-lbl { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+        .opt-row-sub { font-size: 10.5px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; color: var(--ink-3); margin-left: 8px; }
+        .opt-step { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; background: #fff; }
+        .opt-step button { width: 30px; height: 30px; border: none; background: transparent; font-size: 17px; font-weight: 600; color: var(--ink-2); cursor: pointer; line-height: 1; }
+        .opt-step button:hover { background: rgba(148, 163, 184, 0.16); color: var(--swiss-red); }
+        .opt-step-val { min-width: 32px; text-align: center; font-family: var(--font-mono); font-weight: 700; font-size: 14px; color: var(--ink); }
+        .opt-result { background: linear-gradient(180deg, #fff, #FAFBFC); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+        .opt-save { text-align: center; padding: 4px 0 15px; border-bottom: 1px dashed var(--line); margin-bottom: 15px; }
+        .opt-save-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-3); }
+        .opt-save-amt { font-family: var(--font-mono); font-weight: 700; font-size: 34px; letter-spacing: -1px; color: #0F7A4A; line-height: 1.12; margin-top: 2px; }
+        .opt-save-amt.zero { color: var(--ink-2); font-size: 28px; }
+        .opt-save-sub { font-size: 12px; font-weight: 600; color: var(--ink-3); margin-top: 3px; }
+        .opt-basket-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px; }
+        .opt-line { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 13px; }
+        .opt-line-name { color: var(--ink); font-weight: 600; }
+        .opt-line-amt { font-family: var(--font-mono); font-weight: 700; color: var(--ink); white-space: nowrap; }
+        .opt-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+        .opt-total-lbl { font-weight: 700; color: var(--ink); font-size: 13px; }
+        .opt-total-amt { font-family: var(--font-mono); font-weight: 700; font-size: 18px; color: var(--swiss-red); }
+        .opt-vs { font-size: 12px; color: var(--ink-3); margin-top: 6px; text-align: right; }
+        .opt-note { font-size: 11.5px; line-height: 1.5; font-weight: 600; color: var(--ink-3); margin-top: 14px; border-left: 2px solid var(--line); padding-left: 9px; }
+        .opt-empty { text-align: center; font-size: 13px; font-weight: 600; color: var(--ink-3); padding: 34px 12px; }
         input[type="date"] { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; box-sizing: border-box; font-size: 13.5px; font-family: var(--font-body); color: var(--ink); background: rgba(255, 255, 255, 0.9); transition: border-color 0.2s var(--ease-soft), box-shadow 0.2s var(--ease-soft); }
         input[type="date"]:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(227, 165, 68, 0.22); }
         .date-row { display: flex; align-items: center; gap: 8px; }
@@ -754,6 +807,8 @@
         .t-note.warn { color: #9B1C1C; border-left-color: var(--swiss-red); }
         .date-note { margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--ink-2); font-family: var(--font-mono); }
         .w-coverage { font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+        .w-source { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--ink-3); margin-top: 10px; }
+        .w-source::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: linear-gradient(135deg, #D8232A 0 50%, #fff 50% 100%); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12); }
         /* Gear rental */
         /* The recommendation is the module — one shop, chosen from the activity already picked. */
         .rec { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: rgba(255,255,255,0.72); }
@@ -889,7 +944,24 @@
         <button type="button" class="seg-opt" data-value="en" onclick="setLang('en')">EN</button>
         <span class="seg-indicator"></span>
     </div>
+    <button type="button" class="nav-share" id="shareBtn" onclick="openShare()" data-i18n-title="share.btn" title="Partager" data-i18n-aria="share.btn" aria-label="Partager">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="14" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="3.5" y="14" width="6.5" height="6.5" rx="1"/><path d="M14 14h3M17 14v3M14 17.5h1.5M17 20.5h3.5M20.5 14v6.5"/></svg>
+    </button>
 </nav>
+
+<!-- ================= SHARE / QR MODAL ================= -->
+<div id="shareModal" class="share-modal" hidden>
+    <div class="share-backdrop" onclick="closeShare()"></div>
+    <div class="share-card" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+        <button type="button" class="share-close" onclick="closeShare()" data-i18n-aria="share.close" aria-label="Fermer">×</button>
+        <div class="share-flag" aria-hidden="true"></div>
+        <h3 id="shareTitle" data-i18n="share.title">Ouvrez Sommio sur votre téléphone</h3>
+        <p class="share-sub" data-i18n="share.sub">Scannez le code — ou copiez le lien à partager.</p>
+        <div class="share-qr"><svg viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img" aria-label="QR sommio.ch"><rect width="29" height="29" fill="#ffffff"/><path d="M2 2h7v1h-7zM10 2h3v1h-3zM14 2h5v1h-5zM20 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM10 3h2v1h-2zM13 3h2v1h-2zM20 3h1v1h-1zM26 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM11 4h1v1h-1zM13 4h2v1h-2zM17 4h1v1h-1zM20 4h1v1h-1zM22 4h3v1h-3zM26 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM11 5h3v1h-3zM16 5h3v1h-3zM20 5h1v1h-1zM22 5h3v1h-3zM26 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM11 6h1v1h-1zM14 6h2v1h-2zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h3v1h-3zM26 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM11 7h1v1h-1zM14 7h3v1h-3zM18 7h1v1h-1zM20 7h1v1h-1zM26 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h7v1h-7zM11 9h2v1h-2zM14 9h2v1h-2zM17 9h1v1h-1zM3 10h1v1h-1zM8 10h6v1h-6zM16 10h2v1h-2zM19 10h1v1h-1zM25 10h2v1h-2zM2 11h1v1h-1zM4 11h1v1h-1zM6 11h2v1h-2zM9 11h1v1h-1zM16 11h2v1h-2zM21 11h5v1h-5zM4 12h1v1h-1zM6 12h4v1h-4zM13 12h1v1h-1zM17 12h1v1h-1zM19 12h1v1h-1zM21 12h3v1h-3zM25 12h2v1h-2zM2 13h1v1h-1zM4 13h4v1h-4zM16 13h4v1h-4zM23 13h1v1h-1zM26 13h1v1h-1zM3 14h1v1h-1zM6 14h4v1h-4zM12 14h2v1h-2zM15 14h2v1h-2zM18 14h1v1h-1zM20 14h1v1h-1zM26 14h1v1h-1zM2 15h2v1h-2zM6 15h2v1h-2zM12 15h2v1h-2zM16 15h2v1h-2zM21 15h1v1h-1zM25 15h1v1h-1zM2 16h1v1h-1zM4 16h2v1h-2zM8 16h2v1h-2zM12 16h4v1h-4zM17 16h3v1h-3zM21 16h3v1h-3zM25 16h2v1h-2zM2 17h1v1h-1zM5 17h3v1h-3zM9 17h5v1h-5zM16 17h2v1h-2zM19 17h3v1h-3zM23 17h2v1h-2zM26 17h1v1h-1zM2 18h1v1h-1zM5 18h6v1h-6zM12 18h2v1h-2zM15 18h2v1h-2zM18 18h5v1h-5zM24 18h1v1h-1zM10 19h6v1h-6zM18 19h1v1h-1zM22 19h1v1h-1zM2 20h7v1h-7zM10 20h2v1h-2zM13 20h1v1h-1zM16 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM22 20h1v1h-1zM26 20h1v1h-1zM2 21h1v1h-1zM8 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM16 21h3v1h-3zM22 21h1v1h-1zM25 21h2v1h-2zM2 22h1v1h-1zM4 22h3v1h-3zM8 22h1v1h-1zM12 22h1v1h-1zM15 22h8v1h-8zM24 22h1v1h-1zM26 22h1v1h-1zM2 23h1v1h-1zM4 23h3v1h-3zM8 23h1v1h-1zM11 23h4v1h-4zM17 23h4v1h-4zM25 23h2v1h-2zM2 24h1v1h-1zM4 24h3v1h-3zM8 24h1v1h-1zM13 24h2v1h-2zM17 24h2v1h-2zM23 24h2v1h-2zM26 24h1v1h-1zM2 25h1v1h-1zM8 25h1v1h-1zM10 25h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM16 25h1v1h-1zM18 25h2v1h-2zM21 25h2v1h-2zM26 25h1v1h-1zM2 26h7v1h-7zM12 26h1v1h-1zM18 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM26 26h1v1h-1z" fill="#0B1220"/></svg></div>
+        <div class="share-url" id="shareUrl">sommio.ch</div>
+        <button type="button" class="share-copy" id="shareCopyBtn" onclick="copyShareLink()" data-i18n="share.copy">Copier le lien</button>
+    </div>
+</div>
 
 <!-- ================= MATTERHORN LANDING ================= -->
 <section id="hero">
@@ -1055,6 +1127,15 @@
             </div>
         </div>
 
+        <div class="opt-wrap reveal" id="passOptimizer">
+            <div class="eyebrow" data-i18n="opt.eyebrow">Le bon forfait, au juste prix</div>
+            <h2 class="section-title" style="margin-top:3px;" data-i18n="opt.title">Optimiseur de forfait</h2>
+            <p class="section-sub" data-i18n="opt.sub">Combien de jours de ski, et où ? On calcule la combinaison de forfaits la moins chère — le forfait régional Alpes vaudoises couvre cinq domaines sur un seul billet.</p>
+            <section class="panel">
+                <div id="optBody"></div>
+            </section>
+        </div>
+
         <div class="dash-pair">
             <div>
                 <h2 class="section-title reveal" data-i18n="sec.gear">Louez votre matériel</h2>
@@ -1138,7 +1219,7 @@
             'lbl.ticketType': 'Type de forfait',
             'lbl.durationOption': 'Durée / option',
             'foot.routes': 'Itinéraires des Alpes vaudoises · Villars — Gryon — Les Diablerets — Leysin — Glacier 3000',
-            'foot.sources': 'Météo : Open-Meteo · Tarifs : matrice CFF de démonstration'
+            'foot.sources': 'Météo : MeteoSwiss (modèle ICON-CH) via Open-Meteo · Tarifs : matrice CFF de démonstration'
         },
         en: {
             'hero.tagline': 'The real cost of your Vaud Alps trip — rail, lift passes and gear, in one honest price.',
@@ -1165,7 +1246,7 @@
             'lbl.ticketType': 'Ticket type',
             'lbl.durationOption': 'Duration / option',
             'foot.routes': 'Vaud Alps routes · Villars — Gryon — Les Diablerets — Leysin — Glacier 3000',
-            'foot.sources': 'Weather: Open-Meteo · Fares: demo SBB matrix'
+            'foot.sources': 'Weather: MeteoSwiss (ICON-CH) via Open-Meteo · Fares: demo SBB matrix'
         }
     };
     function t(k, p) {
@@ -1191,7 +1272,7 @@
     }
     function rerenderDynamic() {
         const calls = ['populateOrigins', 'renderActivities', 'renderPicker', 'updatePassPrice', 'updateRental',
-                       'updateTripDatesNote', 'calculateTariff', 'updateTripRollup', 'renderItinerary'];
+                       'renderOptimizer', 'updateTripDatesNote', 'calculateTariff', 'updateTripRollup', 'renderItinerary'];
         if (typeof passSchemeKey !== 'undefined') passSchemeKey = null;   // force picker rebuild
         calls.forEach(fn => { try { window[fn] && window[fn](); } catch (e) {} });
         // Weather panel re-renders from the last payload in the new language (no re-fetch).
@@ -1209,6 +1290,42 @@
         applyI18n();
         syncLangSeg();
         rerenderDynamic();
+    }
+
+    // ---- Share / QR (points at the live site; the QR is pre-rendered, works offline) ----
+    const SHARE_URL = 'https://sommio.ch';
+    function shareEsc(e) { if (e.key === 'Escape') closeShare(); }
+    function openShare() {
+        const m = document.getElementById('shareModal');
+        if (!m) return;
+        const btn = document.getElementById('shareCopyBtn');
+        if (btn) { btn.textContent = t('share.copy'); btn.classList.remove('done'); }
+        m.hidden = false;
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('keydown', shareEsc);
+    }
+    function closeShare() {
+        const m = document.getElementById('shareModal');
+        if (!m) return;
+        m.hidden = true;
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', shareEsc);
+    }
+    async function copyShareLink() {
+        const btn = document.getElementById('shareCopyBtn');
+        try {
+            await navigator.clipboard.writeText(SHARE_URL);
+        } catch (e) {
+            const ta = document.createElement('textarea');
+            ta.value = SHARE_URL; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); } catch (_) {}
+            document.body.removeChild(ta);
+        }
+        if (btn) {
+            btn.textContent = t('share.copied'); btn.classList.add('done');
+            setTimeout(() => { btn.textContent = t('share.copy'); btn.classList.remove('done'); }, 1800);
+        }
     }
 
     // ---- Pass 2 vocabulary (dynamic / data-driven strings) ----
@@ -1458,7 +1575,22 @@
         'ui.ticketPlaceholder': 'Votre billet façon CFF s’affiche ici dès que le moteur tarifaire tourne.',
         'ui.mapLegend': 'La ligne rouge en pointillés trace l’itinéraire ferroviaire depuis votre gare de départ.',
         'ui.mapUnavailable': 'Carte indisponible — la liste de recherche fonctionne toujours.',
-        'weather.error': 'Impossible de joindre le service météo Open-Meteo. Vérifiez votre connexion et réessayez.',
+        'weather.error': 'Impossible de joindre le service météo. Vérifiez votre connexion et réessayez.',
+        'weather.source': 'Source : MeteoSwiss · modèle ICON-CH (Alpes, 1–2 km)',
+        'share.btn': 'Partager', 'share.title': 'Ouvrez Sommio sur votre téléphone',
+        'share.sub': 'Scannez le code — ou copiez le lien à partager.',
+        'share.copy': 'Copier le lien', 'share.copied': 'Lien copié ✓', 'share.close': 'Fermer',
+        'opt.eyebrow': 'Le bon forfait, au juste prix', 'opt.title': 'Optimiseur de forfait',
+        'opt.sub': 'Combien de jours de ski, et où ? On calcule la combinaison de forfaits la moins chère — le forfait régional Alpes vaudoises couvre cinq domaines sur un seul billet.',
+        'opt.daysHead': 'Jours de ski par domaine', 'opt.groupHead': 'Composition du groupe',
+        'opt.separate': 'hors forfait régional', 'opt.empty': 'Ajoutez des jours de ski pour comparer les forfaits.',
+        'opt.youSave': 'Vous économisez', 'opt.vsDaily': 'contre des forfaits à la journée',
+        'opt.insteadOf': 'Au lieu de', 'opt.bestPlanLbl': 'Total optimisé',
+        'opt.alreadyBest': 'Déjà le meilleur tarif pour ce plan', 'opt.basket': 'Le panier recommandé',
+        'opt.groupTotal': 'Total groupe · {n} pers.',
+        'opt.passAV': '{n}× Forfait Alpes Vaudoises · {days}', 'opt.passVGD': '{n}× Forfait VGD · {days}',
+        'opt.passDaily': '{n} forfaits à la journée', 'opt.passGlacier': '{n}× Glacier 3000 · {days}',
+        'opt.coverNote': 'Un seul forfait Alpes Vaudoises couvre Villars, Gryon, Les Diablerets, Leysin et Les Mosses. Glacier 3000 se prend séparément.',
         'aria.searchResorts': 'Rechercher une station', 'aria.map': 'Carte des itinéraires des Alpes vaudoises',
         'aria.arrivalDate': 'Date d’arrivée', 'aria.departureDate': 'Date de départ',
         'aria.travelClass': 'Classe', 'aria.ticketType': 'Type de billet',
@@ -1470,7 +1602,22 @@
         'ui.ticketPlaceholder': 'Your SBB-style ticket renders here once the fare engine runs.',
         'ui.mapLegend': 'Red dashed line traces the rail route from your departure hub.',
         'ui.mapUnavailable': 'Map unavailable — the search list still works.',
-        'weather.error': 'Couldn’t reach the Open-Meteo weather service. Check your connection and try again.',
+        'weather.error': 'Couldn’t reach the weather service. Check your connection and try again.',
+        'weather.source': 'Source: MeteoSwiss · ICON-CH model (Alps, 1–2 km)',
+        'share.btn': 'Share', 'share.title': 'Open Sommio on your phone',
+        'share.sub': 'Scan the code — or copy the link to share.',
+        'share.copy': 'Copy link', 'share.copied': 'Link copied ✓', 'share.close': 'Close',
+        'opt.eyebrow': 'The right pass, at the right price', 'opt.title': 'Pass optimizer',
+        'opt.sub': 'How many ski days, and where? We work out the cheapest legal pass mix — the regional Alpes Vaudoises pass covers five resorts on one ticket.',
+        'opt.daysHead': 'Ski days per resort', 'opt.groupHead': 'Group make-up',
+        'opt.separate': 'not on regional pass', 'opt.empty': 'Add some ski days to compare passes.',
+        'opt.youSave': 'You save', 'opt.vsDaily': 'versus buying day passes',
+        'opt.insteadOf': 'Instead of', 'opt.bestPlanLbl': 'Optimised total',
+        'opt.alreadyBest': 'Already the best price for this plan', 'opt.basket': 'Recommended basket',
+        'opt.groupTotal': 'Group total · {n} ppl',
+        'opt.passAV': '{n}× Alpes Vaudoises pass · {days}', 'opt.passVGD': '{n}× VGD pass · {days}',
+        'opt.passDaily': '{n} single-day passes', 'opt.passGlacier': '{n}× Glacier 3000 · {days}',
+        'opt.coverNote': 'One Alpes Vaudoises pass covers Villars, Gryon, Les Diablerets, Leysin and Les Mosses. Glacier 3000 is bought separately.',
         'aria.searchResorts': 'Search resorts', 'aria.map': 'Map of Vaud Alps routes',
         'aria.arrivalDate': 'Arrival date', 'aria.departureDate': 'Departure date',
         'aria.travelClass': 'Travel class', 'aria.ticketType': 'Ticket type',
@@ -1844,6 +1991,7 @@
         refreshMap();
         updatePassPrice();
         updateRental();
+        renderOptimizer();
         if (lastWeatherData) renderWeather(lastWeatherData);
         renderItinerary();
         saveState();
@@ -2177,6 +2325,7 @@
                     <div class="outlook-row">
                         ${(data.outlook || []).map(d => outlookCard(d, data.bestDay)).join('')}
                     </div>
+                    <div class="w-source">${esc(t('weather.source'))}</div>
                 </div>
             </div>`;
         countNumber(document.getElementById('wTemp'), Math.round(data.current.temperature), { suffix: '°' });
@@ -2272,6 +2421,33 @@
             </div>${dayCards}`;
     }
 
+    // The feed asks for MeteoSwiss's high-resolution Alpine model (ICON-CH2, ~1–2 km) first, then
+    // a seamless ICON fallback (~7 days), then a global fallback (~15 days) so a trip planned two
+    // weeks out never shows blank days. Open-Meteo returns one array per model, suffixed; collapse
+    // them back to the flat shape the rest of the code expects, preferring the MeteoSwiss value at
+    // each step and filling any gap from the next model down.
+    const WX_SUFFIXES = ['_meteoswiss_icon_ch2', '_icon_seamless', '_gfs_seamless'];
+    function mergeModelArrays(block) {
+        if (!block) return block;
+        const primary = WX_SUFFIXES[0];
+        Object.keys(block).forEach(key => {
+            if (!key.endsWith(primary)) return;
+            const base = key.slice(0, -primary.length);
+            const arrs = WX_SUFFIXES.map(s => block[base + s]);
+            const prim = arrs[0];
+            if (Array.isArray(prim)) {
+                block[base] = prim.map((v, i) => {
+                    for (const a of arrs) { if (a && a[i] != null) return a[i]; }
+                    return null;
+                });
+            } else {
+                const hit = arrs.find(v => v != null);
+                block[base] = (hit != null) ? hit : prim;
+            }
+        });
+        return block;
+    }
+
     function buildWeatherPayload(loc, data) {
         const nowIndex = data.hourly?.time
             ? data.hourly.time.findIndex(t => t >= data.current_weather.time)
@@ -2323,11 +2499,14 @@
                 `&current_weather=true` +
                 `&hourly=temperature_2m,snowfall,precipitation,weathercode` +
                 `&daily=temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,weathercode` +
+                `&models=meteoswiss_icon_ch2,icon_seamless,gfs_seamless` +
                 fp.query + `&timezone=Europe/Berlin`;
             const res = await fetch(url);
-            if (!res.ok) throw new Error(`Open-Meteo responded with ${res.status}`);
+            if (!res.ok) throw new Error(`Weather service responded with ${res.status}`);
             const data = await res.json();
             if (!data.current_weather) throw new Error('Missing current_weather block');
+            mergeModelArrays(data.daily);
+            mergeModelArrays(data.hourly);
 
             const payload = buildWeatherPayload(loc, data);
             payload.coverageKey = fp.coverageKey;
@@ -2820,6 +2999,157 @@
         }
         updateRental();      // a bundled forfait may change what the gear card shows / counts
         updateTripRollup();
+    }
+
+    // ---- PASS OPTIMIZER (winter regional ski passes) ----
+    // Compares buying a lift pass resort-by-resort (a day pass each ski day) against the cheapest
+    // legal bundle: the regional Alpes Vaudoises multi-day pass (Villars · Gryon · Les Diablerets ·
+    // Leysin · Les Mosses on one ticket), the cheaper VGD-local 1–2 day pass where it applies, and
+    // separate Glacier 3000 tickets (never inside the regional pass). Uses ONLY the stored official
+    // rates — nothing invented. Advisory: it does not alter the all-in total.
+    const OPT_REGIONAL = ['villars', 'gryon', 'diablerets', 'leysin'];   // on the Alpes Vaudoises card
+    const OPT_RESORTS  = ['villars', 'gryon', 'diablerets', 'leysin', 'glacier3000'];
+    const OPT_BANDS = ['adult', 'youthsenior', 'child'];
+    let optState = null;
+
+    function optTripLength() {
+        try {
+            const s = parseDate(document.getElementById('tripStart').value);
+            const e = parseDate(document.getElementById('tripEnd').value);
+            if (s && e && e >= s) return Math.min(15, Math.round((e - s) / 86400000) + 1);
+        } catch (_) {}
+        return 2;
+    }
+    function optDefaults() {
+        const days = { villars: 0, gryon: 0, diablerets: 0, leysin: 0, glacier3000: 0 };
+        const seed = OPT_RESORTS.includes(currentDestination) ? currentDestination : 'villars';
+        days[seed] = optTripLength();
+        return { days, group: { adult: Math.max(1, travellerCount()), youthsenior: 0, child: 0 } };
+    }
+    function optStep(kind, key, delta) {
+        if (!optState) optState = optDefaults();
+        if (kind === 'days') {
+            optState.days[key] = Math.max(0, Math.min(15, (optState.days[key] || 0) + delta));
+        } else {
+            const next = Math.max(0, Math.min(30, (optState.group[key] || 0) + delta));
+            const others = OPT_BANDS.filter(b => b !== key).reduce((s, b) => s + (optState.group[b] || 0), 0);
+            optState.group[key] = (next === 0 && others === 0) ? 1 : next;   // never leave an empty group
+        }
+        renderOptimizer();
+    }
+
+    const optPrices = () => PASS_SCHEMES.glacier3000.winter.prices;   // regional ladder d1..d15 + g1/g2
+    const optVgd    = () => PASS_SCHEMES.vgd.winter.prices;           // VGD-local d1/d2
+    function optSingleDay(resort, band) {
+        const P = optPrices();
+        if (resort === 'leysin')      return P.d1[band];             // no cheaper Leysin-only winter day
+        if (resort === 'glacier3000') return P.g1[band];
+        return optVgd().d1[band];    // villars / gryon / diablerets — VGD-local single day is cheapest
+    }
+    function optGlacierBest(days, band) {
+        if (days <= 0) return 0;
+        const P = optPrices();
+        const pairs = Math.floor(days / 2), one = days % 2;
+        return Math.min(days * P.g1[band], pairs * P.g2[band] + one * P.g1[band]);
+    }
+
+    function optCompute(st) {
+        const P = optPrices(), V = optVgd();
+        const rDays = OPT_REGIONAL.reduce((s, id) => s + (st.days[id] || 0), 0);
+        const gDays = st.days.glacier3000 || 0;
+        const hasLeysin = (st.days.leysin || 0) > 0;
+        const regN = Math.min(Math.max(rDays, 1), 15);
+        const visited = OPT_RESORTS.filter(id => (st.days[id] || 0) > 0);
+
+        // Decide the regional strategy once — product ordering is consistent across age bands.
+        let regionMode = 'none';        // 'av' | 'vgd' | 'daily' | 'none'
+        if (rDays > 0) {
+            const naiveA = OPT_REGIONAL.reduce((s, id) => s + (st.days[id] || 0) * optSingleDay(id, 'adult'), 0);
+            const avA = P['d' + regN].adult;
+            const vgdA = (!hasLeysin && rDays <= 2) ? V['d' + rDays].adult : Infinity;
+            const bundleA = Math.min(avA, vgdA);
+            regionMode = (bundleA <= naiveA) ? (vgdA < avA ? 'vgd' : 'av') : 'daily';
+        }
+
+        const per = {};
+        OPT_BANDS.forEach(b => {
+            const regionalNaive = OPT_REGIONAL.reduce((s, id) => s + (st.days[id] || 0) * optSingleDay(id, b), 0);
+            let regionalOpt = 0;
+            if (regionMode === 'av')         regionalOpt = P['d' + regN][b];
+            else if (regionMode === 'vgd')   regionalOpt = V['d' + rDays][b];
+            else if (regionMode === 'daily') regionalOpt = regionalNaive;
+            const gOpt = optGlacierBest(gDays, b);
+            per[b] = { naive: regionalNaive + gDays * P.g1[b], opt: regionalOpt + gOpt, regionalOpt, gOpt };
+        });
+
+        const sumBand = (fn) => OPT_BANDS.reduce((s, b) => s + (st.group[b] || 0) * fn(per[b]), 0);
+        const totalTravellers = OPT_BANDS.reduce((s, b) => s + (st.group[b] || 0), 0);
+        const groupNaive = sumBand(p => p.naive), groupOpt = sumBand(p => p.opt);
+        return {
+            rDays, gDays, regN, hasLeysin, visited, regionMode, totalTravellers,
+            groupNaive, groupOpt,
+            groupRegional: sumBand(p => p.regionalOpt), groupGlacier: sumBand(p => p.gOpt),
+            savings: Math.max(0, groupNaive - groupOpt)
+        };
+    }
+
+    function renderOptimizer() {
+        const wrap = document.getElementById('passOptimizer');
+        const body = document.getElementById('optBody');
+        if (!wrap || !body) return;
+        if (currentSeason !== 'WINTER') { wrap.style.display = 'none'; return; }
+        wrap.style.display = '';
+        if (!optState) optState = optDefaults();
+
+        const step = (kind, key, val) => `<div class="opt-step">
+                <button type="button" onclick="optStep('${kind}','${key}',-1)" aria-label="−">−</button>
+                <span class="opt-step-val">${val}</span>
+                <button type="button" onclick="optStep('${kind}','${key}',1)" aria-label="+">+</button>
+            </div>`;
+        const dayRow = (id) => `<div class="opt-row">
+                <span class="opt-row-lbl">${esc(RESORT_BY_ID[id].name)}${id === 'glacier3000' ? `<span class="opt-row-sub">${esc(t('opt.separate'))}</span>` : ''}</span>
+                ${step('days', id, optState.days[id] || 0)}</div>`;
+        const bandRow = (b) => `<div class="opt-row">
+                <span class="opt-row-lbl">${esc(catLabel(b))}</span>
+                ${step('group', b, optState.group[b] || 0)}</div>`;
+
+        const inputs = `<div class="opt-inputs">
+            <div class="opt-block-title">${esc(t('opt.daysHead'))}</div>
+            ${OPT_RESORTS.map(dayRow).join('')}
+            <div class="opt-block-title opt-sub-head">${esc(t('opt.groupHead'))}</div>
+            ${OPT_BANDS.map(bandRow).join('')}</div>`;
+
+        const R = optCompute(optState);
+        const dayTxt = (d) => t(d > 1 ? 'cost.days' : 'cost.day', { n: d });
+        let result;
+        if (R.rDays === 0 && R.gDays === 0) {
+            result = `<div class="opt-result"><div class="opt-empty">${esc(t('opt.empty'))}</div></div>`;
+        } else {
+            const lines = [];
+            if (R.rDays > 0) {
+                const name = R.regionMode === 'av'  ? t('opt.passAV',  { n: R.totalTravellers, days: dayTxt(R.regN) })
+                          : R.regionMode === 'vgd'  ? t('opt.passVGD', { n: R.totalTravellers, days: dayTxt(R.rDays) })
+                          :                           t('opt.passDaily', { n: R.rDays });
+                lines.push(`<div class="opt-line"><span class="opt-line-name">${esc(name)}</span><span class="opt-line-amt">CHF ${R.groupRegional}.-</span></div>`);
+            }
+            if (R.gDays > 0) {
+                lines.push(`<div class="opt-line"><span class="opt-line-name">${esc(t('opt.passGlacier', { n: R.totalTravellers, days: dayTxt(R.gDays) }))}</span><span class="opt-line-amt">CHF ${R.groupGlacier}.-</span></div>`);
+            }
+            const saveTop = R.savings > 0
+                ? `<div class="opt-save-lbl">${esc(t('opt.youSave'))}</div><div class="opt-save-amt">CHF ${R.savings}.-</div><div class="opt-save-sub">${esc(t('opt.vsDaily'))}</div>`
+                : `<div class="opt-save-lbl">${esc(t('opt.bestPlanLbl'))}</div><div class="opt-save-amt zero">CHF ${R.groupOpt}.-</div><div class="opt-save-sub">${esc(t('opt.alreadyBest'))}</div>`;
+            const vs = R.savings > 0 ? `<div class="opt-vs">${esc(t('opt.insteadOf'))} <s>CHF ${R.groupNaive}.-</s></div>` : '';
+            const regionalResorts = R.visited.filter(v => OPT_REGIONAL.includes(v));
+            const coverNote = (R.regionMode !== 'daily' && (R.hasLeysin || regionalResorts.length > 1))
+                ? `<div class="opt-note">${esc(t('opt.coverNote'))}</div>` : '';
+            result = `<div class="opt-result">
+                <div class="opt-save">${saveTop}</div>
+                <div class="opt-basket-title">${esc(t('opt.basket'))}</div>
+                ${lines.join('')}
+                <div class="opt-total"><span class="opt-total-lbl">${esc(t('opt.groupTotal', { n: R.totalTravellers }))}</span><span class="opt-total-amt">CHF ${R.groupOpt}.-</span></div>
+                ${vs}${coverNote}</div>`;
+        }
+        body.innerHTML = `<div class="opt-grid">${inputs}${result}</div>`;
     }
 
     // --- GEAR RENTAL ---
@@ -3462,6 +3792,7 @@
         calculateTariff();
         updateTripRollup();
         renderItinerary();
+        renderOptimizer();
         applyI18n();
         syncLangSeg();
         requestAnimationFrame(positionAllSegmented);
