@@ -187,70 +187,66 @@
             pointer-events: none;
         }
 
+        #heroTopo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+        .hero-veil {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background:
+                linear-gradient(90deg, rgba(9,13,19,0.84) 0%, rgba(9,13,19,0.34) 44%, rgba(9,13,19,0) 70%),
+                radial-gradient(125% 80% at 50% 46%, rgba(10,14,20,0) 42%, rgba(8,11,16,0.74) 100%);
+        }
         .hero-content {
             position: relative; z-index: 3; height: 100%;
             display: flex; flex-direction: column;
-            align-items: center; justify-content: flex-start;
-            padding-top: 13vh; text-align: center;
-            color: var(--ink); will-change: transform, opacity;
+            align-items: flex-start; justify-content: center;
+            width: 100%; max-width: 1200px; margin: 0 auto;
+            padding: 0 clamp(24px, 8vw, 120px); text-align: left;
+            color: #EAEEF3; will-change: transform, opacity;
         }
-        .swiss-flag {
-            position: relative; width: 30px; height: 30px;
-            background: var(--swiss-red); border-radius: 5px;
-            margin-bottom: 22px;
-            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
-            animation: rise-in 1.1s ease both;
+        .hero-brand {
+            font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase;
+            font-weight: 700; color: #DCE3EA; margin-bottom: clamp(28px, 6vh, 60px);
+            animation: rise-in 1.1s ease 0.05s both;
         }
-        .swiss-flag::before, .swiss-flag::after {
-            content: ''; position: absolute; background: #fff;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
+        .hero-rule {
+            width: 46px; height: 2px; background: #C8402F; margin-bottom: 26px;
+            animation: rise-in 1.1s ease 0.16s both;
         }
-        .swiss-flag::before { width: 20px; height: 6px; }
-        .swiss-flag::after  { width: 6px; height: 20px; }
-        .hero-content h1 {
-            margin: 0;
-            font-size: clamp(40px, 6.5vw, 72px);
-            letter-spacing: -2.5px; font-weight: 700;
-            animation: rise-in 1.1s ease 0.15s both;
+        .hero-head {
+            margin: 0; max-width: 15ch;
+            font-size: clamp(34px, 6vw, 68px); line-height: 1.02;
+            letter-spacing: -0.025em; font-weight: 700; color: #F3F6F9;
+            text-wrap: balance;
+            animation: rise-in 1.1s ease 0.28s both;
         }
-        .hero-content .tagline {
-            margin: 12px 0 0;
-            font-size: clamp(14px, 1.9vw, 18px);
-            font-weight: 500; color: var(--ink-2);
-            animation: rise-in 1.1s ease 0.3s both;
+        .hero-sub {
+            margin: 22px 0 0; max-width: 46ch;
+            font-size: clamp(14px, 1.7vw, 17px); line-height: 1.55; font-weight: 500;
+            color: #AEBBC8;
+            animation: rise-in 1.1s ease 0.42s both;
         }
-        .hero-content .sectors {
-            margin: 10px 0 0;
-            font-size: 11.5px; font-weight: 700;
-            letter-spacing: 2.8px; text-transform: uppercase;
-            color: var(--ink-3);
-            animation: rise-in 1.1s ease 0.45s both;
-        }
-        .hero-content .hero-proof {
-            margin: 18px 0 0;
-            font-size: clamp(11.5px, 1.35vw, 13px); font-weight: 600;
-            letter-spacing: 0.2px; color: var(--ink-2); opacity: 0.9;
-            animation: rise-in 1.1s ease 0.58s both;
+        .hero-region {
+            margin: 30px 0 0;
+            font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+            font-weight: 700; color: #8FA0B2;
+            animation: rise-in 1.1s ease 0.54s both;
         }
         .hero-cta {
-            width: auto; margin-top: 30px; padding: 15px 44px;
+            width: auto; margin-top: 34px; padding: 14px 34px;
             font-family: var(--font-display);
-            font-size: 15px; font-weight: 700; color: #fff;
-            background: var(--swiss-red);
-            border: none; border-radius: 3px; cursor: pointer;
-            box-shadow: 0 8px 26px rgba(235, 0, 0, 0.28);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-            animation: rise-in 1.1s ease 0.72s both;
+            font-size: 13.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+            color: #EAEEF3; background: transparent;
+            border: 1px solid rgba(200,64,46,0.85); border-radius: 2px; cursor: pointer;
+            transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+            animation: rise-in 1.1s ease 0.66s both;
         }
         .hero-cta:hover {
-            background: var(--swiss-red-hover);
+            background: #C8402F; border-color: #C8402F; color: #fff;
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(235, 0, 0, 0.36);
         }
         .scroll-indicator {
-            position: absolute; bottom: 26px; left: 50%;
+            position: absolute; bottom: 24px; left: 50%;
             transform: translateX(-50%); z-index: 3;
-            color: var(--swiss-red); font-size: 22px;
+            color: rgba(180,196,214,0.6); font-size: 20px;
             animation: bob 2.2s ease-in-out infinite;
             cursor: pointer; user-select: none;
         }
@@ -569,9 +565,8 @@
 
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
-            .flake, .cloud, .scroll-indicator, .swiss-flag,
-            .hero-content h1, .hero-content .tagline,
-            .hero-content .sectors, .hero-cta, .skeleton { animation: none !important; }
+            .scroll-indicator, .hero-brand, .hero-rule, .hero-head,
+            .hero-sub, .hero-region, .hero-cta, .skeleton { animation: none !important; }
             .reveal { opacity: 1; transform: none; transition: none; }
         }
     </style>
@@ -620,36 +615,12 @@
         }
 
         /* ---- Hero: alpenglow dusk ---- */
-        #hero {
-            background: linear-gradient(180deg,
-                #0B1122 0%, #131C31 26%, #202D46 46%, #34435C 64%, #63707E 80%, #AFB2B4 91%, var(--snow) 100%);
-        }
-        body.summer #hero {
-            background: linear-gradient(180deg,
-                #17233B 0%, #31445D 30%, #5C6979 54%, #949389 76%, #CDC7BD 90%, var(--snow) 100%);
-        }
-        .hero-sun { display: none; }
-        .hero-glow {
-            position: absolute; left: 50%; top: 44%;
-            width: min(720px, 88vw); height: 520px;
-            transform: translate(-50%, -50%); pointer-events: none; z-index: 0;
-            background: radial-gradient(closest-side, rgba(198,66,58,0.26) 0%, rgba(150,52,56,0.11) 44%, rgba(18,26,42,0) 72%);
-        }
-        .hero-snow { display: none; }
-        #mtnFg { height: 34%; }
-        #hero::after { height: 20vh; background: linear-gradient(180deg, transparent 0%, var(--snow) 96%); }
-
-        /* The mountain layers now carry their own alpenglow gradients (see hero SVG). */
-
-        /* Hero typography over the dark sky */
-        .hero-content { color: #E7ECF3; }
-        .hero-content h1 { color: #FFFFFF; text-shadow: 0 10px 48px rgba(6, 12, 26, 0.6); }
-        .hero-content .tagline { color: rgba(223, 230, 240, 0.94); text-shadow: 0 2px 22px rgba(6, 12, 26, 0.55); }
-        .hero-content .sectors { color: rgba(165, 182, 206, 0.82); }
-        .hero-content .hero-proof { color: rgba(205, 216, 232, 0.8); text-shadow: 0 2px 18px rgba(6, 12, 26, 0.5); }
-        .scroll-indicator { color: var(--gold); }
-        .hero-cta { box-shadow: 0 12px 34px rgba(235, 0, 0, 0.42); }
-        .hero-cta:hover { transform: translateY(-3px); box-shadow: 0 20px 48px rgba(235, 0, 0, 0.52); }
+        #hero { background: linear-gradient(158deg, #0B1017 0%, #0E141C 54%, #10161F 100%); }
+        body.summer #hero { background: linear-gradient(158deg, #0B1017 0%, #0E141C 54%, #10161F 100%); }
+        .hero-sun, .hero-glow, .hero-snow { display: none; }
+        /* Bottom fade blends the cartographic hero into the light dashboard below. */
+        #hero::after { height: 20vh; z-index: 2; background: linear-gradient(180deg, transparent 0%, var(--snow) 96%); }
+        .scroll-indicator { color: rgba(180,196,214,0.6); }
 
         /* ---- Working area: theme lives in background + accents, cards stay clean ---- */
         .section-title { color: var(--indigo); }
@@ -965,55 +936,16 @@
 
 <!-- ================= MATTERHORN LANDING ================= -->
 <section id="hero">
-    <video id="heroVideo" class="hero-video" autoplay muted loop playsinline></video>
-    <div class="hero-glow"></div>
-
-    <!-- Layered mountain silhouettes — flat, atmospheric, no facets -->
-    <div class="mtn-layer" id="mtnFar">
-        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-            <polygon fill="#465469" opacity="0.85" points="0,640 0,478 160,442 340,466 520,430 700,458 880,428 1070,462 1260,436 1440,458 1440,640"/>
-            <rect x="0" y="440" width="1440" height="200" fill="url(#baseHaze)" opacity="0.5"/>
-        </svg>
-    </div>
-
-    <div class="mtn-layer" id="mtnMid">
-        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-            <polygon fill="#38455B" points="0,640 0,516 210,452 430,500 650,436 870,498 1090,448 1310,500 1440,472 1440,640"/>
-            <rect x="0" y="470" width="1440" height="170" fill="url(#baseHaze)" opacity="0.45"/>
-        </svg>
-    </div>
-
-    <div class="mtn-layer" id="mtnMain">
-        <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-            <!-- Matterhorn massif — iconic asymmetric pyramid, shadow tone -->
-            <polygon fill="#232E44" points="0,640 0,590 260,566 500,516 620,452 686,320 706,232 716,206 740,258 768,346 828,432 980,498 1200,550 1440,584 1440,640"/>
-            <!-- lit east flank, one subtle tonal shift (no facets) -->
-            <polygon fill="#2B3750" points="716,206 740,258 768,346 828,432 980,498 1200,550 1440,584 1440,640 716,640"/>
-            <!-- summit snow, clean -->
-            <polygon fill="url(#capSnow)" points="700,266 716,206 740,258 723,286 710,262"/>
-            <polygon fill="url(#capSnow)" opacity="0.45" points="710,262 723,286 743,330 725,308"/>
-            <!-- red alpenglow catching the summit ridge (subtle) -->
-            <polygon fill="#C34A3E" opacity="0.32" points="716,206 736,250 729,254 716,222"/>
-            <!-- atmospheric haze at the base -->
-            <rect x="0" y="486" width="1440" height="154" fill="url(#baseHaze)"/>
-        </svg>
-    </div>
-
-    <div class="mtn-layer" id="mtnFg">
-        <svg viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-            <polygon fill="#101725" points="0,300 0,182 220,156 440,190 660,150 880,188 1100,152 1320,190 1440,168 1440,300"/>
-        </svg>
-    </div>
-
-    <div class="hero-snow" id="heroSnow"></div>
+    <canvas id="heroTopo" aria-hidden="true"></canvas>
+    <div class="hero-veil" aria-hidden="true"></div>
 
     <div class="hero-content" id="heroContent">
-        <div class="swiss-flag" aria-hidden="true"></div>
-        <h1>Sommio</h1>
-        <p class="tagline" data-i18n="hero.tagline">Le coût réel de votre séjour dans les Alpes vaudoises — train, forfaits et matériel, réunis en un seul prix.</p>
-        <p class="sectors">Villars · Gryon · Les Diablerets · Leysin · Glacier 3000</p>
-        <p class="hero-proof" data-i18n="hero.proof">Tarifs CFF en direct · barèmes officiels des exploitants · rien d’inventé</p>
-        <button class="hero-cta" data-i18n="hero.cta" onclick="enterDashboard()">Commencer l’expédition</button>
+        <div class="hero-brand">Sommio</div>
+        <div class="hero-rule" aria-hidden="true"></div>
+        <h1 class="hero-head" data-i18n="hero.head">Votre séjour, au franc près.</h1>
+        <p class="hero-sub" data-i18n="hero.sub">Train, forfaits et matériel dans les Alpes vaudoises — un seul prix, rien d’inventé.</p>
+        <div class="hero-region" data-i18n="hero.region">Alpes vaudoises</div>
+        <button class="hero-cta" data-i18n="hero.cta" onclick="enterDashboard()">Commencer</button>
     </div>
 
     <div class="scroll-indicator" onclick="enterDashboard()" data-i18n-title="hero.scroll" title="Aller au tableau de bord">▾</div>
@@ -1195,9 +1127,10 @@
     let LANG = 'fr';
     const I18N = {
         fr: {
-            'hero.tagline': 'Le coût réel de votre séjour dans les Alpes vaudoises — train, forfaits et matériel, réunis en un seul prix.',
-            'hero.proof': 'Tarifs CFF en direct · barèmes officiels des exploitants · rien d’inventé',
-            'hero.cta': 'Commencer l’expédition',
+            'hero.head': 'Votre séjour, au franc près.',
+            'hero.sub': 'Train, forfaits et matériel dans les Alpes vaudoises — un seul prix, rien d’inventé.',
+            'hero.region': 'Alpes vaudoises',
+            'hero.cta': 'Commencer',
             'hero.scroll': 'Aller au tableau de bord',
             'nav.perPerson': 'Par personne, tout compris',
             'season.winter': 'Hiver',
@@ -1222,9 +1155,10 @@
             'foot.sources': 'Météo : MeteoSwiss (modèle ICON-CH) via Open-Meteo · Tarifs : matrice CFF de démonstration'
         },
         en: {
-            'hero.tagline': 'The real cost of your Vaud Alps trip — rail, lift passes and gear, in one honest price.',
-            'hero.proof': 'Live SBB fares · real operator rate cards · nothing invented',
-            'hero.cta': 'Begin Expedition',
+            'hero.head': 'Your whole trip, to the last franc.',
+            'hero.sub': 'Rail, lift passes and gear across the Vaud Alps — one honest price, nothing invented.',
+            'hero.region': 'Vaud Alps',
+            'hero.cta': 'Get started',
             'hero.scroll': 'Scroll to dashboard',
             'nav.perPerson': 'Per person, all in',
             'season.winter': 'Winter',
@@ -1920,35 +1854,82 @@
         document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
     }
 
+    // Hero background: a swisstopo-style contour field drawn from value noise (marching squares).
+    function makeNoise(seed) {
+        let s = seed >>> 0; const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+        const perm = new Uint8Array(512), base = []; for (let i = 0; i < 256; i++) base[i] = i;
+        for (let i = 255; i > 0; i--) { const j = (rnd() * (i + 1)) | 0; const t = base[i]; base[i] = base[j]; base[j] = t; }
+        for (let i = 0; i < 512; i++) perm[i] = base[i & 255];
+        const fade = t => t * t * t * (t * (t * 6 - 15) + 10), lerp = (a, b, t) => a + (b - a) * t;
+        const grad = (h, x, y) => ((h & 1) ? x : -x) + ((h & 2) ? y : -y);
+        return (x, y) => {
+            const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, xf = x - Math.floor(x), yf = y - Math.floor(y);
+            const u = fade(xf), v = fade(yf);
+            const aa = perm[perm[X] + Y], ab = perm[perm[X] + Y + 1], ba = perm[perm[X + 1] + Y], bb = perm[perm[X + 1] + Y + 1];
+            const x1 = lerp(grad(aa, xf, yf), grad(ba, xf - 1, yf), u), x2 = lerp(grad(ab, xf, yf - 1), grad(bb, xf - 1, yf - 1), u);
+            return (lerp(x1, x2, v) + 1) / 2;
+        };
+    }
+    function drawHeroTopo() {
+        const cv = document.getElementById('heroTopo'); if (!cv) return;
+        const ctx = cv.getContext('2d'); if (!ctx) return;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const hero = document.getElementById('hero');
+        const de = document.documentElement;
+        const W = cv.clientWidth || (hero && hero.clientWidth) || window.innerWidth || de.clientWidth || 0;
+        const H = cv.clientHeight || (hero && hero.clientHeight) || window.innerHeight || de.clientHeight || 0;
+        if (W < 2 || H < 2) {   // layout not measured yet — retry a bounded number of times
+            drawHeroTopo._tries = (drawHeroTopo._tries || 0) + 1;
+            if (drawHeroTopo._tries < 120) requestAnimationFrame(drawHeroTopo);
+            return;
+        }
+        drawHeroTopo._tries = 0;
+        cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);   // transparent — the CSS gradient is the ground
+        const noise = makeNoise(20260806);
+        const fbm = (x, y) => { let a = 0, amp = 0.6, f = 1; for (let o = 0; o < 4; o++) { a += amp * noise(x * f, y * f); f *= 2; amp *= 0.5; } return a; };
+        const cell = 8, cols = Math.ceil(W / cell) + 1, rows = Math.ceil(H / cell) + 1;
+        const field = new Float32Array(cols * rows), sc = 0.0019;
+        for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) field[j * cols + i] = fbm(i * cell * sc, j * cell * sc);
+        const iso = (level) => {
+            ctx.beginPath();
+            for (let j = 0; j < rows - 1; j++) for (let i = 0; i < cols - 1; i++) {
+                const tl = field[j * cols + i], tr = field[j * cols + i + 1], br = field[(j + 1) * cols + i + 1], bl = field[(j + 1) * cols + i];
+                let c = 0; if (tl > level) c |= 8; if (tr > level) c |= 4; if (br > level) c |= 2; if (bl > level) c |= 1;
+                if (c === 0 || c === 15) continue;
+                const x = i * cell, y = j * cell;
+                const top = [x + cell * ((level - tl) / (tr - tl || 1e-6)), y], bot = [x + cell * ((level - bl) / (br - bl || 1e-6)), y + cell];
+                const lft = [x, y + cell * ((level - tl) / (bl - tl || 1e-6))], rgt = [x + cell, y + cell * ((level - tr) / (br - tr || 1e-6))];
+                const seg = (a, b) => { ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); };
+                switch (c) {
+                    case 1: case 14: seg(lft, bot); break; case 2: case 13: seg(bot, rgt); break;
+                    case 3: case 12: seg(lft, rgt); break; case 4: case 11: seg(top, rgt); break;
+                    case 6: case 9: seg(top, bot); break; case 7: case 8: seg(lft, top); break;
+                    case 5: seg(lft, top); seg(bot, rgt); break; case 10: seg(top, rgt); seg(lft, bot); break;
+                }
+            }
+            ctx.stroke();
+        };
+        let k = 0;
+        for (let lvl = 0.30; lvl <= 0.76; lvl += 0.045) {
+            const emph = (k % 3 === 0);
+            ctx.lineWidth = emph ? 1.2 : 0.8;
+            ctx.strokeStyle = emph ? 'rgba(176,196,216,0.24)' : 'rgba(150,170,192,0.12)';
+            iso(lvl); k++;
+        }
+        ctx.lineWidth = 1.3; ctx.strokeStyle = 'rgba(200,64,46,0.40)'; iso(0.615);   // one red index contour
+    }
+
     function initHero() {
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        if (!reducedMotion) {
-            const snow = document.getElementById('heroSnow');
-            for (let i = 0; i < 36; i++) {
-                const flake = document.createElement('span');
-                flake.className = 'flake';
-                const size = (Math.random() * 3 + 1.5).toFixed(1);
-                flake.style.cssText =
-                    `left:${(Math.random() * 100).toFixed(1)}%;width:${size}px;height:${size}px;` +
-                    `animation-duration:${(Math.random() * 10 + 9).toFixed(1)}s;` +
-                    `animation-delay:-${(Math.random() * 19).toFixed(1)}s;` +
-                    `opacity:${(Math.random() * 0.45 + 0.3).toFixed(2)}`;
-                snow.appendChild(flake);
-            }
-        }
-
-        // Optional video upgrade: drop `matterhorn.mp4` beside index.html
-        const video = document.getElementById('heroVideo');
-        video.addEventListener('canplay', () => document.getElementById('hero').classList.add('video-mode'));
-        video.src = 'matterhorn.mp4';
+        drawHeroTopo();
+        window.addEventListener('load', drawHeroTopo);   // redraw once fonts/layout are final
+        let resizeT;
+        window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(drawHeroTopo, 200); });
 
         const hero = document.getElementById('hero');
         const nav = document.getElementById('topNav');
-        const far = document.getElementById('mtnFar');
-        const mid = document.getElementById('mtnMid');
-        const main = document.getElementById('mtnMain');
-        const fg = document.getElementById('mtnFg');
         const content = document.getElementById('heroContent');
         let ticking = false;
         window.addEventListener('scroll', () => {
@@ -1958,12 +1939,8 @@
                 const y = window.scrollY;
                 nav.classList.toggle('visible', y > hero.offsetHeight * 0.72);
                 if (!reducedMotion) {
-                    far.style.transform = `translateY(${y * 0.06}px)`;
-                    mid.style.transform = `translateY(${y * 0.14}px)`;
-                    main.style.transform = `translateY(${y * 0.24}px)`;
-                    if (fg) fg.style.transform = `translateY(${y * 0.34}px)`;
-                    content.style.transform = `translateY(${y * 0.4}px)`;
-                    content.style.opacity = Math.max(0, 1 - y / 420);
+                    content.style.transform = `translateY(${y * 0.35}px)`;
+                    content.style.opacity = Math.max(0, 1 - y / 460);
                 }
                 ticking = false;
             });
@@ -2675,6 +2652,7 @@
 
     function addExpenseRow(item = {}) {
         const container = document.getElementById('expenseContainer');
+        if (!container) return;
         const div = document.createElement('div');
         div.className = 'expense-item';
 
